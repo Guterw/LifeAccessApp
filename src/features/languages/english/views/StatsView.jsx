@@ -108,7 +108,7 @@ function WordGroupViewer({ wordsList, onClose, title }) {
         {viewStep === 'CATEGORIES' && selectedLevel && Object.keys(groupedData[selectedLevel].categories).map(cat => {
           const wordsInCat = groupedData[selectedLevel].categories[cat].length;
           return (
-            <button key={cat} onClick={() => { setSelectedCategory(cat); setViewStep('WORDS'); }} className="w-full bg-gray-800 p-5 rounded-2xl border border-gray-700 flex justify-between items-center hover:border-blue-500 transition-all shadow-md ml-4 w-[calc(100%-1rem)]">
+            <button key={cat} onClick={() => { setSelectedCategory(cat); setViewStep('WORDS'); }} className=" bg-gray-800 p-5 rounded-2xl border border-gray-700 flex justify-between items-center hover:border-blue-500 transition-all shadow-md ml-4 w-[calc(100%-1rem)]">
               <div className="flex items-center gap-5">
                 <div className="p-3 bg-yellow-500/10 text-yellow-500 rounded-xl"><Bookmark size={24} /></div>
                 <div className="text-left">
