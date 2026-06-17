@@ -42,7 +42,7 @@ function App() {
   }
   
   return (
-    <HashRouter basename="/LifeAccessApp/">
+    <HashRouter>
       <div className="min-h-screen bg-gray-900 text-white font-sans selection:bg-blue-500/30">
         {/* O pb-24 garante que o conteúdo não fique escondido atrás da Bottom Bar */}
         <div className="max-w-md mx-auto w-full px-4 pb-28">
