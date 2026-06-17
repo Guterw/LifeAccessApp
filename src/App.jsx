@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+// import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { useState } from 'react';
+import { HashRouter, Routes, Route } from 'react-router-dom';
 //Notificação
 import { checkAllNotifications } from './utils/notificationService';
 // Importação do Componente
@@ -41,7 +42,7 @@ function App() {
   }
   
   return (
-    <BrowserRouter basename="LifeAccessApp">
+    <HashRouter basename="/LifeAccessApp/">
       <div className="min-h-screen bg-gray-900 text-white font-sans selection:bg-blue-500/30">
         {/* O pb-24 garante que o conteúdo não fique escondido atrás da Bottom Bar */}
         <div className="max-w-md mx-auto w-full px-4 pb-28">
@@ -69,7 +70,7 @@ function App() {
         {/* A barra de navegação fica fixa no fundo de todas as telas */}
         <BottomNav />
       </div>
-    </BrowserRouter>
+    </HashRouter>
   );
 }
 
