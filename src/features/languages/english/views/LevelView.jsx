@@ -29,8 +29,9 @@ export default function LevelView() {
   const [displayedStreak, setDisplayedStreak] = useState(0);
   const [numberPopped, setNumberPopped] = useState(false);
 
+  // Independente do idioma da interface, a palavra exibida é sempre em inglês,
+  // então a tradução esperada nunca pode ser a própria palavra em inglês.
   const currentValidAnswers = currentWord ? (
-    uiLang === 'en' ? [currentWord.en] : 
     (uiLang === 'es' && currentWord.es) ? currentWord.es : 
     currentWord.pt 
   ) : [];

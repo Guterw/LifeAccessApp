@@ -1,20 +1,34 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { User, Flame, Dumbbell, Receipt, CalendarCheck, Globe, Bell, Moon } from 'lucide-react';
 import { useLanguage } from '../../../contexts/LanguageContext';
 import BackButton from '../../../components/BackButton';
+import { db } from '../../../config/dexieDb';
 
 export default function SettingsView() {
   const { t, userName, uiLang, changeLanguage, languageStreak } = useLanguage();
   const today = new Intl.DateTimeFormat(uiLang, { dateStyle: 'full' }).format(new Date());
-  const [permission, setPermission] = useState(Notification.permission);
+  const [permission, setPermission] = useState(typeof Notification !== 'undefined' ? Notification.permission : 'default');
   const [notifLang, setNotifLang] = useState(true);
   const [notifTasks, setNotifTasks] = useState(true);
   const [notifFitness, setNotifFitness] = useState(false);
 
-  const requestNotificationPermission = async () => {
-    if (!("Notification" in window)) return false;
-    const permission = await Notification.requestPermission();
-    return permission === 'granted';
+  // Carrega as preferências de notificação salvas no Dexie ao abrir a tela
+  useEffect(() => {
+    const loadNotifPrefs = async () => {
+      const settings = await db.appSettings.get(1);
+      if (settings) {
+        setNotifLang(settings.notifLang ?? true);
+        setNotifTasks(settings.notifTasks ?? true);
+        setNotifFitness(settings.notifFitness ?? false);
+      }
+    };
+    loadNotifPrefs();
+  }, []);
+
+  // Atualiza o estado local e já persiste a escolha no banco
+  const handleToggleChange = async (key, setter, value) => {
+    setter(value);
+    await db.appSettings.update(1, { [key]: value });
   };
 
   // Componente auxiliar de Toggle para não poluir o JSX
@@ -129,15 +143,15 @@ export default function SettingsView() {
           <div className="space-y-3 pl-12">
             <label className="flex justify-between items-center text-sm text-gray-300">
               {t('notifications.language')}
-              <Toggle checked={notifLang} onChange={setNotifLang} />
+              <Toggle checked={notifLang} onChange={(val) => handleToggleChange('notifLang', setNotifLang, val)} />
             </label>
             <label className="flex justify-between items-center text-sm text-gray-300">
               {t('notifications.tasks')}
-              <Toggle checked={notifTasks} onChange={setNotifTasks} />
+              <Toggle checked={notifTasks} onChange={(val) => handleToggleChange('notifTasks', setNotifTasks, val)} />
             </label>
             <label className="flex justify-between items-center text-sm text-gray-300">
               {t('notifications.fitness')}
-              <Toggle checked={notifFitness} onChange={setNotifFitness} />
+              <Toggle checked={notifFitness} onChange={(val) => handleToggleChange('notifFitness', setNotifFitness, val)} />
             </label>
           </div>
         </div>

@@ -22,7 +22,7 @@ export const LanguageProvider = ({ children }) => {
         setLanguageStreak(settings.languageStreak || 0); // Puxa do DB
       } else {
         await db.appSettings.put({ 
-          id: 1, uiLang: 'pt', isFirstAccess: true, userName: '', languageStreak: 0 
+          id: 1, uiLanguage: 'pt', isFirstAccess: true, userName: '', languageStreak: 0 
         });
       }
       setIsLoading(false);
@@ -43,24 +43,6 @@ export const LanguageProvider = ({ children }) => {
     await db.appSettings.update(1, { isFirstAccess: false, userName: name });
   };
 
-  const requestNotificationPermission = async () => {
-    if (!("Notification" in window)) {
-      alert("Seu navegador não suporta notificações.");
-      return false;
-    }
-    const permission = await Notification.requestPermission();
-    return permission === 'granted';
-  };
-
-  const scheduleDailyReminder = () => {
-    // Lógica para agendar os dois momentos:
-    // 1. Lembrete durante o dia (se não fez atividade)
-    // 2. Lembrete 2h antes de acabar o dia (22h)
-    
-    // NOTA: Para rodar em background real, o ideal é um Service Worker.
-    // Para começar agora, criaremos um "Watcher" que verifica o estado no App.jsx.
-  };
-  
   // LÓGICA DE OFENSIVA (STREAK)
   const registerLanguageActivity = async () => {
     const settings = await db.appSettings.get(1);
@@ -104,12 +86,13 @@ export const LanguageProvider = ({ children }) => {
 
   // A função T() é quem vai traduzir os textos nas telas. 
   // Ex: t('home.greeting') -> "Bem-vindo,"
-  const t = (path) => {
+  // Aceita um segundo parâmetro opcional de fallback: t('chave', 'Texto padrão')
+  const t = (path, fallback) => {
     const keys = path.split('.');
     let current = translations[uiLang] || translations['pt'];
     
     for (const key of keys) {
-      if (current[key] === undefined) return path; // Se não achar a tradução, devolve a chave
+      if (current[key] === undefined) return fallback !== undefined ? fallback : path; // Se não achar a tradução, usa o fallback ou devolve a chave
       current = current[key];
     }
     return current;

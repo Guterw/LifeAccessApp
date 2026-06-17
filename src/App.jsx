@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { HashRouter, Routes, Route } from 'react-router-dom';
 //Notificação
 import { checkAllNotifications } from './utils/notificationService';
+import { db } from './config/dexieDb';
 // Importação do Componente
 import BottomNav from './components/BottomNav';
 // Importação das Views Principais
@@ -28,8 +29,9 @@ function App() {
   useEffect(() => {
   const interval = setInterval(async () => {
     const settings = await db.appSettings.get(1);
-    if (settings?.lastLanguageActivity) {
-      checkAndNotify(settings.lastLanguageActivity);
+    if (settings) {
+      // Tarefas e Fitness ainda não existem como módulos, então mandamos valores vazios por enquanto
+      checkAllNotifications(settings, [], {});
     }
   }, 1000 * 60 * 30); // Checa a cada 30 minutos
 

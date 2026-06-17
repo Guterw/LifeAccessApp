@@ -43,7 +43,7 @@ export default function BottomNav() {
         className={`flex flex-col items-center justify-center w-16 transition-colors ${isFitnessActive ? 'text-green-500' : 'text-gray-500 hover:text-gray-400'}`}
       >
         <Dumbbell size={24} />
-        <span className="text-[10px] font-bold mt-1">Fitness</span>
+        <span className="text-[10px] font-bold mt-1">{t('nav.fitness')}</span>
       </button>
 
       {/* Botão Home Central - Totalmente contido na barra, sem pular ou mudar de tamanho */}
@@ -64,7 +64,7 @@ export default function BottomNav() {
         className={`flex flex-col items-center justify-center w-16 transition-colors ${isFinanceActive ? 'text-red-400' : 'text-gray-500 hover:text-gray-400'}`}
       >
         <Wallet size={24} />
-        <span className="text-[10px] font-bold mt-1">Finanças</span>
+        <span className="text-[10px] font-bold mt-1">{t('nav.finance')}</span>
       </button>
 
       {/* Botão Tarefas */}
@@ -73,7 +73,7 @@ export default function BottomNav() {
         className={`flex flex-col items-center justify-center w-16 transition-colors ${isTasksActive ? 'text-purple-500' : 'text-gray-500 hover:text-gray-400'}`}
       >
         <Gamepad2 size={24} />
-        <span className="text-[10px] font-bold mt-1">Tarefas</span>
+        <span className="text-[10px] font-bold mt-1">{t('nav.tasks')}</span>
       </button>
 
     </div>

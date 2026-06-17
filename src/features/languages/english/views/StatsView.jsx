@@ -15,11 +15,6 @@ function WordGroupViewer({ wordsList, onClose, title }) {
   const [selectedLevel, setSelectedLevel] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState(null);
 
-  const safeT = (key, fallback) => {
-    const translation = t(key);
-    return translation === key ? fallback : translation;
-  };
-
   // Dicionário interno para traduzir as categorias que vêm do englishLevels.js
   const categoryTranslations = {
     'Pronomes': { en: 'Pronouns', es: 'Pronombres', pt: 'Pronomes' },
@@ -51,21 +46,16 @@ function WordGroupViewer({ wordsList, onClose, title }) {
 
   const groupedData = wordsList.reduce((acc, wordObj) => {
     const wordEn = typeof wordObj === 'string' ? wordObj : wordObj.word || wordObj.en;
-    let levelId = 'unknown';
-    let levelTitle = { pt: 'Outros', en: 'Others', es: 'Otros' };
-    let category = 'Geral';
-    let fullWordData = { en: wordEn, pt: ['Tradução indisponível'] };
 
-    for (const [key, levelData] of Object.entries(englishLevels)) {
-      const found = levelData.words.find(w => w.en === wordEn);
-      if (found) {
-        levelId = key;
-        levelTitle = levelData.title;
-        category = found.category || 'Geral';
-        fullWordData = found;
-        break;
-      }
-    }
+    // O level e a category já foram salvos no momento exato em que a palavra foi
+    // aprendida/errada (em LevelView.jsx), então usamos eles diretamente em vez de
+    // procurar a palavra do zero em englishLevels — isso evita atribuir a palavra
+    // ao primeiro nível em que ela aparece, quando ela se repete em vários níveis.
+    const levelId = (wordObj && wordObj.level !== undefined && wordObj.level !== null) ? wordObj.level : 'unknown';
+    const levelInfo = englishLevels[levelId];
+    const levelTitle = levelInfo ? levelInfo.title : { pt: 'Outros', en: 'Others', es: 'Otros' };
+    const category = (wordObj && wordObj.category) || 'Geral';
+    const fullWordData = (levelInfo && levelInfo.words.find(w => w.en === wordEn)) || { en: wordEn, pt: ['Tradução indisponível'] };
 
     if (!acc[levelId]) acc[levelId] = { title: levelTitle, categories: {} };
     if (!acc[levelId].categories[category]) acc[levelId].categories[category] = [];
@@ -107,7 +97,7 @@ function WordGroupViewer({ wordsList, onClose, title }) {
                 <div className="text-left">
                   <h4 className="font-bold text-white text-lg">{levelInfo.title[uiLang] || levelInfo.title.pt}</h4>
                   {/* TEXTO "PALAVRAS" AGORA TRADUZIDO */}
-                  <p className="text-sm text-gray-400">{totalWordsInLevel} {safeT('stats.words', 'palavras')}</p>
+                  <p className="text-sm text-gray-400">{totalWordsInLevel} {t('stats.words', 'palavras')}</p>
                 </div>
               </div>
               <ChevronRight className="text-gray-500" />
@@ -124,7 +114,7 @@ function WordGroupViewer({ wordsList, onClose, title }) {
                 <div className="text-left">
                   {/* CATEGORIA AGORA TRADUZIDA */}
                   <h4 className="font-bold text-white text-lg">{getTranslatedCategory(cat)}</h4>
-                  <p className="text-sm text-gray-400">{wordsInCat} {safeT('stats.words', 'palavras')}</p>
+                  <p className="text-sm text-gray-400">{wordsInCat} {t('stats.words', 'palavras')}</p>
                 </div>
               </div>
               <ChevronRight className="text-gray-500" />
@@ -144,7 +134,7 @@ function WordGroupViewer({ wordsList, onClose, title }) {
         ))}
         
         {Object.keys(groupedData).length === 0 && (
-          <div className="text-center text-gray-500 py-20 font-bold text-lg">{safeT('stats.noData', 'Nenhum dado encontrado.')}</div>
+          <div className="text-center text-gray-500 py-20 font-bold text-lg">{t('stats.noData', 'Nenhum dado encontrado.')}</div>
         )}
       </div>
     </div>
@@ -157,11 +147,6 @@ function WordGroupViewer({ wordsList, onClose, title }) {
 export default function StatsView() {
   const { t, languageStreak } = useLanguage();
   
-  const safeT = (key, fallback) => {
-    const translation = t(key);
-    return translation === key ? fallback : translation;
-  };
-  
   const learnedWords = useLiveQuery(() => db.learnedWords?.toArray() ?? [], []) || [];
   const wrongWords = useLiveQuery(() => db.mistakesLog?.toArray() ?? [], []) || [];
 
@@ -169,22 +154,22 @@ export default function StatsView() {
 
   return (
     <div className="w-full pt-8 animate-fade-in pb-24 px-4">
-      <BackButton to="/english" label={safeT('backToEnglish', 'Voltar')} />
+      <BackButton to="/english" label={t('backToEnglish', 'Voltar')} />
       
       <h2 className="text-3xl font-black text-white mt-6 mb-8 tracking-wide">
-        {safeT('stats.title', 'Meu Progresso')}
+        {t('stats.title', 'Meu Progresso')}
       </h2>
 
       <div className="grid grid-cols-2 gap-4 mb-4">
         <div className="bg-gray-800 p-5 rounded-2xl border border-gray-700 shadow-md">
           <Trophy className="text-yellow-500 mb-2" size={28} />
-          <h4 className="text-gray-400 text-xs font-bold uppercase tracking-wider">{safeT('stats.streak', 'Ofensiva')}</h4>
+          <h4 className="text-gray-400 text-xs font-bold uppercase tracking-wider">{t('stats.streak', 'Ofensiva')}</h4>
           <p className="text-2xl font-black text-white mt-1">{languageStreak} dias</p>
         </div>
         
         <div className="bg-gray-800 p-5 rounded-2xl border border-gray-700 shadow-md">
           <BookOpen className="text-green-500 mb-2" size={28} />
-          <h4 className="text-gray-400 text-xs font-bold uppercase tracking-wider">{safeT('stats.learned', 'Vocabulário')}</h4>
+          <h4 className="text-gray-400 text-xs font-bold uppercase tracking-wider">{t('stats.learned', 'Vocabulário')}</h4>
           <p className="text-2xl font-black text-white mt-1">{learnedWords.length}</p>
         </div>
       </div>
@@ -192,13 +177,13 @@ export default function StatsView() {
       <div className="bg-gray-800 p-5 rounded-2xl border border-gray-700 shadow-md mb-8 flex items-center gap-5">
         <AlertTriangle className="text-red-400" size={32} />
         <div>
-          <h4 className="text-gray-400 text-xs font-bold uppercase tracking-wider">{safeT('stats.errors', 'Erros Recentes')}</h4>
-          <p className="text-xl font-black text-white mt-0.5">{wrongWords.length} {safeT('stats.words', 'palavras')}</p>
+          <h4 className="text-gray-400 text-xs font-bold uppercase tracking-wider">{t('stats.errors', 'Erros Recentes')}</h4>
+          <p className="text-xl font-black text-white mt-0.5">{wrongWords.length} {t('stats.words', 'palavras')}</p>
         </div>
       </div>
 
       <h3 className="font-bold text-gray-400 mb-4 uppercase tracking-wider text-sm">
-        {safeT('stats.exploreWords', 'Explorar Palavras')}
+        {t('stats.exploreWords', 'Explorar Palavras')}
       </h3>
       
       <div className="space-y-4">
@@ -209,8 +194,8 @@ export default function StatsView() {
           <div className="flex items-center gap-5">
             <div className="p-3 bg-green-500/20 text-green-400 rounded-xl"><BookOpen size={24} /></div>
             <div className="text-left">
-              <h4 className="font-bold text-white text-lg">{safeT('stats.learnedWords', 'Palavras Aprendidas')}</h4>
-              <p className="text-sm text-gray-400">{safeT('stats.learnedDesc', 'Ver vocabulário dominado')}</p>
+              <h4 className="font-bold text-white text-lg">{t('stats.learnedWords', 'Palavras Aprendidas')}</h4>
+              <p className="text-sm text-gray-400">{t('stats.learnedDesc', 'Ver vocabulário dominado')}</p>
             </div>
           </div>
           <ChevronRight className="text-gray-500" />
@@ -223,8 +208,8 @@ export default function StatsView() {
           <div className="flex items-center gap-5">
             <div className="p-3 bg-red-500/20 text-red-400 rounded-xl"><AlertTriangle size={24} /></div>
             <div className="text-left">
-              <h4 className="font-bold text-white text-lg">{safeT('stats.reviewWords', 'Palavras a Revisar')}</h4>
-              <p className="text-sm text-gray-400">{safeT('stats.reviewDesc', 'Ver erros recentes')}</p>
+              <h4 className="font-bold text-white text-lg">{t('stats.reviewWords', 'Palavras a Revisar')}</h4>
+              <p className="text-sm text-gray-400">{t('stats.reviewDesc', 'Ver erros recentes')}</p>
             </div>
           </div>
           <ChevronRight className="text-gray-500" />
@@ -234,7 +219,7 @@ export default function StatsView() {
       {modalType && (
         <WordGroupViewer 
           wordsList={modalType === 'learned' ? learnedWords : wrongWords}
-          title={modalType === 'learned' ? safeT('stats.learnedWords', 'Vocabulário Dominado') : safeT('stats.reviewWords', 'Palavras para Revisão')}
+          title={modalType === 'learned' ? t('stats.learnedWords', 'Vocabulário Dominado') : t('stats.reviewWords', 'Palavras para Revisão')}
           onClose={() => setModalType(null)} 
         />
       )}
