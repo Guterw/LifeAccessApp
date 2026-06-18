@@ -27,16 +27,8 @@ body {
 }
 
 /* Trava o scroll elástico no iOS/Safari */
-html, body, #root {
-  width: 100%;
-  height: 100%;
-  
+html, body {
   /* Mata o efeito de "puxar" a tela que revela o fundo/barras do Safari */
   overscroll-behavior-y: none; 
-  
-  /* Impede que o corpo do site role. O scroll só vai acontecer onde VOCÊ colocar overflow-y-auto */
-  overflow: hidden; 
-  
-  /* Evita seleção de texto acidental ao tentar rolar a tela */
-  -webkit-tap-highlight-color: transparent;
+
 }

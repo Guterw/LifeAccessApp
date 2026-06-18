@@ -4,10 +4,12 @@ import BackButton from '../../../../../components/BackButton';
 import { Send, Bot, MessageSquare, AlertCircle, Trash2 } from 'lucide-react';
 import { generateCloudResponse } from '../../../../../services/aiService';
 import FooterBrand from '../../../../../components/FooterBrand';
+import { useKeyboardOpen } from '../../../../../hooks/useKeyboardOpen';
 
 export default function AiChatFreeView() {
   const { t } = useLanguage();
-  
+  const isKeyboardOpen = useKeyboardOpen();
+
   const [messages, setMessages] = useState(() => {
     const saved = localStorage.getItem('chatHistory');
     return saved ? JSON.parse(saved) : [{ 
@@ -64,8 +66,18 @@ export default function AiChatFreeView() {
     }
   };
 
+  useEffect(() => {
+    // Ao entrar na tela: trava o body
+    document.body.style.overflow = 'hidden';
+    
+    // Ao sair da tela (desmontar componente): destrava o body para o resto do app
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, []);
+
   return (
-    <div className="fixed inset-x-0 top-0 bottom-[80px] flex flex-col bg-gray-950 z-10 animate-fade-in">
+    <div className={`fixed inset-x-0 top-0 flex flex-col bg-gray-950 z-10 animate-fade-in transition-all duration-200 ${isKeyboardOpen ? 'bottom-0' : 'bottom-[80px]'}`}>
       
       {/* HEADER */}
       <div className="shrink-0 h-16 w-full bg-gray-900 border-b border-gray-800 z-20 flex items-center justify-between px-2 sm:px-4 shadow-lg">

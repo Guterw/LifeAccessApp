@@ -2,12 +2,14 @@ import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Home, Globe, Dumbbell, Wallet, Gamepad2 } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useKeyboardOpen } from '../hooks/useKeyboardOpen';
 
 export default function BottomNav() {
   const location = useLocation();
   const navigate = useNavigate();
   const { t } = useLanguage();
   const currentPath = location.pathname;
+  const isKeyboardOpen = useKeyboardOpen();
 
   // Lógica corrigida e mais abrangente (usa includes para garantir que pegue a rota certa)
   const isLanguageActive = 
@@ -26,8 +28,8 @@ export default function BottomNav() {
 
   return (
     // h-20 e items-center garantem que TODOS os botões fiquem alinhados no exato meio vertical da barra
-    <div className="fixed bottom-0 left-0 w-full bg-gray-900 border-t border-gray-800 pb-safe h-20 px-4 flex justify-between items-center z-50">
-      
+    <div className={`fixed bottom-0 left-0 w-full bg-gray-900 border-t border-gray-800 pb-safe h-20 px-4 flex justify-between items-center z-50 transition-transform duration-200 ${isKeyboardOpen ? 'translate-y-full' : 'translate-y-0'}`}>
+            
       {/* Botão Idiomas */}
       <button 
         onClick={() => navigate('/languages')} 
