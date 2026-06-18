@@ -129,7 +129,7 @@ export default function AiChatFreeView() {
       <div className="shrink-0 bg-gray-900 border-t border-gray-800 p-3 sm:p-4">
         {/* FOOTER DA MARCA (Centralizado e fixo acima do input) */}
       <div className="shrink-0 -mt-5">
-        <FooterBrand direction="flex-row" textSize="text-xs" textColor="text-white-400" />
+        <FooterBrand direction="flex-row" textSize="text-[11px]" textColor="text-white-400" />
       </div>
         <form onSubmit={handleSendMessage} className="flex items-end gap-2 w-full max-w-4xl mx-auto">
           <div className="flex-1 bg-gray-800 border border-gray-700 rounded-2xl">
