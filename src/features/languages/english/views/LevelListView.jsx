@@ -4,6 +4,7 @@ import { englishLevels } from '../../../../data/englishLevels';
 import { ChevronRight, Layers } from 'lucide-react';
 import { useLanguage } from '../../../../contexts/LanguageContext';
 import BackButton from '../../../../components/BackButton';
+import FooterBrand from '../../../../components/FooterBrand';
 
 export default function LevelListView() {
   const { t, uiLang } = useLanguage();
@@ -20,10 +21,10 @@ export default function LevelListView() {
 }, {});
 
   return (
-    <div className="w-full pt-8 animate-fade-in pb-24 px-4">
+    <div className="w-full pt-8 animate-fade-in pb-24 px-4 -mb-20 -mt-5">
       <BackButton to="/english" label={t('backToEnglish')} />
       
-      <h2 className="text-2xl font-bold text-blue-400 mb-6">{t('levelList.title')}</h2>
+      <h2 className="text-2xl font-bold text-blue-400 mb-6 -mt-5">{t('levelList.title')}</h2>
       
       <div className="space-y-4">
         {Object.entries(groups).map(([groupName, levels]) => (
@@ -45,6 +46,11 @@ export default function LevelListView() {
           </button>
         ))}
       </div>
+            {/* FOOTER DA MARCA (Centralizado e fixo acima do input) */}
+            <div className="shrink-0 mt-4">
+                <FooterBrand direction="flex-col" textSize="text-xs" textColor="text-white-400" />
+            </div>
+            <div className="-mb-8"></div>
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useLanguage } from '../../../contexts/LanguageContext';
 import { User, ArrowRight } from 'lucide-react';
+import FooterBrand from '../../../components/FooterBrand';
 
 export default function NameView() {
   const { finishOnboarding, t } = useLanguage();
@@ -25,7 +26,7 @@ export default function NameView() {
         <p className="text-gray-400 max-w-xs mx-auto">{t('nameSubtitle')}</p>
       </div>
 
-      <form onSubmit={handleSubmit} className="w-full max-w-sm space-y-6">
+      <form onSubmit={handleSubmit} className="w-full max-w-sm space-y-6 mb-6">
         <input
           type="text"
           autoFocus
@@ -44,6 +45,7 @@ export default function NameView() {
           <ArrowRight size={24} />
         </button>
       </form>
+        <FooterBrand direction="flex-col" textSize="text-xs" textColor="text-white-500" />
     </div>
   );
 }

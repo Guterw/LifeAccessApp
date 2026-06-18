@@ -3,6 +3,7 @@ import { User, Flame, Dumbbell, Receipt, CalendarCheck, Globe, Bell, Moon } from
 import { useLanguage } from '../../../contexts/LanguageContext';
 import BackButton from '../../../components/BackButton';
 import { db } from '../../../config/dexieDb';
+import FooterBrand from '../../../components/FooterBrand';
 
 export default function SettingsView() {
   const { t, userName, uiLang, changeLanguage, languageStreak } = useLanguage();
@@ -53,10 +54,10 @@ export default function SettingsView() {
   };
 
   return (
-    <div className="w-full pt-8 animate-fade-in pb-20 px-4">
+    <div className="w-full pt-8 animate-fade-in pb-20 px-4 -mb-20 -mt-5">
       <BackButton to="/" label={t('backToHome')} />
 
-      <h2 className="text-3xl font-black text-white mb-6 tracking-wide">{t('settings.title')}</h2>
+      <h2 className="text-3xl font-black text-white -mt-4 mb-6 tracking-wide">{t('settings.title')}</h2>
 
       {/* Seção de Perfil (Mantida igual) */}
       <div className="bg-gray-800 p-6 rounded-3xl border border-gray-700 flex items-center gap-5 shadow-lg mb-8">
@@ -110,10 +111,10 @@ export default function SettingsView() {
             <span className="font-bold text-white">{t('settings.language')}</span>
           </div>
           <select 
-  value={uiLang} 
-  onChange={(e) => changeLanguage(e.target.value)}
-  className="bg-gray-900 text-white p-2 rounded-lg border border-gray-600 text-sm"
->
+            value={uiLang} 
+            onChange={(e) => changeLanguage(e.target.value)}
+            className="bg-gray-900 text-white p-2 rounded-lg border border-gray-600 text-sm"
+          >
             <option value="pt">Português</option>
             <option value="en">English</option>
             <option value="es">Español</option>
@@ -165,6 +166,11 @@ export default function SettingsView() {
           <Toggle checked={true} onChange={() => {}} />
         </div>
       </div>
+      {/* FOOTER DA MARCA (Centralizado e fixo acima do input) */}
+      <div className="shrink-0 mt-4">
+          <FooterBrand direction="flex-col" textSize="text-xs" textColor="text-white-400" />
+      </div>
+      <div className="-mb-3"></div>
     </div>
   );
 }

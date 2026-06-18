@@ -5,6 +5,7 @@ import { useLanguage } from '../../../../contexts/LanguageContext';
 import BackButton from '../../../../components/BackButton';
 import { Trophy, BookOpen, AlertTriangle, ChevronRight, ArrowLeft, Library, Bookmark } from 'lucide-react';
 import { englishLevels } from '../../../../data/englishLevels';
+import FooterBrand from '../../../../components/FooterBrand';
 
 // ==========================================
 // TELA FULLSCREEN DE EXPLORAÇÃO
@@ -164,10 +165,10 @@ export default function StatsView() {
   const [modalType, setModalType] = useState(null); 
 
   return (
-    <div className="w-full pt-8 animate-fade-in pb-24 px-4">
+    <div className="w-full pt-8 animate-fade-in pb-24 px-4 -mt-5 -mb-20">
       <BackButton to="/english" label={t('backToEnglish', 'Voltar')} />
       
-      <h2 className="text-3xl font-black text-white mt-6 mb-8 tracking-wide">
+      <h2 className="text-3xl font-black text-white mb-6 tracking-wide -mt-5">
         {t('stats.title', 'Meu Progresso')}
       </h2>
 
@@ -234,6 +235,11 @@ export default function StatsView() {
           onClose={() => setModalType(null)} 
         />
       )}
+      {/* FOOTER DA MARCA (Centralizado e fixo acima do input) */}
+      <div className="shrink-0 mt-4">
+        <FooterBrand direction="flex-col" textSize="text-xs" textColor="text-white-400" />
+      </div>
+      <div className="-mb-8"></div>
     </div>
   );
 }

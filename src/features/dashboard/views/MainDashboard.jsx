@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Globe, Dumbbell, Wallet, Gamepad2, Settings, Flame } from 'lucide-react';
 import { useLanguage } from '../../../contexts/LanguageContext';
 import ModuleCard from '../../../components/ModuleCard';
+import FooterBrand from '../../../components/FooterBrand';
 
 export default function MainDashboard() {
   const navigate = useNavigate();
@@ -29,7 +30,7 @@ export default function MainDashboard() {
     // Removido qualquer padding lateral da div pai
     // pt-12 garante o respiro no topo, pb-24 respiro na base
     // relative + overflow-hidden contém os glows de fundo dentro da largura do app
-    <div className="w-full min-h-screen relative overflow-hidden pt-12 pb-24 animate-fade-in">
+    <div className="w-full min-h-screen relative overflow-hidden pt-12 pb-24 animate-fade-in -mt-5 -mb-20">
 
       {/* Glows ambiente: só pra tirar o aspecto "chapado" do fundo, sutil de propósito */}
       <div className="absolute -top-24 -right-16 w-72 h-72 bg-blue-600/20 rounded-full blur-3xl pointer-events-none -z-10"></div>
@@ -99,6 +100,9 @@ export default function MainDashboard() {
           customBgClass="bg-gray-800/40 border border-gray-700/40"
           iconBgClass="bg-purple-500/10 text-purple-400"
         />
+      </div>
+      <div className="shrink-0 mt-3 -mb-4">
+        <FooterBrand direction="flex-col" textSize="text-xs" textColor="text-white-500" />
       </div>
     </div>
   );

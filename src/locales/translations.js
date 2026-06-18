@@ -105,7 +105,42 @@ export const translations = {
     language: "Lembretes de Idiomas",
     tasks: "Tarefas e Agenda",
     fitness: "Fitness"
-  }
+  },
+  ai: {
+      teacherTitle: 'Professor IA',
+      teacherDesc: 'Conversação por chat e voz',
+      hubTitlePre: 'Central',
+      hubSubtitle: 'Aprimore sua fluência operacional por meio de inteligência artificial localizada.',
+      chatFreeTitle: 'Chat Livre',
+      chatFreeDesc: 'Reading & Writing • Prática Aberta',
+      chatTasksTitle: 'Tarefas por Chat',
+      chatTasksDesc: 'Reading and Writing (Cenários)',
+      voiceFreeTitle: 'Treino de Voz',
+      voiceFreeDesc: 'Speaking and Listening',
+      voiceTasksTitle: 'Tarefas por Voz',
+      voiceTasksDesc: 'Speaking and Listening (Cenários)',
+      installed: 'IA Instalada',
+      removeTitle: 'Remover IA?',
+      removeDesc: 'Isso apagará o motor da IA do seu dispositivo (liberando espaço) e removerá o histórico local. Você precisará baixar novamente se quiser usar.',
+      removeBtn: 'Sim, Remover',
+      uninstalling: 'Desinstalando...',
+      cleaningCache: 'Limpando CacheStorage...',
+      online: 'Online',
+      permissionTitle: 'Motor de IA Necessário',
+      permissionDesc: 'Para utilizar a conversação inteligente de forma ilimitada, segura e offline, precisamos baixar o motor de Inteligência Artificial para o seu dispositivo (Aprox. 800MB).',
+      permissionNote: 'Isso será feito apenas uma vez. Depois, o processamento será instantâneo.',
+      allowDownload: 'Permitir e Baixar',
+      installing: 'Instalando IA...',
+      connectingGPU: 'Conectando ao WebGPU...',
+      typeMessage: 'Digite sua mensagem...',
+      
+      // MANTIDOS EM INGLÊS PROPOSITALMENTE (Configurações do Robô)
+      initialGreeting: "Hello! I'm your English AI Teacher. How are you doing today? We can talk about anything you want!",
+      systemPromptFree: "You are a friendly and supportive English teacher. Speak naturally, keep answers conversational and clear, and gently correct any major grammar mistakes at the end of your response.",
+      errorMessage: "Sorry, I had an internal processing error. Could you try again?"
+    },
+    backToEnglish: 'Voltar',
+    cancel: 'Cancelar',
   },
   
   en: {
@@ -214,7 +249,42 @@ export const translations = {
     language: "Language Reminder",
     tasks: "Agenda and Tasks",
     fitness: "Fitness"
-    }
+    },
+    ai: {
+      teacherTitle: 'AI Teacher',
+      teacherDesc: 'Chat and voice conversation',
+      hubTitlePre: 'Central',
+      hubSubtitle: 'Improve your operational fluency through localized artificial intelligence.',
+      chatFreeTitle: 'Free Chat',
+      chatFreeDesc: 'Reading & Writing • Open Practice',
+      chatTasksTitle: 'Chat Tasks',
+      chatTasksDesc: 'Reading and Writing (Scenarios)',
+      voiceFreeTitle: 'Voice Training',
+      voiceFreeDesc: 'Speaking and Listening',
+      voiceTasksTitle: 'Voice Tasks',
+      voiceTasksDesc: 'Speaking and Listening (Scenarios)',
+      installed: 'AI Installed',
+      removeTitle: 'Remove AI?',
+      removeDesc: 'This will delete the AI engine from your device (freeing up space) and remove the local history. You will need to download it again if you want to use it.',
+      removeBtn: 'Yes, Remove',
+      uninstalling: 'Uninstalling...',
+      cleaningCache: 'Clearing CacheStorage...',
+      online: 'Online',
+      permissionTitle: 'AI Engine Required',
+      permissionDesc: 'To use smart conversation unlimitedly, safely, and offline, we need to download the Artificial Intelligence engine to your device (Approx. 800MB).',
+      permissionNote: 'This will only be done once. Afterwards, processing will be instant.',
+      allowDownload: 'Allow and Download',
+      installing: 'Installing AI...',
+      connectingGPU: 'Connecting to WebGPU...',
+      typeMessage: 'Type your message...',
+      
+      // MANTIDOS EM INGLÊS PROPOSITALMENTE (Configurações do Robô)
+      initialGreeting: "Hello! I'm your English AI Teacher. How are you doing today? We can talk about anything you want!",
+      systemPromptFree: "You are a friendly and supportive English teacher. Speak naturally, keep answers conversational and clear, and gently correct any major grammar mistakes at the end of your response.",
+      errorMessage: "Sorry, I had an internal processing error. Could you try again?"
+    },
+    backToEnglish: 'Back',
+    cancel: 'Cancel',
   },
 
   es: {
@@ -323,6 +393,41 @@ export const translations = {
     language: "Recordatorio de idioma",
     tasks: "Agenda y Tareas",
     fitness: "Fitness"
-    }
+    },
+    ai: {
+      teacherTitle: 'Profesor IA',
+      teacherDesc: 'Conversación por chat y voz',
+      hubTitlePre: 'Central',
+      hubSubtitle: 'Mejora tu fluidez operativa a través de inteligencia artificial localizada.',
+      chatFreeTitle: 'Chat Libre',
+      chatFreeDesc: 'Reading & Writing • Práctica Abierta',
+      chatTasksTitle: 'Tareas por Chat',
+      chatTasksDesc: 'Reading and Writing (Escenarios)',
+      voiceFreeTitle: 'Entrenamiento de Voz',
+      voiceFreeDesc: 'Speaking and Listening',
+      voiceTasksTitle: 'Tareas por Voz',
+      voiceTasksDesc: 'Speaking and Listening (Escenarios)',
+      installed: 'IA Instalada',
+      removeTitle: '¿Eliminar IA?',
+      removeDesc: 'Esto borrará el motor de IA de tu dispositivo (liberando espacio) y eliminará el historial local. Tendrás que descargarlo de nuevo si quieres usarlo.',
+      removeBtn: 'Sí, Eliminar',
+      uninstalling: 'Desinstalando...',
+      cleaningCache: 'Limpiando CacheStorage...',
+      online: 'En línea',
+      permissionTitle: 'Motor de IA Requerido',
+      permissionDesc: 'Para utilizar la conversación inteligente de forma ilimitada, segura y sin conexión, necesitamos descargar el motor de Inteligencia Artificial en tu dispositivo (Aprox. 800MB).',
+      permissionNote: 'Esto se hará solo una vez. Después, el procesamiento será instantáneo.',
+      allowDownload: 'Permitir y Descargar',
+      installing: 'Instalando IA...',
+      connectingGPU: 'Conectando a WebGPU...',
+      typeMessage: 'Escribe tu mensaje...',
+      
+      // MANTIDOS EM INGLÊS PROPOSITALMENTE (Configurações do Robô)
+      initialGreeting: "Hello! I'm your English AI Teacher. How are you doing today? We can talk about anything you want!",
+      systemPromptFree: "You are a friendly and supportive English teacher. Speak naturally, keep answers conversational and clear, and gently correct any major grammar mistakes at the end of your response.",
+      errorMessage: "Sorry, I had an internal processing error. Could you try again?"
+    },
+    backToEnglish: 'Volver',
+    cancel: 'Cancelar',
   }
 };

@@ -20,6 +20,8 @@ import LevelListView from './features/languages/english/views/LevelListView';
 import LevelView from './features/languages/english/views/LevelView';
 import StatsView from './features/languages/english/views/StatsView';
 import LevelGroupView from './features/languages/english/views/LevelGroupView';
+import AiHubView from './features/languages/english/views/AiHubView';
+import AiChatFreeView from './features/languages/english/views/ai-chat/AiChatFreeView';
 
 function App() {
   const { isFirstAccess } = useLanguage();
@@ -61,6 +63,8 @@ function App() {
             <Route path="/levels/group/:groupName" element={<LevelGroupView />} />
             <Route path="/level/:id" element={<LevelView />} />
             <Route path="/english/stats" element={<StatsView />} />
+            <Route path="/english/ai-hub" element={<AiHubView />} />
+            <Route path="/english/ai-chat/free" element={<AiChatFreeView />} />
             
             {/* Rotas futuras (deixamos cegas por enquanto para não dar erro se clicar na Bottom Bar) */}
             <Route path="/fitness" element={<div className="pt-8 text-center text-gray-400">Em breve</div>} />

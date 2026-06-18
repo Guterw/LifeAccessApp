@@ -4,6 +4,7 @@ import { ChevronRight, Lock } from 'lucide-react';
 import { useLanguage } from '../../../contexts/LanguageContext';
 import BackButton from '../../../components/BackButton';
 import FlagIcon from '../../../components/FlagIcon';
+import FooterBrand from '../../../components/FooterBrand';
 
 export default function LanguagesDashboard() {
   const navigate = useNavigate();
@@ -17,10 +18,10 @@ export default function LanguagesDashboard() {
   ];
 
   return (
-    <div className="w-full pt-8 animate-fade-in">
+    <div className="w-full pt-8 animate-fade-in -mt-5">
       <BackButton to="/" label={t('backToHome')} />
 
-      <div className="mb-8 text-center">
+      <div className="mb-8 text-center -mt-5">
         <h2 className="text-3xl font-black text-blue-400 mb-2 tracking-tight">{t('languages.title')}</h2>
         <p className="text-gray-400 text-sm">{t('languages.subtitle')}</p>
       </div>
@@ -55,6 +56,9 @@ export default function LanguagesDashboard() {
             {lang.active ? <ChevronRight className="text-blue-400" size={24} /> : <Lock className="text-gray-600" size={20} />}
           </button>
         ))}
+      </div>
+      <div className="shrink-0 mt-3 -mb-4">
+        <FooterBrand direction="flex-col" textSize="text-xs" textColor="text-white-400" />
       </div>
     </div>
   );

@@ -6,6 +6,7 @@ import BackButton from '../../../../components/BackButton';
 import { Play, CheckCircle2 } from 'lucide-react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../../../../config/dexieDb';
+import FooterBrand from '../../../../components/FooterBrand';
 
 export default function LevelGroupView() {
   const { groupName } = useParams();
@@ -27,9 +28,9 @@ export default function LevelGroupView() {
   });
 
   return (
-    <div className="w-full pt-8 animate-fade-in pb-24 px-4">
+    <div className="w-full pt-8 animate-fade-in pb-24 px-4 -mb-20 -mt-5">
       <BackButton to="/levels" label={t('backToEnglish', 'Voltar')} />
-      <h2 className="text-3xl font-black text-white mt-6 mb-8 tracking-wide">Nível {groupName}</h2>
+      <h2 className="text-3xl font-black text-white -mt-5 mb-6 tracking-wide">Nível {groupName}</h2>
 
       <div className="space-y-4">
         {levelsInGroup.map((level) => {
@@ -78,6 +79,11 @@ export default function LevelGroupView() {
           );
         })}
       </div>
+      {/* FOOTER DA MARCA (Centralizado e fixo acima do input) */}
+      <div className="shrink-0 mt-4">
+        <FooterBrand direction="flex-col" textSize="text-xs" textColor="text-white-400" />
+      </div>
+      <div className="-mb-8"></div>
     </div>
   );
 }

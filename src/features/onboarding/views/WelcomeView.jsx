@@ -2,6 +2,7 @@ import React from 'react';
 import { useLanguage } from '../../../contexts/LanguageContext';
 import { CheckCircle2 } from 'lucide-react';
 import FlagIcon from '../../../components/FlagIcon';
+import FooterBrand from '../../../components/FooterBrand';
 
 export default function WelcomeView({ onNext }) {
   // Puxamos as funções mágicas do nosso Cérebro de Idiomas
@@ -15,9 +16,9 @@ export default function WelcomeView({ onNext }) {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center justify-center p-6 animate-fade-in fixed inset-0 z-50">
+    <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center justify-between py-12 px-4 animate-fade-in fixed inset-0 z-50 overflow-y-auto">
       
-      <div className="text-center mb-12">
+      <div className="text-center mt-6 mb-12">
         <h1 className="text-5xl font-black text-blue-500 mb-4 tracking-tighter">LifeAccess</h1>
         <p className="text-2xl font-bold text-white mb-2">{t('welcome')}</p>
         <p className="text-gray-400">{t('selectLanguage')}</p>
@@ -49,13 +50,17 @@ export default function WelcomeView({ onNext }) {
         ))}
       </div>
 
-      <button
-        onClick={onNext}
-        className="w-full max-w-sm bg-blue-600 hover:bg-blue-700 text-white font-bold p-4 rounded-xl transition-colors shadow-lg text-lg"
-      >
-        {t('continueBtn')}
-      </button>
-
+      {/* Botão e Footer ficam juntos na parte inferior */}
+      <div className="w-full max-w-sm shrink-0 flex flex-col items-center gap-4">
+        <button
+          onClick={onNext}
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold p-4 rounded-xl transition-colors shadow-lg text-lg"
+        >
+          {t('continueBtn')}
+        </button>
+        
+        <FooterBrand direction="flex-col" textSize="text-xs" textColor="text-white-500" />
+      </div>
     </div>
   );
 }

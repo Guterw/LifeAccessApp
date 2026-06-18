@@ -2,10 +2,11 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../../../../config/dexieDb';
-import { BookOpen, AlertTriangle, Trophy, PlayCircle, Flame, ChevronRight } from 'lucide-react';
+import { BookOpen, Sparkles, AlertTriangle, Trophy, PlayCircle, Flame, ChevronRight } from 'lucide-react';
 import { useLanguage } from '../../../../contexts/LanguageContext';
 import BackButton from '../../../../components/BackButton';
 import FlagIcon from '../../../../components/FlagIcon';
+import FooterBrand from '../../../../components/FooterBrand';
 
 export default function VocabularyDashboard() {
   const navigate = useNavigate();
@@ -18,11 +19,11 @@ export default function VocabularyDashboard() {
   const isStreakActive = languageStreak > 0;
 
   return (
-    <div className="w-full pt-8 animate-fade-in px-4 pb-24">
+    <div className="w-full pt-8 animate-fade-in px-4 pb-24 -mt-5 -mb-20">
       <BackButton to="/languages" label={t('backToLanguages', 'Voltar')} />
 
       {/* Cabeçalho Identitário (Seu design original mantido!) */}
-      <div className="flex flex-col items-center mb-12">
+      <div className="flex flex-col items-center mb-12 -mt-5">
         <div className="w-20 h-20 rounded-full overflow-hidden border-4 border-gray-800 shadow-xl mb-6">
           <FlagIcon code="gb" />
         </div>
@@ -91,6 +92,27 @@ export default function VocabularyDashboard() {
           </div>
         </button>
 
+        {/* BOTÃO DO PROFESSOR IA - DESTAQUE PREMIUM */}
+        <button 
+          onClick={() => navigate('/english/ai-hub')}
+          className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 p-5 rounded-2xl border border-indigo-500/50 flex items-center justify-between hover:from-indigo-500 hover:to-purple-500 transition-all shadow-[0_0_20px_rgba(99,102,241,0.3)] mb-4"
+        >
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-white/20 text-white rounded-xl backdrop-blur-md">
+              <Sparkles size={28} />
+            </div>
+            <div className="text-left">
+              <h3 className="text-xl font-black text-white tracking-wide">
+                {t('ai.teacherTitle', 'Professor IA')}
+              </h3>
+              <p className="text-sm text-indigo-100 font-medium mt-0.5">
+                {t('ai.teacherDesc', 'Conversação por chat e voz')}
+              </p>
+            </div>
+          </div>
+          <ChevronRight className="text-white/70" />
+        </button>
+
         {/* Botão de Prática Funcional apontando para /levels */}
         <button 
           onClick={() => navigate('/levels')}
@@ -100,6 +122,11 @@ export default function VocabularyDashboard() {
           {t('english.practiceBtn', 'Praticar Vocabulário')}
         </button>
       </div>
+      {/* FOOTER DA MARCA (Centralizado e fixo acima do input) */}
+      <div className="shrink-0 mt-4">
+          <FooterBrand direction="flex-col" textSize="text-xs" textColor="text-white-400" />
+      </div>
+      <div className="-mb-8"></div>
     </div>
   );
 }
