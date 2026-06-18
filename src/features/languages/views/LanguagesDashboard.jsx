@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ChevronRight, Lock } from 'lucide-react';
 import { useLanguage } from '../../../contexts/LanguageContext';
 import BackButton from '../../../components/BackButton';
+import FlagIcon from '../../../components/FlagIcon';
 
 export default function LanguagesDashboard() {
   const navigate = useNavigate();
@@ -43,7 +44,7 @@ export default function LanguagesDashboard() {
 
             <div className="flex items-center gap-4 pl-2">
               <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-gray-700/50 shadow-inner flex-shrink-0 bg-gray-900">
-                <img src={`https://flagcdn.com/w80/${lang.flag}.png`} alt={lang.name} className="w-full h-full object-cover" />
+                <FlagIcon code={lang.flag} />
               </div>
               <div>
                 <h3 className={`text-xl font-bold ${lang.active ? 'text-white' : 'text-gray-300'}`}>{lang.name}</h3>

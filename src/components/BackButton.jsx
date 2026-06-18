@@ -6,12 +6,13 @@ export default function BackButton({ to, label }) {
   const navigate = useNavigate();
 
   return (
-    <button 
-      onClick={() => navigate(to)} 
-      className="flex items-center text-gray-300 bg-gray-800/50 hover:bg-gray-700 py-2.5 px-4 rounded-xl border border-gray-700/50 mb-8 transition-all shadow-sm backdrop-blur-sm w-fit"
+    <button
+      onClick={() => navigate(to)}
+      aria-label={label}
+      title={label}
+      className="flex items-center justify-center w-11 h-11 rounded-full text-gray-300 bg-gray-800/50 hover:bg-gray-700 hover:text-white border border-gray-700/50 mb-8 transition-all shadow-sm backdrop-blur-sm"
     >
-      <ArrowLeft size={18} className="mr-2" />
-      <span className="font-semibold text-sm">{label}</span>
+      <ArrowLeft size={20} />
     </button>
   );
 }

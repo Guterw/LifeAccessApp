@@ -28,14 +28,22 @@ export default function MainDashboard() {
   return (
     // Removido qualquer padding lateral da div pai
     // pt-12 garante o respiro no topo, pb-24 respiro na base
-    <div className="w-full pt-12 pb-24 animate-fade-in">
-      
+    // relative + overflow-hidden contém os glows de fundo dentro da largura do app
+    <div className="w-full min-h-screen relative overflow-hidden pt-12 pb-24 animate-fade-in">
+
+      {/* Glows ambiente: só pra tirar o aspecto "chapado" do fundo, sutil de propósito */}
+      <div className="absolute -top-24 -right-16 w-72 h-72 bg-blue-600/20 rounded-full blur-3xl pointer-events-none -z-10"></div>
+      <div className="absolute top-40 -left-20 w-56 h-56 bg-purple-600/10 rounded-full blur-3xl pointer-events-none -z-10"></div>
+
       {/* Container agora sem px-5 nas laterais, garantindo 100% da largura */}
       <div className="px-4"> {/* Apenas um respiro mínimo para o texto não 'sumir' na dobra do vidro */}
         <div className="flex justify-between items-start mb-10">
           <div className="pr-2">
             <h1 className="text-3xl font-black text-white tracking-tight leading-tight">
-              {t('home.greeting')} <span className="text-blue-500">{userName}!</span>
+              {t('home.greeting')}{' '}
+              <span className="bg-gradient-to-r from-blue-400 via-cyan-300 to-blue-500 bg-clip-text text-transparent">
+                {userName}!
+              </span>
             </h1>
             <p className="text-blue-400 font-semibold text-xs mt-2 uppercase tracking-widest">{formattedDate}</p>
             <p className="text-gray-400 mt-2 text-sm">{t('home.subtitle')}</p>
@@ -63,11 +71,15 @@ export default function MainDashboard() {
           badge={streakBadge}
         />
 
+        {/* Ícones com a mesma cor de identidade usada quando o módulo está ativo na BottomNav,
+            só que mais suave — pra não parecer "morto" mesmo estando em desenvolvimento */}
         <ModuleCard 
           icon={Dumbbell}
           title={t('home.fitnessModule')}
           subtitle={t('inDev')}
           isActive={false}
+          customBgClass="bg-gray-800/40 border border-gray-700/40"
+          iconBgClass="bg-green-500/10 text-green-400"
         />
 
         <ModuleCard 
@@ -75,6 +87,8 @@ export default function MainDashboard() {
           title={t('home.financeModule')}
           subtitle={t('inDev')}
           isActive={false}
+          customBgClass="bg-gray-800/40 border border-gray-700/40"
+          iconBgClass="bg-red-500/10 text-red-400"
         />
 
         <ModuleCard 
@@ -82,6 +96,8 @@ export default function MainDashboard() {
           title={t('home.tasksModule')}
           subtitle={t('inDev')}
           isActive={false}
+          customBgClass="bg-gray-800/40 border border-gray-700/40"
+          iconBgClass="bg-purple-500/10 text-purple-400"
         />
       </div>
     </div>

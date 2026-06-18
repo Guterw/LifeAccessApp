@@ -39,6 +39,17 @@ function WordGroupViewer({ wordsList, onClose, title }) {
     return categoryTranslations[cat]?.[uiLang] || cat;
   };
 
+  // word.pt e word.es são arrays de strings, mas word.en é a própria palavra-base
+  // (uma string só). Se a UI estiver em inglês e indexarmos word.en?.[0] direto,
+  // o JS pega o primeiro CARACTERE da string em vez da palavra inteira (ex: "Am" -> "A").
+  // Por isso só usamos word[uiLang] quando ele realmente for um array; caso contrário
+  // caímos para o português.
+  const getDisplayTranslation = (word) => {
+    const value = word[uiLang];
+    if (Array.isArray(value) && value.length > 0) return value[0];
+    return word.pt?.[0] || word.en;
+  };
+
   useEffect(() => {
     document.body.style.overflow = 'hidden';
     return () => { document.body.style.overflow = 'unset'; };
@@ -108,7 +119,7 @@ function WordGroupViewer({ wordsList, onClose, title }) {
         {viewStep === 'CATEGORIES' && selectedLevel && Object.keys(groupedData[selectedLevel].categories).map(cat => {
           const wordsInCat = groupedData[selectedLevel].categories[cat].length;
           return (
-            <button key={cat} onClick={() => { setSelectedCategory(cat); setViewStep('WORDS'); }} className=" bg-gray-800 p-5 rounded-2xl border border-gray-700 flex justify-between items-center hover:border-blue-500 transition-all shadow-md ml-4 w-[calc(100%-1rem)]">
+            <button key={cat} onClick={() => { setSelectedCategory(cat); setViewStep('WORDS'); }} className="w-full bg-gray-800 p-5 rounded-2xl border border-gray-700 flex justify-between items-center hover:border-blue-500 transition-all shadow-md ml-4 w-[calc(100%-1rem)]">
               <div className="flex items-center gap-5">
                 <div className="p-3 bg-yellow-500/10 text-yellow-500 rounded-xl"><Bookmark size={24} /></div>
                 <div className="text-left">
@@ -129,7 +140,7 @@ function WordGroupViewer({ wordsList, onClose, title }) {
                 <BookOpen size={20} className="text-blue-400" />
                 <span className="font-bold text-white text-xl">{word.en}</span>
               </div>
-              <span className="text-sm font-semibold text-gray-400">{word[uiLang]?.[0] || word.pt?.[0]}</span>
+              <span className="text-sm font-semibold text-gray-400">{getDisplayTranslation(word)}</span>
             </div>
         ))}
         

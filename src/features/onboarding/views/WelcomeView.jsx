@@ -1,6 +1,7 @@
 import React from 'react';
 import { useLanguage } from '../../../contexts/LanguageContext';
 import { CheckCircle2 } from 'lucide-react';
+import FlagIcon from '../../../components/FlagIcon';
 
 export default function WelcomeView({ onNext }) {
   // Puxamos as funções mágicas do nosso Cérebro de Idiomas
@@ -8,9 +9,9 @@ export default function WelcomeView({ onNext }) {
 
   // As 3 opções iniciais com as bandeiras corretas (gb = Grã-Bretanha)
   const languages = [
-    { code: 'pt', name: 'Português', flag: '🇧🇷' },
-    { code: 'en', name: 'English', flag: '🇬🇧' },
-    { code: 'es', name: 'Español', flag: '🇪🇸' }
+    { code: 'pt', name: 'Português', flag: 'br' },
+    { code: 'en', name: 'English', flag: 'gb' },
+    { code: 'es', name: 'Español', flag: 'es' }
   ];
 
   return (
@@ -34,8 +35,8 @@ export default function WelcomeView({ onNext }) {
             }`}
           >
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-gray-700 shadow-inner bg-gray-900 flex items-center justify-center text-2xl">
-                <span role="img" aria-label={lang.name}>{lang.flag}</span>
+              <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-gray-700 shadow-inner">
+                <FlagIcon code={lang.flag} />
               </div>
               <span className={`text-xl font-bold ${uiLang === lang.code ? 'text-white' : 'text-gray-300'}`}>
                 {lang.name}
