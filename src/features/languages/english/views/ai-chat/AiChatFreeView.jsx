@@ -68,7 +68,7 @@ export default function AiChatFreeView() {
     <div className="absolute inset-x-0 top-0 bottom-[80px] flex flex-col bg-gray-950 overflow-hidden z-10 animate-fade-in">
       
       {/* HEADER */}
-      <div className="shrink-0 h-16 w-full bg-gray-900 border-b border-gray-800 z-20 flex items-center justify-between px-2 sm:px-4 shadow-lg">
+      <div className="shrink-0 h-16 pt-[env(safe-area-inset-top)] w-full bg-gray-900 border-b border-gray-800 z-20 flex items-center justify-between px-2 sm:px-4 shadow-lg">
         <div className="flex items-center gap-2 sm:gap-3 min-w-0">
           <div className="shrink-0 mt-8">
             <BackButton to="/english/ai-hub" label="" />
@@ -128,7 +128,7 @@ export default function AiChatFreeView() {
       {/* INPUT AREA */}
       <div className="shrink-0 bg-gray-900 border-t border-gray-800 p-3 sm:p-4">
         {/* FOOTER DA MARCA (Centralizado e fixo acima do input) */}
-      <div className="shrink-0 -mt-5">
+      <div className="shrink-0 -mt-4">
         <FooterBrand direction="flex-row" textSize="text-[11px]" textColor="text-white-400" />
       </div>
         <form onSubmit={handleSendMessage} className="flex items-end gap-2 w-full max-w-4xl mx-auto">

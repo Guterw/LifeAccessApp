@@ -77,7 +77,7 @@ function WordGroupViewer({ wordsList, onClose, title }) {
   }, {});
 
   return (
-    <div className="fixed inset-0 bg-gray-900 z-[100] flex flex-col animate-slide-up overflow-hidden">
+    <div className="fixed inset-0 bg-gray-900 z-[100] flex flex-col animate-slide-up overflow-hidden -mt-10">
       <div className="pt-12 pb-4 px-6 bg-gray-900 border-b border-gray-800 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-4">
           <button 
@@ -168,7 +168,7 @@ export default function StatsView() {
     <div className="w-full pt-8 animate-fade-in pb-24 px-4 -mt-5 -mb-20">
       <BackButton to="/english" label={t('backToEnglish', 'Voltar')} />
       
-      <h2 className="text-3xl font-black text-white mb-6 tracking-wide -mt-5">
+      <h2 className="text-3xl font-black bg-gradient-to-br from-blue-900 text-white to-red-500 text-transparent bg-clip-text drop-shadow-[0_0px_5px_rgba(168,85,247,0.5)] mb-6 tracking-wide -mt-5">
         {t('stats.title', 'Meu Progresso')}
       </h2>
 

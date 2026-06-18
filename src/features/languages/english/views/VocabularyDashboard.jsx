@@ -28,7 +28,7 @@ export default function VocabularyDashboard() {
           <FlagIcon code="gb" />
         </div>
 
-        <h1 className="text-3xl font-black text-blue-400 mb-5 tracking-wide text-center">
+        <h1 className="text-3xl bg-gradient-to-br from-blue-900 text-blue-500 to-red-500 text-transparent bg-clip-text font-black drop-shadow-[0_2px_15px_rgba(168,85,247,0.5)] mb-5 tracking-wide text-center">
           {t('english.title', 'Módulo de Inglês')}
         </h1>
         
