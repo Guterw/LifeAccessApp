@@ -22,7 +22,7 @@ export default function AiHubView() {
   ];
 
   return (
-    <div className="h-full overflow-y-auto w-full pt-8 animate-fade-in pb-24 px-4 min-h-screen selection:bg-purple-500/30 relative -mt-5 -mb-20">
+    <div className="w-full pt-8 animate-fade-in pb-24 px-4 min-h-screen selection:bg-purple-500/30 relative -mt-5 -mb-20">
 
       <div className="flex items-center justify-between z-10 relative -mb-2">
         <BackButton to="/english" label={safeT('backToEnglish', 'Voltar')} />

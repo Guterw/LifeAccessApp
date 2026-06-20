@@ -5,6 +5,7 @@ import { englishLevels } from '../../../../data/englishLevels';
 import { RotateCcw, CheckCircle2, XCircle, Flame } from 'lucide-react';
 import { useLanguage } from '../../../../contexts/LanguageContext';
 import BackButton from '../../../../components/BackButton';
+import FooterBrand from '../../../../components/FooterBrand';
 
 export default function LevelView() {
   const { id } = useParams();

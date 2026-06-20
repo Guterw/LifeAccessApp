@@ -573,5 +573,143 @@ export const englishLevels = {
       { en: 'Fair play to you!', pt: ['parabéns pra você!', 'muito bem!'], es: ['¡bien hecho!'], category: 'Frases' },
       { en: 'Let\'s crack on', pt: ['vamos começar', 'vamos ao trabalho'], es: ['vamos a ponernos manos a la obra'], category: 'Frases' }
     ]
+  },
+  19: {
+    id: 19,
+    title: {
+      pt: "A1 - Números e Cores",
+      en: "A1 - Numbers & Colors",
+      es: "A1 - Números y Colores"
+    },
+    group: ['A1'],
+    words: [
+      { en: 'Zero', pt: ['zero'], es: ['cero'], category: 'Números' },
+      { en: 'One', pt: ['um', 'uma'], es: ['uno', 'una'], category: 'Números' },
+      { en: 'Two', pt: ['dois', 'duas'], es: ['dos'], category: 'Números' },
+      { en: 'Three', pt: ['três', 'tres'], es: ['tres'], category: 'Números' },
+      { en: 'Four', pt: ['quatro'], es: ['cuatro'], category: 'Números' },
+      { en: 'Five', pt: ['cinco'], es: ['cinco'], category: 'Números' },
+      { en: 'Six', pt: ['seis'], es: ['seis'], category: 'Números' },
+      { en: 'Seven', pt: ['sete'], es: ['siete'], category: 'Números' },
+      { en: 'Eight', pt: ['oito'], es: ['ocho'], category: 'Números' },
+      { en: 'Nine', pt: ['nove'], es: ['nueve'], category: 'Números' },
+      { en: 'Ten', pt: ['dez'], es: ['diez'], category: 'Números' },
+      { en: 'Color', pt: ['cor'], es: ['color'], category: 'Cores' },
+      { en: 'Red', pt: ['vermelho'], es: ['rojo'], category: 'Cores' },
+      { en: 'Blue', pt: ['azul'], es: ['azul'], category: 'Cores' },
+      { en: 'Green', pt: ['verde'], es: ['verde'], category: 'Cores' },
+      { en: 'Yellow', pt: ['amarelo'], es: ['amarillo'], category: 'Cores' },
+      { en: 'Black', pt: ['preto'], es: ['negro'], category: 'Cores' },
+      { en: 'White', pt: ['branco'], es: ['blanco'], category: 'Cores' },
+      { en: 'Orange', pt: ['laranja'], es: ['naranja'], category: 'Cores' },
+      { en: 'Pink', pt: ['rosa'], es: ['rosa'], category: 'Cores' },
+      { en: 'Purple', pt: ['roxo'], es: ['morado', 'púrpura'], category: 'Cores' },
+      { en: 'How old are you?', pt: ['quantos anos você tem?', 'quantos anos voce tem?'], es: ['¿cuántos años tienes?'], category: 'Frases' },
+      { en: 'I am twenty years old', pt: ['eu tenho vinte anos'], es: ['yo tengo veinte años'], category: 'Frases' }
+    ]
+  },
+  20: {
+    id: 20,
+    title: {
+      pt: "A1 - Tempo, Dias e Calendário",
+      en: "A1 - Time, Days & Calendar",
+      es: "A1 - Tiempo, Días y Calendario"
+    },
+    group: ['A1'],
+    words: [
+      { en: 'Today', pt: ['hoje'], es: ['hoy'], category: 'Calendário' },
+      { en: 'Tomorrow', pt: ['amanhã', 'amanha'], es: ['mañana'], category: 'Calendário' },
+      { en: 'Yesterday', pt: ['ontem'], es: ['ayer'], category: 'Calendário' },
+      { en: 'Monday', pt: ['segunda-feira', 'segunda'], es: ['lunes'], category: 'Dias da Semana' },
+      { en: 'Tuesday', pt: ['terça-feira', 'terca-feira', 'terça'], es: ['martes'], category: 'Dias da Semana' },
+      { en: 'Wednesday', pt: ['quarta-feira', 'quarta'], es: ['miércoles'], category: 'Dias da Semana' },
+      { en: 'Thursday', pt: ['quinta-feira', 'quinta'], es: ['jueves'], category: 'Dias da Semana' },
+      { en: 'Friday', pt: ['sexta-feira', 'sexta'], es: ['viernes'], category: 'Dias da Semana' },
+      { en: 'Saturday', pt: ['sábado', 'sabado'], es: ['sábado'], category: 'Dias da Semana' },
+      { en: 'Sunday', pt: ['domingo'], es: ['domingo'], category: 'Dias da Semana' },
+      { en: 'Day', pt: ['dia'], es: ['día'], category: 'Tempo' },
+      { en: 'Week', pt: ['semana'], es: ['semana'], category: 'Tempo' },
+      { en: 'Month', pt: ['mês', 'mes'], es: ['mes'], category: 'Tempo' },
+      { en: 'Year', pt: ['ano'], es: ['año'], category: 'Tempo' },
+      { en: 'Morning', pt: ['manhã', 'manha'], es: ['mañana'], category: 'Tempo' },
+      { en: 'Afternoon', pt: ['tarde'], es: ['tarde'], category: 'Tempo' },
+      { en: 'Night', pt: ['noite'], es: ['noche'], category: 'Tempo' },
+      { en: 'Clock', pt: ['relógio', 'relogio'], es: ['reloj'], category: 'Tempo' },
+      { en: 'What time is it?', pt: ['que horas são?', 'que horas sao?'], es: ['¿qué hora es?'], category: 'Frases' },
+      { en: 'Now', pt: ['agora'], es: ['ahora'], category: 'Tempo' },
+      { en: 'Later', pt: ['mais tarde', 'depois'], es: ['más tarde', 'luego'], category: 'Tempo' },
+      { en: 'Always', pt: ['sempre'], es: ['siempre'], category: 'Tempo' },
+      { en: 'Never', pt: ['nunca'], es: ['nunca'], category: 'Tempo' }
+    ]
+  },
+  21: {
+    id: 21,
+    title: {
+      pt: "A1 - Adjetivos e Sensações do Dia a Dia",
+      en: "A1 - Everyday Adjectives & Feelings",
+      es: "A1 - Adjetivos y Sensaciones Diarias"
+    },
+    group: ['A1'],
+    words: [
+      { en: 'Big', pt: ['grande'], es: ['grande'], category: 'Adjetivos' },
+      { en: 'Small', pt: ['pequeno', 'pequena'], es: ['pequeño', 'pequeña'], category: 'Adjetivos' },
+      { en: 'Good', pt: ['bom', 'boa'], es: ['bueno', 'buena'], category: 'Adjetivos' },
+      { en: 'Bad', pt: ['ruim', 'mau', 'má'], es: ['malo', 'mala'], category: 'Adjetivos' },
+      { en: 'Hot', pt: ['quente'], es: ['caliente'], category: 'Adjetivos' },
+      { en: 'Cold', pt: ['frio', 'fria'], es: ['frío', 'fría'], category: 'Adjetivos' },
+      { en: 'New', pt: ['novo', 'nova'], es: ['nuevo', 'nueva'], category: 'Adjetivos' },
+      { en: 'Old', pt: ['velho', 'velha', 'antigo'], es: ['viejo', 'vieja'], category: 'Adjetivos' },
+      { en: 'Happy', pt: ['feliz', 'contente'], es: ['feliz', 'contento'], category: 'Sentimentos' },
+      { en: 'Sad', pt: ['triste'], es: ['triste'], category: 'Sentimentos' },
+      { en: 'Tired', pt: ['cansado', 'cansada'], es: ['cansado', 'cansada'], category: 'Sentimentos' },
+      { en: 'Hungry', pt: ['com fome', 'faminto'], es: ['con hambre', 'hambriento'], category: 'Sentimentos' },
+      { en: 'Thirsty', pt: ['com sede'], es: ['con sed'], category: 'Sentimentos' },
+      { en: 'Beautiful', pt: ['bonito', 'bonita', 'lindo'], es: ['bonito', 'hermoso'], category: 'Adjetivos' },
+      { en: 'Fast', pt: ['rápido', 'rapido'], es: ['rápido'], category: 'Adjetivos' },
+      { en: 'Slow', pt: ['devagar', 'lento'], es: ['lento', 'despacio'], category: 'Adjetivos' },
+      { en: 'Easy', pt: ['fácil', 'facil'], es: ['fácil'], category: 'Adjetivos' },
+      { en: 'Difficult', pt: ['difícil', 'dificil'], es: ['difícil'], category: 'Adjetivos' },
+      { en: 'Strong', pt: ['forte'], es: ['fuerte'], category: 'Adjetivos' },
+      { en: 'Weak', pt: ['fraco', 'fraca'], es: ['débil'], category: 'Adjetivos' },
+      { en: 'I am hungry', pt: ['eu estou com fome'], es: ['yo tengo hambre'], category: 'Frases' },
+      { en: 'I am tired', pt: ['eu estou cansado', 'eu estou cansada'], es: ['yo estoy cansado', 'yo estoy cansada'], category: 'Frases' },
+      { en: 'I am happy', pt: ['eu estou feliz'], es: ['yo estoy feliz'], category: 'Frases' }
+    ]
+  },
+  22: {
+    id: 22,
+    title: {
+      pt: "A1 - Verbos do Dia a Dia e Objetos Comuns",
+      en: "A1 - Everyday Verbs & Common Objects",
+      es: "A1 - Verbos Diarios y Objetos Comunes"
+    },
+    group: ['A1'],
+    words: [
+      { en: 'To see', pt: ['ver'], es: ['ver'], category: 'Verbos' },
+      { en: 'To know', pt: ['saber', 'conhecer'], es: ['saber', 'conocer'], category: 'Verbos' },
+      { en: 'To like', pt: ['gostar'], es: ['gustar'], category: 'Verbos' },
+      { en: 'To love', pt: ['amar'], es: ['amar'], category: 'Verbos' },
+      { en: 'To play', pt: ['jogar', 'brincar'], es: ['jugar'], category: 'Verbos' },
+      { en: 'To read', pt: ['ler'], es: ['leer'], category: 'Verbos' },
+      { en: 'To write', pt: ['escrever'], es: ['escribir'], category: 'Verbos' },
+      { en: 'To listen', pt: ['ouvir', 'escutar'], es: ['escuchar'], category: 'Verbos' },
+      { en: 'To watch', pt: ['assistir'], es: ['mirar', 'ver'], category: 'Verbos' },
+      { en: 'To give', pt: ['dar'], es: ['dar'], category: 'Verbos' },
+      { en: 'To take', pt: ['pegar', 'levar'], es: ['tomar', 'llevar'], category: 'Verbos' },
+      { en: 'To come', pt: ['vir'], es: ['venir'], category: 'Verbos' },
+      { en: 'To look', pt: ['olhar'], es: ['mirar'], category: 'Verbos' },
+      { en: 'To study', pt: ['estudar'], es: ['estudiar'], category: 'Verbos' },
+      { en: 'To live', pt: ['morar', 'viver'], es: ['vivir'], category: 'Verbos' },
+      { en: 'Phone', pt: ['telefone', 'celular'], es: ['teléfono'], category: 'Objetos' },
+      { en: 'Book', pt: ['livro'], es: ['libro'], category: 'Objetos' },
+      { en: 'Table', pt: ['mesa'], es: ['mesa'], category: 'Objetos' },
+      { en: 'Chair', pt: ['cadeira'], es: ['silla'], category: 'Objetos' },
+      { en: 'Car', pt: ['carro'], es: ['coche', 'carro'], category: 'Objetos' },
+      { en: 'Key', pt: ['chave'], es: ['llave'], category: 'Objetos' },
+      { en: 'Door', pt: ['porta'], es: ['puerta'], category: 'Objetos' },
+      { en: 'Window', pt: ['janela'], es: ['ventana'], category: 'Objetos' },
+      { en: 'I like coffee', pt: ['eu gosto de café', 'eu gosto de cafe'], es: ['me gusta el café'], category: 'Frases' },
+      { en: 'I love you', pt: ['eu te amo', 'eu amo você'], es: ['te amo'], category: 'Frases' }
+    ]
   }
 };

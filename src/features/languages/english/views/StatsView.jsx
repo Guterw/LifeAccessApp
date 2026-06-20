@@ -33,7 +33,15 @@ function WordGroupViewer({ wordsList, onClose, title }) {
     'Gíria (Irlanda)': { en: 'Slang (Ireland)', es: 'Jerga (Irlanda)', pt: 'Gíria (Irlanda)' },
     'Lugares': { en: 'Places', es: 'Lugares', pt: 'Lugares' },
     'Viagem': { en: 'Travel', es: 'Viajes', pt: 'Viagem' },
-    'Geral': { en: 'General', es: 'General', pt: 'Geral' }
+    'Geral': { en: 'General', es: 'General', pt: 'Geral' },
+    'Números': { en: 'Numbers', es: 'Números', pt: 'Números' },
+    'Cores': { en: 'Colors', es: 'Colores', pt: 'Cores' },
+    'Calendário': { en: 'Calendar', es: 'Calendario', pt: 'Calendário' },
+    'Dias da Semana': { en: 'Days of the Week', es: 'Días de la Semana', pt: 'Dias da Semana' },
+    'Tempo': { en: 'Time', es: 'Tiempo', pt: 'Tempo' },
+    'Adjetivos': { en: 'Adjectives', es: 'Adjetivos', pt: 'Adjetivos' },
+    'Sentimentos': { en: 'Feelings', es: 'Sentimientos', pt: 'Sentimentos' },
+    'Objetos': { en: 'Objects', es: 'Objetos', pt: 'Objetos' },
   };
 
   const getTranslatedCategory = (cat) => {

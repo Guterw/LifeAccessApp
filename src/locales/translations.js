@@ -133,6 +133,12 @@ export const translations = {
       installing: 'Instalando IA...',
       connectingGPU: 'Conectando ao WebGPU...',
       typeMessage: 'Digite sua mensagem...',
+      levelLabel: 'Nível',
+      translationLabel: 'Tradução',
+      correctionLabel: 'Dica',
+      errorBanner: 'Algo deu errado. Tente enviar novamente.',
+      errorMessage: "Desculpe, tive um erro interno de processamento. Pode tentar novamente?",
+
       
       // MANTIDOS EM INGLÊS PROPOSITALMENTE (Configurações do Robô)
       initialGreeting: "Hello! I'm your English AI Teacher. How are you doing today? We can talk about anything you want!",
@@ -277,7 +283,12 @@ export const translations = {
       installing: 'Installing AI...',
       connectingGPU: 'Connecting to WebGPU...',
       typeMessage: 'Type your message...',
-      
+      levelLabel: 'Level',
+      translationLabel: 'Translation',
+      correctionLabel: 'Tip',
+      errorBanner: 'Something went wrong. Please try sending again.',
+      errorMessage: "Sorry, I had an internal processing error. Could you try again?",
+            
       // MANTIDOS EM INGLÊS PROPOSITALMENTE (Configurações do Robô)
       initialGreeting: "Hello! I'm your English AI Teacher. How are you doing today? We can talk about anything you want!",
       systemPromptFree: "You are a friendly and supportive English teacher. Speak naturally, keep answers conversational and clear, and gently correct any major grammar mistakes at the end of your response.",
@@ -421,7 +432,12 @@ export const translations = {
       installing: 'Instalando IA...',
       connectingGPU: 'Conectando a WebGPU...',
       typeMessage: 'Escribe tu mensaje...',
-      
+      levelLabel: 'Nivel',
+      translationLabel: 'Traducción',
+      correctionLabel: 'Consejo',
+      errorBanner: 'Algo salió mal. Intenta enviar de nuevo.',
+      errorMessage: "Lo siento, tuve un error interno de procesamiento. ¿Podrías intentarlo de nuevo?",
+            
       // MANTIDOS EM INGLÊS PROPOSITALMENTE (Configurações do Robô)
       initialGreeting: "Hello! I'm your English AI Teacher. How are you doing today? We can talk about anything you want!",
       systemPromptFree: "You are a friendly and supportive English teacher. Speak naturally, keep answers conversational and clear, and gently correct any major grammar mistakes at the end of your response.",
