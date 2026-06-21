@@ -143,8 +143,15 @@ export default function AlphaNumbersExerciseView() {
   const playAudio = (text) => {
     if (!window.speechSynthesis) return;
     window.speechSynthesis.cancel();
-    const cleanText = String(text).replace(/[^a-zA-Z0-9\s.]/g, '');
-    const utterance = new SpeechSynthesisUtterance(text);
+    
+    // 1. Pega o texto e limpa sujeiras
+    let cleanText = String(text).replace(/[^a-zA-Z0-9\s.]/g, ''); 
+    
+    // 2. A MÁGICA PARA O IPHONE: Transforma tudo em minúsculo!
+    // Isso impede o iOS Safari de falar "Capital A" ou "Cap B".
+    cleanText = cleanText.toLowerCase();
+    
+    const utterance = new SpeechSynthesisUtterance(cleanText);
     utterance.lang = 'en-IE';
     utterance.rate = 0.85;
     window.speechSynthesis.speak(utterance);
