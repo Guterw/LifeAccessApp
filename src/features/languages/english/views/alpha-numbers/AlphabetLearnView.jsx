@@ -29,6 +29,7 @@ export default function AlphabetLearnView() {
   const playAudio = (text) => {
     if (!window.speechSynthesis) return;
     window.speechSynthesis.cancel();
+    const cleanText = String(text).replace(/[^a-zA-Z0-9\s.]/g, '');
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = 'en-IE'; // Sotaque Irlandês
     utterance.rate = 0.85; // Um pouco mais lento para estudo
@@ -72,10 +73,10 @@ export default function AlphabetLearnView() {
               onClick={() => playAudio(item.letter)}
               className="bg-gray-800 border border-gray-700 hover:border-blue-500 hover:bg-gray-700 rounded-2xl p-4 flex flex-col items-center justify-center transition-all shadow-lg active:scale-95 group"
             >
-              <span className="text-3xl font-black text-white mb-1 group-hover:text-blue-400 transition-colors">
+              <span aria-hidden="true" className="text-3xl font-black text-white mb-1 group-hover:text-blue-400 transition-colors">
                 {item.letter}
               </span>
-              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest bg-gray-900/50 px-2 py-0.5 rounded-full">
+              <span aria-hidden="true" className="text-[10px] font-bold text-gray-400 uppercase tracking-widest bg-gray-900/50 px-2 py-0.5 rounded-full">
                 {item.phonetic}
               </span>
             </button>

@@ -143,6 +143,7 @@ export default function AlphaNumbersExerciseView() {
   const playAudio = (text) => {
     if (!window.speechSynthesis) return;
     window.speechSynthesis.cancel();
+    const cleanText = String(text).replace(/[^a-zA-Z0-9\s.]/g, '');
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = 'en-IE';
     utterance.rate = 0.85;
