@@ -4,7 +4,7 @@ import BackButton from '../../../../../components/BackButton';
 import FooterBrand from '../../../../../components/FooterBrand';
 import { ListTodo, ChevronRight, CheckCircle2, RotateCcw, AlertTriangle } from 'lucide-react';
 import { useLanguage } from '../../../../../contexts/LanguageContext';
-import { TASK_SCENARIOS } from './taskScenarios';
+import { TASK_SCENARIOS } from '../../../../../data/taskScenarios';
 
 export default function AiTaskSelectionView() {
   const { t, uiLang } = useLanguage();

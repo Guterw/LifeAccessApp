@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { db } from '../../../../config/dexieDb';
-import { englishLevels } from '../../../../data/englishLevels';
+import { vocabulariesLevels } from '../../../../data/vocabulariesLevels';
 import { RotateCcw, CheckCircle2, XCircle, Flame, Volume2, Turtle } from 'lucide-react';
 import { useLanguage } from '../../../../contexts/LanguageContext';
 import BackButton from '../../../../components/BackButton';
@@ -54,7 +54,7 @@ export default function LevelView() {
   const { t, uiLang, registerLanguageActivity } = useLanguage();
   
   const currentLevelId = parseInt(id) || 1;
-  const levelData = englishLevels[currentLevelId];
+  const levelData = vocabulariesLevels[currentLevelId];
 
   const [queue, setQueue] = useState([]);
   const [currentWord, setCurrentWord] = useState(null);

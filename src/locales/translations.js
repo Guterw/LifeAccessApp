@@ -147,6 +147,32 @@ export const translations = {
     },
     backToEnglish: 'Voltar',
     cancel: 'Cancelar',
+    alpha: {
+      alphabet: "Alfabeto",
+      numbers: "Números",
+      trainingMode: "Modo Treino"
+    },
+    general: {
+      exercise: "Exercício",
+      completed: "Concluído",
+      restartExercise: "Reiniciar Exercício",
+      restartConfirmation: "Reiniciar exercício?",
+      restartWarning: "Todo o seu progresso neste exercício será apagado e você vai começar do zero. Essa ação não pode ser desfeita.",
+      restart: "Reiniciar",
+      back: "Voltar",
+      saveAndExit: "Salvar e Sair",
+      remaining: "Faltam",
+      question: "questão",
+      questions: "questões",
+      listenAgain: "Ouvir novamente",
+      tapToSpeak: "Toque no microfone e fale...",
+      checkAnswer: "Verificar Resposta",
+      correct: "Você acertou!",
+      almostThere: "Quase lá!",
+      goesToQueue: "A resposta vai para o final da fila.",
+      continue: "Continuar",
+      backToMenu: "Voltar para o Menu"
+    },
   },
   
   en: {
@@ -296,6 +322,32 @@ export const translations = {
     },
     backToEnglish: 'Back',
     cancel: 'Cancel',
+    alpha: {
+      alphabet: "Alphabet",
+      numbers: "Numbers",
+      trainingMode: "Training Mode"
+    },
+    general: {
+      exercise: "Exercise",
+      completed: "Completed",
+      restartExercise: "Restart Exercise",
+      restartConfirmation: "Restart exercise?",
+      restartWarning: "All your progress in this exercise will be erased and you will start from scratch. This action cannot be undone.",
+      restart: "Restart",
+      back: "Back",
+      saveAndExit: "Save and Exit",
+      remaining: "Remaining",
+      question: "question",
+      questions: "questions",
+      listenAgain: "Listen again",
+      tapToSpeak: "Tap the mic and speak...",
+      checkAnswer: "Check Answer",
+      correct: "You got it right!",
+      almostThere: "Almost there!",
+      goesToQueue: "The answer goes to the end of the queue.",
+      continue: "Continue",
+      backToMenu: "Back to Menu"
+    },
   },
 
   es: {
@@ -445,5 +497,31 @@ export const translations = {
     },
     backToEnglish: 'Volver',
     cancel: 'Cancelar',
+    alpha: {
+      alphabet: "Alfabeto",
+      numbers: "Números",
+      trainingMode: "Modo Entrenamiento"
+    },
+    general: {
+      exercise: "Ejercicio",
+      completed: "Completado",
+      restartExercise: "Reiniciar Ejercicio",
+      restartConfirmation: "¿Reiniciar ejercicio?",
+      restartWarning: "Todo tu progreso en este ejercicio será borrado y comenzarás desde cero. Esta acción no se puede deshacer.",
+      restart: "Reiniciar",
+      back: "Volver",
+      saveAndExit: "Guardar y Salir",
+      remaining: "Faltan",
+      question: "pregunta",
+      questions: "preguntas",
+      listenAgain: "Escuchar de nuevo",
+      tapToSpeak: "Toca el micrófono y habla...",
+      checkAnswer: "Comprobar Respuesta",
+      correct: "¡Acertaste!",
+      almostThere: "¡Casi!",
+      goesToQueue: "La respuesta va al final de la cola.",
+      continue: "Continuar",
+      backToMenu: "Volver al Menú"
+    },
   }
 };

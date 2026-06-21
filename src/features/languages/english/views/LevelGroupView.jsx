@@ -1,6 +1,6 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { englishLevels } from '../../../../data/englishLevels';
+import { vocabulariesLevels } from '../../../../data/vocabulariesLevels';
 import { useLanguage } from '../../../../contexts/LanguageContext';
 import BackButton from '../../../../components/BackButton';
 import { Play, CheckCircle2 } from 'lucide-react';
@@ -22,7 +22,7 @@ export default function LevelGroupView() {
     return acc;
   }, {});
 
-  const levelsInGroup = Object.values(englishLevels).filter((l) => {
+  const levelsInGroup = Object.values(vocabulariesLevels).filter((l) => {
     const groupList = (l.group && l.group.length) ? l.group : ['A1'];
     return groupList.includes(groupName);
   });

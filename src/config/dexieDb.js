@@ -2,8 +2,9 @@ import Dexie from 'dexie';
 
 export const db = new Dexie('LifeAccessDB');
 
-// Subimos para a versão 4 pois adicionamos a coluna 'category' nas tabelas
-db.version(6).stores({
+// Subimos para a versão 7: novo módulo de progresso para Alfabeto/Números (Fundamentos),
+// substituindo o controle que antes vivia solto no localStorage.
+db.version(7).stores({
   // ==========================================
   // ⚙️ MÓDULO: CONFIGURAÇÕES DO SISTEMA
   // ==========================================
@@ -17,6 +18,14 @@ db.version(6).stores({
   levelProgress: 'level, correctCount, total, pendingQueue',
   completedLevels: 'level, completedAt',
   chatHistory: '++id, timestamp, role, content',
+
+  // ==========================================
+  // 🔤 MÓDULO: FUNDAMENTOS (Alfabeto & Números)
+  // ==========================================
+  // Chave composta [mode+exerciseIndex] identifica cada exercício de forma única
+  // e estável, igual ao padrão já usado em levelProgress/completedLevels.
+  alphaNumProgress: '[mode+exerciseIndex], mode, exerciseIndex, pendingQueue, correctCount, total, updatedAt',
+  completedAlphaNum: '[mode+exerciseIndex], mode, exerciseIndex, completedAt, xp',
 
   // ==========================================
   // ⚔️ MÓDULO: TAREFAS & RPG (Em Breve)

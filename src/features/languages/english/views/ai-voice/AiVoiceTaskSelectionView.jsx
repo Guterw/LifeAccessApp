@@ -5,7 +5,7 @@ import BackButton from '../../../../../components/BackButton';
 import FooterBrand from '../../../../../components/FooterBrand';
 import { Headphones, ChevronRight, CheckCircle2, RotateCcw, AlertTriangle } from 'lucide-react';
 import { useLanguage } from '../../../../../contexts/LanguageContext';
-import { VOICE_SCENARIOS } from './voiceScenarios'; // Importa os cenários de voz
+import { VOICE_SCENARIOS } from '../../../../../data/voiceScenarios'; // Importa os cenários de voz
 
 export default function AiVoiceTaskSelectionView() {
   const { t, uiLang } = useLanguage();

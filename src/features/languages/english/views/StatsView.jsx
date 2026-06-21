@@ -4,7 +4,7 @@ import { db } from '../../../../config/dexieDb';
 import { useLanguage } from '../../../../contexts/LanguageContext';
 import BackButton from '../../../../components/BackButton';
 import { Trophy, BookOpen, AlertTriangle, ChevronRight, ArrowLeft, Library, Bookmark } from 'lucide-react';
-import { englishLevels } from '../../../../data/englishLevels';
+import { vocabulariesLevels } from '../../../../data/vocabulariesLevels';
 import FooterBrand from '../../../../components/FooterBrand';
 
 // ==========================================
@@ -16,7 +16,7 @@ function WordGroupViewer({ wordsList, onClose, title }) {
   const [selectedLevel, setSelectedLevel] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState(null);
 
-  // Dicionário interno para traduzir as categorias que vêm do englishLevels.js
+  // Dicionário interno para traduzir as categorias que vêm do vocabulariesLevels.js
   const categoryTranslations = {
     'Pronomes': { en: 'Pronouns', es: 'Pronombres', pt: 'Pronomes' },
     'Pronomes (Irlanda/Informal)': { en: 'Pronouns (Ireland/Slang)', es: 'Pronombres (Irlanda/Informal)', pt: 'Pronomes (Irlanda/Informal)' },
@@ -69,10 +69,10 @@ function WordGroupViewer({ wordsList, onClose, title }) {
 
     // O level e a category já foram salvos no momento exato em que a palavra foi
     // aprendida/errada (em LevelView.jsx), então usamos eles diretamente em vez de
-    // procurar a palavra do zero em englishLevels — isso evita atribuir a palavra
+    // procurar a palavra do zero em vocabulariesLevels — isso evita atribuir a palavra
     // ao primeiro nível em que ela aparece, quando ela se repete em vários níveis.
     const levelId = (wordObj && wordObj.level !== undefined && wordObj.level !== null) ? wordObj.level : 'unknown';
-    const levelInfo = englishLevels[levelId];
+    const levelInfo = vocabulariesLevels[levelId];
     const levelTitle = levelInfo ? levelInfo.title : { pt: 'Outros', en: 'Others', es: 'Otros' };
     const category = (wordObj && wordObj.category) || 'Geral';
     const fullWordData = (levelInfo && levelInfo.words.find(w => w.en === wordEn)) || { en: wordEn, pt: ['Tradução indisponível'] };

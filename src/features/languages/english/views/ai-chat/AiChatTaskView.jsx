@@ -7,7 +7,7 @@ import { Send, Bot, MessageSquare, AlertCircle, Globe, Sparkles, ChevronDown, Ta
 import { generateCloudResponse } from '../../../../../services/aiService';
 import FooterBrand from '../../../../../components/FooterBrand';
 import { useKeyboardOpen } from '../../../../../hooks/useKeyboardOpen';
-import { TASK_SCENARIOS } from './taskScenarios';
+import { TASK_SCENARIOS } from '../../../../../data/taskScenarios';
 
 const CEFR_LEVELS = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
 const NATIVE_LANG_NAMES = { pt: 'Brazilian Portuguese', es: 'Spanish', en: 'English' };

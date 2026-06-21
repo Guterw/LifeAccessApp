@@ -1,4 +1,4 @@
-export const englishLevels = {
+export const vocabulariesLevels = {
   1: {
     id: 1,
     title: {

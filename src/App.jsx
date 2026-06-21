@@ -1,25 +1,28 @@
-import React, { useEffect } from 'react';
-// import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { useState } from 'react';
+// src/App.jsx
+import React, { useEffect, useState } from 'react';
 import { HashRouter, Routes, Route } from 'react-router-dom';
-//Notificação
 import { checkAllNotifications } from './utils/notificationService';
 import { db } from './config/dexieDb';
-// Importação do Componente
 import BottomNav from './components/BottomNav';
-// Importação das Views Principais
 import { useLanguage } from './contexts/LanguageContext';
 import WelcomeView from './features/onboarding/views/WelcomeView';
 import NameView from './features/onboarding/views/NameView';
 import MainDashboard from './features/dashboard/views/MainDashboard';
 import LanguagesDashboard from './features/languages/views/LanguagesDashboard';
 import SettingsView from './features/settings/views/SettingsView';
-// Importação das Views do Módulo de Inglês (Agora dentro de languages)
-import VocabularyDashboard from './features/languages/english/views/VocabularyDashboard';
+import EnglishDashboard from './features/languages/english/views/EnglishDashboard';
 import LevelListView from './features/languages/english/views/LevelListView';
 import LevelView from './features/languages/english/views/LevelView';
 import StatsView from './features/languages/english/views/StatsView';
 import LevelGroupView from './features/languages/english/views/LevelGroupView';
+
+// Módulo Alpha-Numbers
+import AlphaNumbersMenu from './features/languages/english/views/alpha-numbers/AlphaNumbersMenu';
+import AlphabetLearnView from './features/languages/english/views/alpha-numbers/AlphabetLearnView';
+import NumbersLearnView from './features/languages/english/views/alpha-numbers/NumbersLearnView';
+import ExerciseSelectionView from './features/languages/english/views/alpha-numbers/ExerciseSelectionView';
+import AlphaNumbersExerciseView from './features/languages/english/views/alpha-numbers/AlphaNumbersExerciseView';
+
 // IA Inglês Área
 import AiHubView from './features/languages/english/views/AiHubView';
 import AiChatFreeView from './features/languages/english/views/ai-chat/AiChatFreeView';
@@ -31,20 +34,17 @@ import AiVoiceTaskSelectionView from './features/languages/english/views/ai-voic
 
 function App() {
   const { isFirstAccess } = useLanguage();
-  const [onboardingStep, setOnboardingStep] = useState(1); // Controla a tela 1 ou 2
-  // Se for a primeira vez que a pessoa abre o app, trava ela na tela de Boas-vindas
+  const [onboardingStep, setOnboardingStep] = useState(1);
   
   useEffect(() => {
-  const interval = setInterval(async () => {
-    const settings = await db.appSettings.get(1);
-    if (settings) {
-      // Tarefas e Fitness ainda não existem como módulos, então mandamos valores vazios por enquanto
-      checkAllNotifications(settings, [], {});
-    }
-  }, 1000 * 60 * 30); // Checa a cada 30 minutos
-
-  return () => clearInterval(interval);
-}, []);
+    const interval = setInterval(async () => {
+      const settings = await db.appSettings.get(1);
+      if (settings) {
+        checkAllNotifications(settings, [], {});
+      }
+    }, 1000 * 60 * 30);
+    return () => clearInterval(interval);
+  }, []);
   
   if (isFirstAccess) {
     if (onboardingStep === 1) return <WelcomeView onNext={() => setOnboardingStep(2)} />;
@@ -54,21 +54,27 @@ function App() {
   return (
     <HashRouter>
       <div className="min-h-screen bg-gray-900 text-white font-sans selection:bg-blue-500/30">
-        {/* O pb-24 garante que o conteúdo não fique escondido atrás da Bottom Bar */}
         <div className="max-w-md mx-auto w-full px-4 pb-28">
           <Routes>
-            {/* Rota Principal */}
             <Route path="/" element={<MainDashboard />} />
             <Route path="/settings" element={<SettingsView />} />
-            {/* Nova Rota: Central de Idiomas */}
             <Route path="/languages" element={<LanguagesDashboard />} />
             
             {/* Rotas do Módulo de Inglês */}
-            <Route path="/english" element={<VocabularyDashboard />} />
+            <Route path="/english" element={<EnglishDashboard />} />
             <Route path="/levels" element={<LevelListView />} />
             <Route path="/levels/group/:groupName" element={<LevelGroupView />} />
             <Route path="/level/:id" element={<LevelView />} />
             <Route path="/english/stats" element={<StatsView />} />
+            
+            {/* Fundamentos: Alfabeto e Números */}
+            <Route path="/english/alpha-numbers" element={<AlphaNumbersMenu />} />
+            <Route path="/english/alpha-numbers/alphabet" element={<AlphabetLearnView />} />
+            <Route path="/english/alpha-numbers/numbers" element={<NumbersLearnView />} />
+            {/* Fluxo de Treino: Seleção e Exercício */}
+            <Route path="/english/alpha-numbers/exercises/:mode" element={<ExerciseSelectionView />} />
+            <Route path="/english/alpha-numbers/exercise/:mode/:index" element={<AlphaNumbersExerciseView />} />
+            
             {/* IA Inglês */}
             <Route path="/english/ai-hub" element={<AiHubView />} />
             <Route path="/english/ai-chat/free" element={<AiChatFreeView />} />
@@ -78,14 +84,13 @@ function App() {
             <Route path="/english/ai-voice/tasks/:taskId" element={<AiVoiceTaskView />} />
             <Route path="/english/ai-voice/tasks" element={<AiVoiceTaskSelectionView />} />
             
-            {/* Rotas futuras (deixamos cegas por enquanto para não dar erro se clicar na Bottom Bar) */}
+            <Route path="/english/path" element={<div className="pt-8 text-center text-gray-400">Em breve</div>} />
+
             <Route path="/fitness" element={<div className="pt-8 text-center text-gray-400">Em breve</div>} />
             <Route path="/finance" element={<div className="pt-8 text-center text-gray-400">Em breve</div>} />
             <Route path="/tasks" element={<div className="pt-8 text-center text-gray-400">Em breve</div>} />
           </Routes>
         </div>
-        
-        {/* A barra de navegação fica fixa no fundo de todas as telas */}
         <BottomNav />
       </div>
     </HashRouter>

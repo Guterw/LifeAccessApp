@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { englishLevels } from '../../../../data/englishLevels';
+import { vocabulariesLevels } from '../../../../data/vocabulariesLevels';
 import { ChevronRight, Layers } from 'lucide-react';
 import { useLanguage } from '../../../../contexts/LanguageContext';
 import BackButton from '../../../../components/BackButton';
@@ -11,7 +11,7 @@ export default function LevelListView() {
   const navigate = useNavigate();
 
   // Agrupa os níveis pelos grupos definidos (A1, A2, B1)
-  const groups = Object.values(englishLevels).reduce((acc, level) => {
+  const groups = Object.values(vocabulariesLevels).reduce((acc, level) => {
   const groupList = (level.group && level.group.length) ? level.group : ['A1'];
   groupList.forEach((g) => {
     if (!acc[g]) acc[g] = [];

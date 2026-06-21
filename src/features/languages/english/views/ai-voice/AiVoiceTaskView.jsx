@@ -6,7 +6,7 @@ import { db } from '../../../../../config/dexieDb';
 import { PhoneOff, Mic, MicOff, Bot, Loader2, Volume2, Target, CheckCircle2, AlertTriangle, MessageSquare, RotateCcw, X, Globe, Sparkles, ChevronDown } from 'lucide-react';
 import { generateCloudResponse } from '../../../../../services/aiService';
 import { useSpeech } from '../../../../../hooks/useSpeech';
-import { VOICE_SCENARIOS } from './voiceScenarios';
+import { VOICE_SCENARIOS } from '../../../../../data/voiceScenarios';
 import FooterBrand from '../../../../../components/FooterBrand'; // <-- Import do FooterBrand
 
 const CEFR_LEVELS = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
