@@ -19,9 +19,9 @@ export default function BottomNav() {
     currentPath.includes('/vocabulary') ||
     currentPath.includes('/english');
 
-  const isFitnessActive = currentPath.includes('/fitness');
-  const isFinanceActive = currentPath.includes('/finance');
-  const isTasksActive = currentPath.includes('/tasks');
+  const isFitnessActive = currentPath.startsWith('/fitness');
+  const isFinanceActive = currentPath.startsWith('/finance');currentPath.includes('/finance');
+  const isTasksActive = currentPath.startsWith('/tasks');
   
   // Home exata
   const isHomeActive = currentPath === '/';

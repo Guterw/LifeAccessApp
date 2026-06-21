@@ -20,10 +20,14 @@ import LevelListView from './features/languages/english/views/LevelListView';
 import LevelView from './features/languages/english/views/LevelView';
 import StatsView from './features/languages/english/views/StatsView';
 import LevelGroupView from './features/languages/english/views/LevelGroupView';
+// IA Inglês Área
 import AiHubView from './features/languages/english/views/AiHubView';
 import AiChatFreeView from './features/languages/english/views/ai-chat/AiChatFreeView';
 import AiTaskSelectionView from './features/languages/english/views/ai-chat/AiTaskSelectionView';
 import AiChatTaskView from './features/languages/english/views/ai-chat/AiChatTaskView';
+import AiVoiceFreeView from './features/languages/english/views/ai-voice/AiVoiceFreeView';
+import AiVoiceTaskView from './features/languages/english/views/ai-voice/AiVoiceTaskView';
+import AiVoiceTaskSelectionView from './features/languages/english/views/ai-voice/AiVoiceTaskSelectionView';
 
 function App() {
   const { isFirstAccess } = useLanguage();
@@ -65,11 +69,15 @@ function App() {
             <Route path="/levels/group/:groupName" element={<LevelGroupView />} />
             <Route path="/level/:id" element={<LevelView />} />
             <Route path="/english/stats" element={<StatsView />} />
+            {/* IA Inglês */}
             <Route path="/english/ai-hub" element={<AiHubView />} />
             <Route path="/english/ai-chat/free" element={<AiChatFreeView />} />
             <Route path="/english/ai-chat/tasks" element={<AiTaskSelectionView />} />
             <Route path="/english/ai-chat/tasks/:taskId" element={<AiChatTaskView />} />
-                        
+            <Route path="/english/ai-voice/free" element={<AiVoiceFreeView />} />
+            <Route path="/english/ai-voice/tasks/:taskId" element={<AiVoiceTaskView />} />
+            <Route path="/english/ai-voice/tasks" element={<AiVoiceTaskSelectionView />} />
+            
             {/* Rotas futuras (deixamos cegas por enquanto para não dar erro se clicar na Bottom Bar) */}
             <Route path="/fitness" element={<div className="pt-8 text-center text-gray-400">Em breve</div>} />
             <Route path="/finance" element={<div className="pt-8 text-center text-gray-400">Em breve</div>} />

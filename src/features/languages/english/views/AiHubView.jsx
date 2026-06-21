@@ -14,11 +14,12 @@ export default function AiHubView() {
     return translation === key ? fallback : translation;
   };
 
+  // Array reordenado: Tasks primeiro, depois Free
   const aiOptions = [
-    { id: 'chat-free', path: '/english/ai-chat/free', icon: <MessageSquare size={26} />, color: 'blue', title: safeT('ai.chatFreeTitle', 'Chat Livre'), desc: safeT('ai.chatFreeDesc', 'Reading & Writing'), glow: 'shadow-[0_0_15px_rgba(59,130,246,0.15)] hover:shadow-[0_0_25px_rgba(59,130,246,0.4)] border-blue-500/20 hover:border-blue-400', iconBg: 'bg-blue-500/10 text-blue-400 border border-blue-500/20' },
     { id: 'chat-tasks', path: '/english/ai-chat/tasks', icon: <ListTodo size={26} />, color: 'indigo', title: safeT('ai.chatTasksTitle', 'Tarefas por Chat'), desc: safeT('ai.chatTasksDesc', 'Reading and Writing (Cenários)'), glow: 'shadow-[0_0_15px_rgba(99,102,241,0.15)] hover:shadow-[0_0_25px_rgba(99,102,241,0.4)] border-indigo-500/20 hover:border-indigo-400', iconBg: 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20' },
-    { id: 'voice-free', path: '/english/ai-voice/free', icon: <Mic size={26} />, color: 'purple', title: safeT('ai.voiceFreeTitle', 'Treino de Voz'), desc: safeT('ai.voiceFreeDesc', 'Speaking and Listening'), glow: 'shadow-[0_0_15px_rgba(168,85,247,0.15)] hover:shadow-[0_0_25px_rgba(168,85,247,0.4)] border-purple-500/20 hover:border-purple-400', iconBg: 'bg-purple-500/10 text-purple-400 border border-purple-500/20' },
-    { id: 'voice-tasks', path: '/english/ai-voice/tasks', icon: <Headphones size={26} />, color: 'pink', title: safeT('ai.voiceTasksTitle', 'Tarefas por Voz'), desc: safeT('ai.voiceTasksDesc', 'Speaking and Listening (Cenários)'), glow: 'shadow-[0_0_15px_rgba(236,72,153,0.15)] hover:shadow-[0_0_25px_rgba(236,72,153,0.4)] border-pink-500/20 hover:border-pink-400', iconBg: 'bg-pink-500/10 text-pink-400 border border-pink-500/20' }
+    { id: 'voice-tasks', path: '/english/ai-voice/tasks', icon: <Headphones size={26} />, color: 'pink', title: safeT('ai.voiceTasksTitle', 'Tarefas por Voz'), desc: safeT('ai.voiceTasksDesc', 'Speaking and Listening (Cenários)'), glow: 'shadow-[0_0_15px_rgba(236,72,153,0.15)] hover:shadow-[0_0_25px_rgba(236,72,153,0.4)] border-pink-500/20 hover:border-pink-400', iconBg: 'bg-pink-500/10 text-pink-400 border border-pink-500/20' },
+    { id: 'chat-free', path: '/english/ai-chat/free', icon: <MessageSquare size={26} />, color: 'blue', title: safeT('ai.chatFreeTitle', 'Chat Livre'), desc: safeT('ai.chatFreeDesc', 'Reading & Writing'), glow: 'shadow-[0_0_15px_rgba(59,130,246,0.15)] hover:shadow-[0_0_25px_rgba(59,130,246,0.4)] border-blue-500/20 hover:border-blue-400', iconBg: 'bg-blue-500/10 text-blue-400 border border-blue-500/20' },
+    { id: 'voice-free', path: '/english/ai-voice/free', icon: <Mic size={26} />, color: 'purple', title: safeT('ai.voiceFreeTitle', 'Treino de Voz'), desc: safeT('ai.voiceFreeDesc', 'Speaking and Listening'), glow: 'shadow-[0_0_15px_rgba(168,85,247,0.15)] hover:shadow-[0_0_25px_rgba(168,85,247,0.4)] border-purple-500/20 hover:border-purple-400', iconBg: 'bg-purple-500/10 text-purple-400 border border-purple-500/20' }
   ];
 
   return (
