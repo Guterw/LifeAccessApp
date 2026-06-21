@@ -28,8 +28,8 @@ export default function BottomNav() {
 
   return (
     // h-20 e items-center garantem que TODOS os botões fiquem alinhados no exato meio vertical da barra
-    <div className={"fixed bottom-0 left-0 w-full bg-gray-900 border-t border-gray-800 pb-safe h-20 px-4 flex justify-between items-center z-50 transition-transform duration-200 ${isKeyboardOpen ? 'translate-y-full' : 'translate-y-0'}"}>
-            
+// Correto: usando crases ``
+    <div className={`fixed bottom-0 left-0 w-full bg-gray-900 border-t border-gray-800 pb-safe h-20 px-4 flex justify-between items-center z-50 transition-transform duration-200 ${isKeyboardOpen ? 'translate-y-full' : 'translate-y-0'}`}>            
       {/* Botão Idiomas */}
       <button 
         onClick={() => navigate('/languages')} 

@@ -2,15 +2,55 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { db } from '../../../../config/dexieDb';
 import { englishLevels } from '../../../../data/englishLevels';
-import { RotateCcw, CheckCircle2, XCircle, Flame } from 'lucide-react';
+import { RotateCcw, CheckCircle2, XCircle, Flame, Volume2, Turtle } from 'lucide-react';
 import { useLanguage } from '../../../../contexts/LanguageContext';
 import BackButton from '../../../../components/BackButton';
-import FooterBrand from '../../../../components/FooterBrand';
+
+// =========================================
+// FUNÇÕES DE ÁUDIO NATIVAS
+// =========================================
+const speakWord = (text, rate = 0.9) => {
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel(); 
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = 'en-US';
+  utterance.rate = rate; // Agora a velocidade é dinâmica
+  window.speechSynthesis.speak(utterance);
+};
+
+const playCorrectSound = () => {
+  const ctx = new (window.AudioContext || window.webkitAudioContext)();
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(523.25, ctx.currentTime); 
+  osc.frequency.exponentialRampToValueAtTime(1046.50, ctx.currentTime + 0.1); 
+  gain.gain.setValueAtTime(0.3, ctx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+  osc.start(ctx.currentTime);
+  osc.stop(ctx.currentTime + 0.5);
+};
+
+const playWrongSound = () => {
+  const ctx = new (window.AudioContext || window.webkitAudioContext)();
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+  osc.type = 'sawtooth';
+  osc.frequency.setValueAtTime(150, ctx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(100, ctx.currentTime + 0.3);
+  gain.gain.setValueAtTime(0.3, ctx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+  osc.start(ctx.currentTime);
+  osc.stop(ctx.currentTime + 0.3);
+};
 
 export default function LevelView() {
   const { id } = useParams();
   const navigate = useNavigate();
-  // uiLang já está sendo importado aqui, o que é perfeito!
   const { t, uiLang, registerLanguageActivity } = useLanguage();
   
   const currentLevelId = parseInt(id) || 1;
@@ -30,12 +70,19 @@ export default function LevelView() {
   const [displayedStreak, setDisplayedStreak] = useState(0);
   const [numberPopped, setNumberPopped] = useState(false);
 
-  // Independente do idioma da interface, a palavra exibida é sempre em inglês,
-  // então a tradução esperada nunca pode ser a própria palavra em inglês.
   const currentValidAnswers = currentWord ? (
     (uiLang === 'es' && currentWord.es) ? currentWord.es : 
     currentWord.pt 
   ) : [];
+
+  // =========================================
+  // AUTO-PLAY DA PALAVRA (Velocidade Normal)
+  // =========================================
+  useEffect(() => {
+    if (currentWord && currentWord.en) {
+      speakWord(currentWord.en, 0.9);
+    }
+  }, [currentWord]);
 
   useEffect(() => {
     if (!levelData) return;
@@ -54,21 +101,18 @@ export default function LevelView() {
     loadProgress();
   }, [currentLevelId, levelData]);
 
-  // Efeito Teatral da Ofensiva (Timers)
   useEffect(() => {
     if (isFinished && streakUpdate?.increased) {
       setShowStreakModal(true);
-      setDisplayedStreak(streakUpdate.oldStreak); // Começa com o número antigo
+      setDisplayedStreak(streakUpdate.oldStreak); 
       
-      // Ato 1: Acende o Fogo (0.5s)
       const t1 = setTimeout(() => {
         setFireIgnited(true);
       }, 500);
 
-      // Ato 2: Transforma o Número (1.5s)
       const t2 = setTimeout(() => {
-        setDisplayedStreak(streakUpdate.newStreak); // Muda pro número novo
-        setNumberPopped(true); // Engatilha a animação CSS de pulo
+        setDisplayedStreak(streakUpdate.newStreak); 
+        setNumberPopped(true); 
       }, 1500);
 
       return () => { clearTimeout(t1); clearTimeout(t2); };
@@ -85,7 +129,7 @@ export default function LevelView() {
   };
 
   const handleCheck = async (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
     if (!inputVal.trim() || !currentWord) return;
 
     const userAnswer = inputVal.trim().toLowerCase();
@@ -95,6 +139,7 @@ export default function LevelView() {
 
     if (isCorrect) {
       setFeedback('correct');
+      playCorrectSound(); // Toca o som de acerto
 
       await db.learnedWords.put({
         en: currentWord.en,
@@ -113,6 +158,8 @@ export default function LevelView() {
 
     } else {
       setFeedback('wrong');
+      playWrongSound(); // Toca o som de erro
+
       await db.mistakesLog.add({
         word: currentWord.en,
         level: currentLevelId,
@@ -132,23 +179,49 @@ export default function LevelView() {
       setFeedback(null);
       
       if (newQueue.length === 0) {
-        // 1. Primeiro registramos a atividade do dia e pegamos o resultado da ofensiva
         const streakResult = await registerLanguageActivity();
         setStreakUpdate(streakResult);
 
-        // 2. Depois marcamos o nível como concluído no banco
         await db.completedLevels.put({
           level: currentLevelId,
           completedAt: new Date().toISOString()
         });
 
-        // 3. Por fim, ativamos a tela de finalizado que vai disparar o useEffect do Modal
         setIsFinished(true);
       } else {
         setQueue(newQueue);
         setCurrentWord(newQueue[0]);
       }
     }, delay);
+  };
+
+  // =========================================
+  // LÓGICA DO BOTÃO PULAR
+  // =========================================
+  const handleSkip = async () => {
+    if (feedback !== null || !currentWord) return;
+
+    setFeedback('wrong'); 
+    playWrongSound(); 
+
+    await db.mistakesLog.add({
+      word: currentWord.en,
+      level: currentLevelId,
+      category: currentWord.category || 'Geral',
+      timestamp: new Date().toISOString()
+    });
+
+    let newQueue = [...queue];
+    const skippedWord = newQueue.shift();
+    newQueue.push(skippedWord); 
+    await saveStateToDB(newQueue, progress.correct);
+
+    setTimeout(async () => {
+      setInputVal('');
+      setFeedback(null);
+      setQueue(newQueue);
+      setCurrentWord(newQueue[0]);
+    }, 3000);
   };
 
   const handleRestartLevel = async () => {
@@ -158,7 +231,6 @@ export default function LevelView() {
     setProgress({ correct: 0, total: levelData.words.length });
     setIsFinished(false);
     
-    // Reseta todos os estados da animação
     setShowStreakModal(false);
     setFireIgnited(false);
     setNumberPopped(false);
@@ -172,7 +244,6 @@ export default function LevelView() {
       <BackButton to="/levels" label={t('levelList.title')} />
 
       <div className="flex justify-between items-center mb-6 px-2">
-        {/* CORREÇÃO DO ERRO AQUI: Ele agora escolhe o idioma certo em vez de jogar o objeto inteiro */}
         <h2 className="text-2xl font-bold text-blue-400">
           {levelData.title[uiLang] || levelData.title.pt}
         </h2>
@@ -196,17 +267,16 @@ export default function LevelView() {
 
       {!isFinished ? (
         <div className="bg-gray-800 p-8 rounded-2xl shadow-xl border border-gray-700 text-center relative overflow-hidden">
+          
           {feedback === 'correct' && (
             <div className="absolute inset-0 bg-gray-900/95 flex flex-col items-center justify-center z-10 backdrop-blur-md animate-fade-in px-4">
               <CheckCircle2 size={60} className="text-green-500 drop-shadow-[0_0_15px_rgba(34,197,94,0.4)] mb-10" />
               <p className="text-green-400 text-sm font-bold uppercase tracking-widest mb-4">
-                {t('level.excellent')}
+                {t('level.excellent', 'Excelente!')}
               </p>
-              
-              {/* Cardzinho mostrando todas as respostas válidas */}
               <div className="bg-gray-800 border border-gray-700 rounded-xl p-3 w-full max-w-xs shadow-inner animate-fade-in" style={{ animationDelay: '200ms' }}>
                 <p className="text-gray-400 text-[10px] font-bold uppercase tracking-widest mb-1">
-                  {t('level.validOptions')}
+                  {t('level.validOptions', 'Opções Válidas')}
                 </p>
                 <p className="text-white text-xl font-black text-center">
                   {currentValidAnswers.join(' / ')}
@@ -214,73 +284,112 @@ export default function LevelView() {
               </div>
             </div>
           )}
+          
           {feedback === 'wrong' && (
             <div className="absolute inset-0 bg-gray-900/95 flex flex-col items-center justify-center z-10 backdrop-blur-md animate-fade-in px-4">
               <XCircle size={60} className="text-red-500 drop-shadow-lg mb-4" />
-              <p className="text-gray-300 text-sm font-bold uppercase tracking-widest mb-1">{t('level.correctIs')}</p>
+              <p className="text-gray-300 text-sm font-bold uppercase tracking-widest mb-1">
+                {t('level.correctIs', 'O correto é:')}
+              </p>
               <p className="text-white text-3xl font-black text-center">{currentValidAnswers.join('/')}</p>
             </div>
           )}
 
-          <p className="text-gray-400 text-sm mb-2">{t('level.translateThis')}</p>
-          <h3 className="text-5xl font-black text-white mb-8 tracking-wide">{currentWord?.en}</h3>
+          <p className="text-gray-400 text-sm mb-2">{t('level.translateThis', 'Traduza esta palavra')}</p>
+          
+          {/* ÁREA DA PALAVRA COM BOTÕES DE ÁUDIO (FLUTUANTES) */}
+          <div className="relative flex items-center justify-center w-full mb-8 min-h-[48px]">
+            {/* Grupo de botões flutuando à esquerda para não empurrar a palavra */}
+            <div className="absolute left-0 flex items-center gap-2">
+              <button 
+                type="button"
+                onClick={() => speakWord(currentWord?.en, 0.2)}
+                className="w-10 h-10 flex items-center justify-center bg-yellow-500/20 text-yellow-500 rounded-full hover:bg-yellow-500/30 transition-colors shrink-0"
+                title="Ouvir bem devagar"
+              >
+                <Turtle size={18} />
+              </button>
+
+              <button 
+                type="button"
+                onClick={() => speakWord(currentWord?.en, 0.9)}
+                className="w-10 h-10 flex items-center justify-center bg-yellow-500/20 text-yellow-500 rounded-full hover:bg-yellow-500/30 transition-colors shrink-0"
+                title="Ouvir pronúncia"
+              >
+                <Volume2 size={20} />
+              </button>
+            </div>
+
+            {/* A palavra centralizada perfeitamente no container */}
+            <h3 className="text-4xl sm:text-5xl font-black text-white tracking-wide text-center px-24 w-full break-words">
+              {currentWord?.en}
+            </h3>
+          </div>
 
           <form onSubmit={handleCheck} className="space-y-4">
             <input
               type="text" autoFocus disabled={feedback !== null}
-              placeholder={t('level.placeholder')}
+              placeholder={t('level.placeholder', 'Sua resposta aqui...')}
               value={inputVal} onChange={(e) => setInputVal(e.target.value)}
               className="w-full bg-gray-900 text-white p-4 rounded-xl border-2 border-gray-700 focus:border-blue-500 focus:outline-none text-center text-lg transition-colors"
             />
+            
             <button
               type="submit" disabled={feedback !== null}
               className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold p-4 rounded-xl transition-colors disabled:opacity-50"
             >
-              {t('level.confirm')}
+              {t('level.confirm', 'Confirmar')}
+            </button>
+
+            {/* BOTÃO (NÃO SEI) PULAR SÓLIDO E EMPILHADO */}
+            <button
+              type="button" 
+              onClick={handleSkip}
+              disabled={feedback !== null}
+              className="w-full flex flex-col items-center justify-center bg-yellow-500 hover:bg-yellow-400 text-yellow-950 p-2.5 rounded-xl transition-colors disabled:opacity-50 shadow-md"
+            >
+              <span className="text-base font-black uppercase tracking-wider">
+                {t('level.skipBtnMain', 'Pular')}
+              </span>
+              <span className="text-xs font-bold opacity-80">
+                {t('level.skipBtnSub', '(Não sei)')}
+              </span>
             </button>
           </form>
         </div>
       ) : (
         <div className="bg-gray-800 p-8 rounded-2xl border border-green-500 text-center shadow-lg animate-fade-in">
           <CheckCircle2 size={60} className="text-green-500 mx-auto mb-4" />
-          <h3 className="text-2xl font-bold text-white mb-2">{t('level.completedTitle')}</h3>
-          <p className="text-gray-400 mb-8">{t('level.masteredAll')} {progress.total} {t('level.words')}</p>
+          <h3 className="text-2xl font-bold text-white mb-2">{t('level.completedTitle', 'Nível Concluído!')}</h3>
+          <p className="text-gray-400 mb-8">{t('level.masteredAll', 'Você dominou todas as')} {progress.total} {t('level.words', 'palavras!')}</p>
 
           <button 
             onClick={() => navigate('/levels')}
             className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold p-4 rounded-xl mb-3 transition-colors shadow-lg"
           >
-            {t('level.finishBtn')}
+            {t('level.finishBtn', 'Finalizar')}
           </button>
           <button 
             onClick={handleRestartLevel}
             className="w-full bg-gray-700 hover:bg-gray-600 text-white font-bold p-4 rounded-xl transition-colors"
           >
-            {t('level.redoBtn')}
+            {t('level.redoBtn', 'Refazer Nível')}
           </button>
         </div>
       )}
 
-      {/* =========================================
-          MODAL DE OFENSIVA (NÍVEL z-[100] Cobre TUDO)
-          ========================================= */}
       {showStreakModal && streakUpdate && (
         <div className="fixed inset-0 z-[100] bg-gray-900/95 backdrop-blur-xl flex flex-col items-center justify-center px-6 animate-fade-in">
-          
           <div className="flex-1 flex flex-col items-center justify-center w-full">
-            {/* O Fogo pulsa infinitamente depois de acender */}
             <div className={`transition-all duration-1000 transform ${fireIgnited ? 'scale-110' : 'scale-90 opacity-50'}`}>
               <Flame 
                 size={140} 
                 className={`transition-colors duration-1000 ${fireIgnited ? 'text-orange-500 drop-shadow-[0_0_60px_rgba(249,115,22,0.8)] animate-pulse' : 'text-gray-600'}`} 
               />
             </div>
-
             <h2 className="text-3xl font-black text-white mt-12 mb-4 tracking-wide text-center">
-              {t('level.streakUpdated')}
+              {t('level.streakUpdated', 'Ofensiva Atualizada!')}
             </h2>
-
-            {/* Número único que se transforma */}
             <div className="flex items-center justify-center h-32 mt-2">
               <span className={`text-8xl font-black transition-all duration-500 transform ${
                 numberPopped 
@@ -291,16 +400,14 @@ export default function LevelView() {
               </span>
             </div>
           </div>
-
           <div className="w-full max-w-sm pb-safe pt-8 pb-12">
             <button 
               onClick={() => setShowStreakModal(false)}
               className="w-full bg-orange-500 hover:bg-orange-600 text-white font-black text-xl p-5 rounded-2xl transition-all shadow-[0_0_20px_rgba(249,115,22,0.4)] hover:shadow-[0_0_30px_rgba(249,115,22,0.6)] active:scale-95 uppercase tracking-wide"
             >
-              {t('level.dedicateBtn')}
+              {t('level.dedicateBtn', 'Continuar Focado')}
             </button>
           </div>
-
         </div>
       )}
 

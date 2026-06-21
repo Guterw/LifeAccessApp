@@ -22,6 +22,8 @@ import StatsView from './features/languages/english/views/StatsView';
 import LevelGroupView from './features/languages/english/views/LevelGroupView';
 import AiHubView from './features/languages/english/views/AiHubView';
 import AiChatFreeView from './features/languages/english/views/ai-chat/AiChatFreeView';
+import AiTaskSelectionView from './features/languages/english/views/ai-chat/AiTaskSelectionView';
+import AiChatTaskView from './features/languages/english/views/ai-chat/AiChatTaskView';
 
 function App() {
   const { isFirstAccess } = useLanguage();
@@ -65,7 +67,9 @@ function App() {
             <Route path="/english/stats" element={<StatsView />} />
             <Route path="/english/ai-hub" element={<AiHubView />} />
             <Route path="/english/ai-chat/free" element={<AiChatFreeView />} />
-            
+            <Route path="/english/ai-chat/tasks" element={<AiTaskSelectionView />} />
+            <Route path="/english/ai-chat/tasks/:taskId" element={<AiChatTaskView />} />
+                        
             {/* Rotas futuras (deixamos cegas por enquanto para não dar erro se clicar na Bottom Bar) */}
             <Route path="/fitness" element={<div className="pt-8 text-center text-gray-400">Em breve</div>} />
             <Route path="/finance" element={<div className="pt-8 text-center text-gray-400">Em breve</div>} />

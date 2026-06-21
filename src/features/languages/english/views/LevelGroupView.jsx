@@ -53,16 +53,22 @@ export default function LevelGroupView() {
                 done ? 'bg-gray-800/50 border-green-500/30' : 'bg-gray-800 border-gray-700 hover:border-blue-500'
               }`}
             >
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <h3 className={`text-xl font-bold mb-1 ${done ? 'text-green-400' : 'text-white'}`}>
+              <div className="flex items-center justify-between mb-4 gap-4">
+                
+                <div className="flex-1 min-w-0">
+                  <h3 className={`text-xl font-bold mb-1 break-words ${done ? 'text-green-400' : 'text-white'}`}>
                     {titleText}
                   </h3>
                   <p className="text-sm text-gray-400">
                     {level.words.length} {t('levelList.wordsToMaster', 'palavras')}
                   </p>
                 </div>
-                {done ? <CheckCircle2 className="text-green-500" size={32} /> : <Play className="text-blue-500" size={32} />}
+                
+                {done ? (
+                  <CheckCircle2 className="text-green-500 shrink-0" size={32} />
+                ) : (
+                  <Play className="text-blue-500 shrink-0" size={32} />
+                )}
               </div>
 
               {/* BARRA DE PROGRESSO - SEMPRE VISÍVEL */}
