@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { db } from '../../../../config/dexieDb';
 import { vocabulariesLevels } from '../../../../data/vocabulariesLevels';
 import { RotateCcw, CheckCircle2, XCircle, Flame, Volume2, Turtle } from 'lucide-react';
 import { useLanguage } from '../../../../contexts/LanguageContext';
 import BackButton from '../../../../components/BackButton';
+import { addXP } from '../../../../utils/xpManager';
 
 // =========================================
 // FUNÇÕES DE ÁUDIO NATIVAS
@@ -51,6 +52,7 @@ const playWrongSound = () => {
 export default function LevelView() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const { t, uiLang, registerLanguageActivity } = useLanguage();
   
   const currentLevelId = parseInt(id) || 1;
@@ -69,6 +71,10 @@ export default function LevelView() {
   const [fireIgnited, setFireIgnited] = useState(false);
   const [displayedStreak, setDisplayedStreak] = useState(0);
   const [numberPopped, setNumberPopped] = useState(false);
+
+  const backRoute = location.state?.fromTrail 
+    ? '/english/trail' 
+    : '/levels';
 
   const currentValidAnswers = currentWord ? (
     (uiLang === 'es' && currentWord.es) ? currentWord.es : 
@@ -187,6 +193,8 @@ export default function LevelView() {
           completedAt: new Date().toISOString()
         });
 
+        await addXP(20);
+
         setIsFinished(true);
       } else {
         setQueue(newQueue);
@@ -241,7 +249,7 @@ export default function LevelView() {
 
   return (
     <div className="w-full pt-8 animate-fade-in relative">
-      <BackButton to="/levels" label={t('levelList.title')} />
+      <BackButton to={backRoute} label={t('levelList.title')} />
 
       <div className="flex justify-between items-center mb-6 px-2">
         <h2 className="text-2xl font-bold text-blue-400">
@@ -364,7 +372,7 @@ export default function LevelView() {
           <p className="text-gray-400 mb-8">{t('level.masteredAll', 'Você dominou todas as')} {progress.total} {t('level.words', 'palavras!')}</p>
 
           <button 
-            onClick={() => navigate('/levels')}
+            onClick={() => navigate(backRoute)}
             className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold p-4 rounded-xl mb-3 transition-colors shadow-lg"
           >
             {t('level.finishBtn', 'Finalizar')}

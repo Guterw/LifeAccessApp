@@ -4,6 +4,7 @@ import { Globe, Dumbbell, Wallet, Gamepad2, Settings, Flame } from 'lucide-react
 import { useLanguage } from '../../../contexts/LanguageContext';
 import ModuleCard from '../../../components/ModuleCard';
 import FooterBrand from '../../../components/FooterBrand';
+import PigeonAvatar from '../../../components/PigeonAvatar'; // IMPORT DO PADDY!
 
 export default function MainDashboard() {
   const navigate = useNavigate();
@@ -60,17 +61,27 @@ export default function MainDashboard() {
       </div>
 
       {/* Os cards agora ficam sem px, ocupando toda a largura até a borda */}
-      <div className="space-y-4 px-2"> 
-        <ModuleCard 
-          onClick={() => navigate('/languages')}
-          icon={Globe}
-          title={t('home.langModule')}
-          subtitle={t('home.langDesc')}
-          isActive={true}
-          customBgClass="bg-gradient-to-r from-blue-900/40 to-gray-800 border border-blue-500/30 hover:border-blue-400 shadow-lg"
-          iconBgClass="bg-blue-500/20 text-blue-400"
-          badge={streakBadge}
-        />
+      {/* Adicionado mt-10 para dar espaço para a cabeça e chapéu do Paddy */}
+      <div className="space-y-4 px-2 mt-10"> 
+        
+        {/* CONTAINER RELATIVO DO MÓDULO DE IDIOMAS COM O PADDY */}
+        <div className="relative">
+          {/* O PADDY IRLANDÊS (Em pé sobre o card) */}
+          <div className="absolute -top-[55px] right-6 z-20 pointer-events-none drop-shadow-[0_12px_12px_rgba(0,0,0,0.6)]">
+            <PigeonAvatar accessory="irish" className="w-20 h-20" />
+          </div>
+
+          <ModuleCard 
+            onClick={() => navigate('/languages')}
+            icon={Globe}
+            title={t('home.langModule')}
+            subtitle={t('home.langDesc')}
+            isActive={true}
+            customBgClass="bg-gradient-to-r from-blue-900/40 to-gray-800 border border-blue-500/30 hover:border-blue-400 shadow-lg relative z-10"
+            iconBgClass="bg-blue-500/20 text-blue-400"
+            badge={streakBadge}
+          />
+        </div>
 
         {/* Ícones com a mesma cor de identidade usada quando o módulo está ativo na BottomNav,
             só que mais suave — pra não parecer "morto" mesmo estando em desenvolvimento */}

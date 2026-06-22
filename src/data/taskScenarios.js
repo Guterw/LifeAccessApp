@@ -1,6 +1,93 @@
-// src/features/languages/english/views/ai-chat/taskScenarios.js
+// src/data/taskScenarios.js
 
 export const TASK_SCENARIOS = [
+  {
+    id: 'chat_intro',
+    title: { pt: 'Apresentação Básica', es: 'Presentación Básica', en: 'Basic Introduction' },
+    description: { 
+      pt: 'Você acabou de chegar e precisa se apresentar para uma pessoa nova.', 
+      es: 'Acabas de llegar y necesitas presentarte a alguien nuevo.', 
+      en: 'You just arrived and need to introduce yourself to someone new.' 
+    },
+    objective: { 
+      pt: 'Diga seu nome, de onde você é e o que veio fazer.', 
+      es: 'Di tu nombre, de dónde eres y qué viniste a hacer.', 
+      en: 'Say your name, where you are from, and what you came to do.' 
+    },
+    aiRole: 'You are a friendly local in Dublin meeting someone new. Ask for their name, where they are from, and why they moved here.',
+    completionCondition: 'Once the user states their name, country of origin, and purpose, warmly welcome them and set isCompleted to true.',
+    firstMessage: {
+      text: 'Hi there! I don\'t think we\'ve met. I\'m Sarah. What\'s your name and where are you from?',
+      translation: { 
+        pt: 'Olá! Acho que não nos conhecemos. Eu sou a Sarah. Qual é o seu nome e de onde você é?', 
+        es: '¡Hola! Creo que no nos conocemos. Soy Sarah. ¿Cuál es tu nombre y de dónde eres?', 
+        en: 'Hi there! I don\'t think we\'ve met. I\'m Sarah. What\'s your name and where are you from?' 
+      },
+      hint: { 
+        pt: 'Responda dizendo seu nome e que você é do Brasil (ex: "Hi Sarah, my name is Luccas and I am from Brazil").', 
+        es: 'Responde diciendo tu nombre y que eres de Brasil.', 
+        en: 'Respond by saying your name and that you are from Brazil.' 
+      }
+    }
+  },
+  {
+    id: 'directions_bus',
+    title: { pt: 'Pedindo Informações', es: 'Pidiendo Direcciones', en: 'Asking for Directions' },
+    description: { 
+      pt: 'Você está perdido na rua e precisa encontrar transporte.', 
+      es: 'Estás perdido en la calle y necesitas encontrar transporte.', 
+      en: 'You are lost on the street and need to find transport.' 
+    },
+    objective: { 
+      pt: 'Pergunte onde fica o ponto de ônibus (bus stop) mais próximo.', 
+      es: 'Pregunte dónde está la parada de autobús (bus stop) más cercana.', 
+      en: 'Ask where the nearest bus stop is.' 
+    },
+    aiRole: 'You are a helpful local walking down the street. The user looks lost. If they ask for the bus stop, give them simple directions (e.g., straight ahead and turn left).',
+    completionCondition: 'Once the user clearly asks for the location of a bus stop and thanks you for the directions, set isCompleted to true.',
+    firstMessage: {
+      text: 'Hi! You look a bit lost. Do you need some help finding somewhere?',
+      translation: { 
+        pt: 'Oi! Você parece um pouco perdido. Precisa de ajuda para encontrar algum lugar?', 
+        es: '¡Hola! Pareces un poco perdido. ¿Necesitas ayuda para encontrar algún lugar?', 
+        en: 'Hi! You look a bit lost. Do you need some help finding somewhere?' 
+      },
+      hint: { 
+        pt: 'Diga que sim e pergunte onde fica o ponto de ônibus (ex: "Yes, please. Where is the bus stop?").', 
+        es: 'Diga que sí y pregunte dónde está la parada de autobús (ej: "Yes, please. Where is the bus stop?").', 
+        en: 'Say yes and ask where the bus stop is (e.g., "Yes, please. Where is the bus stop?").' 
+      }
+    }
+  },
+  {
+    id: 'shopping_clothes',
+    title: { pt: 'Comprando Roupas', es: 'Comprando Ropa', en: 'Clothes Shopping' },
+    description: { 
+      pt: 'Você está em uma loja e precisa de um tamanho diferente.', 
+      es: 'Estás en una tienda y necesitas una talla diferente.', 
+      en: 'You are in a store and need a different size.' 
+    },
+    objective: { 
+      pt: 'Pergunte se eles têm uma camiseta no tamanho Grande (Large) e qual o preço.', 
+      es: 'Pregunte si tienen una camiseta en talla Grande (Large) y cuál es el precio.', 
+      en: 'Ask if they have a t-shirt in Large and what the price is.' 
+    },
+    aiRole: 'You are a shop assistant in a clothing store in Dublin. You help customers find their sizes and tell them prices.',
+    completionCondition: 'Once the user asks for a size Large and asks for the price, tell them the price (e.g., 20 euros) and set isCompleted to true.',
+    firstMessage: {
+      text: 'Hello! Let me know if you need any help finding your size or if you have any questions.',
+      translation: { 
+        pt: 'Olá! Me avise se precisar de ajuda para encontrar o seu tamanho ou se tiver alguma dúvida.', 
+        es: '¡Hola! Avísame si necesitas ayuda para encontrar tu talla o si tienes alguna pregunta.', 
+        en: 'Hello! Let me know if you need any help finding your size or if you have any questions.' 
+      },
+      hint: { 
+        pt: 'Pergunte sobre uma camiseta no tamanho G e o preço (ex: "Do you have this t-shirt in Large? How much is it?").', 
+        es: 'Pregunte por una camiseta en talla L y el precio (ej: "Do you have this t-shirt in Large? How much is it?").', 
+        en: 'Ask about a t-shirt in size Large and the price (e.g., "Do you have this t-shirt in Large? How much is it?").' 
+      }
+    }
+  },
   {
     id: 'dublin_airport',
     title: { pt: 'Imigração em Dublin', es: 'Inmigración en Dublín', en: 'Dublin Immigration' },

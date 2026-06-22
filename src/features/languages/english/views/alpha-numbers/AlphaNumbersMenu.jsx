@@ -1,3 +1,4 @@
+// src/features/languages/english/views/alpha-numbers/AlphaNumbersMenu.jsx
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Type, Hash, ChevronRight, BookOpenText, Play, Zap } from 'lucide-react';
@@ -10,18 +11,44 @@ export default function AlphaNumbersMenu() {
   const navigate = useNavigate();
 
   const learnOptions = [
-    { id: 'alphabet', title: 'Alfabeto', desc: 'Letras e Fonética', icon: <Type size={24} />, color: 'blue', path: '/english/alpha-numbers/alphabet' },
-    { id: 'numbers', title: 'Números', desc: 'Contagem e Dezenas', icon: <Hash size={24} />, color: 'emerald', path: '/english/alpha-numbers/numbers' }
+    { 
+      id: 'alphabet', 
+      title: t('alpha.alphabet', 'Alfabeto'), 
+      desc: t('alpha.alphaDesc', 'Letras e Fonética'), 
+      icon: <Type size={24} />, 
+      color: 'blue', 
+      path: '/english/alpha-numbers/alphabet' 
+    },
+    { 
+      id: 'numbers', 
+      title: t('alpha.numbers', 'Números'), 
+      desc: t('alpha.numbersDesc', 'Contagem e Dezenas'), 
+      icon: <Hash size={24} />, 
+      color: 'emerald', 
+      path: '/english/alpha-numbers/numbers' 
+    }
   ];
 
   const exerciseOptions = [
-    { id: 'ex-alphabet', title: 'Treino Alfabeto', desc: 'Soletração e Som', icon: <Zap size={20} />, path: '/english/alpha-numbers/exercises/alphabet' },
-    { id: 'ex-numbers', title: 'Treino Números', desc: 'Ditado e Sequência', icon: <Zap size={20} />, path: '/english/alpha-numbers/exercises/numbers' }
+    { 
+      id: 'ex-alphabet', 
+      title: t('alpha.exAlphabet', 'Treino Alfabeto'), 
+      desc: t('alpha.exAlphaDesc', 'Soletração e Som'), 
+      icon: <Zap size={20} />, 
+      path: '/english/alpha-numbers/exercises/alphabet' 
+    },
+    { 
+      id: 'ex-numbers', 
+      title: t('alpha.exNumbers', 'Treino Números'), 
+      desc: t('alpha.exNumbersDesc', 'Ditado e Sequência'), 
+      icon: <Zap size={20} />, 
+      path: '/english/alpha-numbers/exercises/numbers' 
+    }
   ];
 
   return (
-    <div className="w-full pt-8 animate-fade-in px-4 pb-24 min-h-screen">
-      <BackButton to="/english" label="Voltar" />
+    <div className="w-full pt-8 animate-fade-in px-4 pb-24 min-h-screen -mt-5 -mb-20">
+      <BackButton to="/english" label={t('general.back', 'Voltar')} />
 
       {/* HEADER ESTILIZADO */}
       <div className="flex flex-col mb-10 mt-6 px-1">
@@ -29,12 +56,16 @@ export default function AlphaNumbersMenu() {
           <div className="p-3 bg-gradient-to-br from-indigo-500 to-purple-600 text-white rounded-2xl shadow-lg shadow-indigo-500/20">
             <BookOpenText size={28} />
           </div>
-          <h2 className="text-3xl font-black text-white tracking-tight">Fundamentos</h2>
+          <h2 className="text-3xl font-black text-white tracking-tight">
+            {t('english.fundamentals', 'Fundamentos')}
+          </h2>
         </div>
       </div>
 
       {/* SEÇÃO APRENDER (Cards com Glassmorphism) */}
-      <h3 className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-4 px-1">Aprender</h3>
+      <h3 className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-4 px-1">
+        {t('alpha.learn', 'Aprender')}
+      </h3>
       <div className="grid gap-4 mb-10">
         {learnOptions.map((opt) => (
             <button
@@ -59,7 +90,9 @@ export default function AlphaNumbersMenu() {
         </div>
 
       {/* SEÇÃO TREINAR (Cards com gradiente vibrante) */}
-      <h3 className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-4 px-1">Treinar</h3>
+      <h3 className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-4 px-1">
+        {t('alpha.train', 'Treinar')}
+      </h3>
       <div className="grid gap-4">
         {exerciseOptions.map((opt) => (
           <button

@@ -67,39 +67,66 @@ export const ALPHABET_EXERCISES = [
   },
   {
     id: 'alpha_level_5',
-    title: { pt: 'Desafio Master (Mistura Total)', en: 'Master Challenge (Total Mix)', es: 'Desafío Maestro (Mezcla Total)' },
+    title: { pt: 'Spelling Bee: Iniciante', en: 'Spelling Bee: Beginner', es: 'Concurso de Deletreo: Principiante' },
     questions: [
-      { id: 'q1', type: 'listen_and_identify', question: { pt: 'Qual você ouviu?', en: 'Which one did you hear?', es: '¿Cuál escuchaste?' }, target: 'A', options: ['E', 'I', 'A', 'Y'], audio_hint: 'A' },
-      { id: 'q2', type: 'listen_and_identify', question: { pt: 'Qual você ouviu?', en: 'Which one did you hear?', es: '¿Cuál escuchaste?' }, target: 'E', options: ['E', 'I', 'A', 'Y'], audio_hint: 'E' },
-      { id: 'q3', type: 'listen_and_identify', question: { pt: 'Qual você ouviu?', en: 'Which one did you hear?', es: '¿Cuál escuchaste?' }, target: 'I', options: ['E', 'I', 'A', 'Y'], audio_hint: 'I' },
-      { id: 'q4', type: 'voice_repetition', question: { pt: 'Diga a letra "J"', en: 'Say the letter "J"', es: 'Di la letra "J"' }, target: ['J', 'j'], instructions: { pt: 'Cuidado para não confundir com G!', en: 'Be careful not to confuse it with G!', es: '¡Cuidado con no confundirla con G!' } },
-      { id: 'q5', type: 'voice_repetition', question: { pt: 'Diga a letra "G"', en: 'Say the letter "G"', es: 'Di la letra "G"' }, target: ['G', 'g'], instructions: { pt: 'Lembre-se: "dji".', en: 'Remember: "dji".', es: 'Recuerda: "dji".' } },
-      { id: 'q6', type: 'listen_and_identify', question: { pt: 'Identifique:', en: 'Identify:', es: 'Identifica:' }, target: 'H', options: ['8', 'A', 'R', 'H'], audio_hint: 'H' },
-      { id: 'q7', type: 'voice_repetition', question: { pt: 'Diga a letra "R"', en: 'Say the letter "R"', es: 'Di la letra "R"' }, target: ['R', 'r'], instructions: { pt: 'Fale "ar".', en: 'Say "ar".', es: 'Di "ar".' } },
-      { id: 'q8', type: 'listen_and_identify', question: { pt: 'Identifique:', en: 'Identify:', es: 'Identifica:' }, target: 'W', options: ['W', 'M', 'U', 'V'], audio_hint: 'W' },
-      { id: 'q9', type: 'voice_repetition', question: { pt: 'Diga a letra "Y"', en: 'Say the letter "Y"', es: 'Di la letra "Y"' }, target: ['Y', 'y'], instructions: { pt: 'A letra do mineiro: "uai".', en: 'Say "uai".', es: 'Di "uai".' } },
-      { id: 'q10', type: 'phonetic_match', question: { pt: 'A fonética "kei" pertence à letra:', en: 'The phonetic "kei" belongs to the letter:', es: 'La fonética "kei" pertenece a la letra:' }, target: 'K', options: ['Q', 'C', 'K', 'T'] }
+      { id: 'q1', type: 'listen_and_identify', question: { pt: 'Ouça a soletração e marque:', en: 'Listen to the spelling and select:', es: 'Escucha el deletreo y marca:' }, target: 'APPLE', options: ['APPLE', 'APPLY', 'AMPLE', 'MAPLE'], audio_hint: 'A. P. P. L. E.' },
+      { id: 'q2', type: 'voice_dictation', question: { pt: 'Soletre: WATER', en: 'Spell: WATER', es: 'Deletrea: WATER' }, target: ['water', 'w a t e r'], instructions: { pt: 'Diga: W - A - T - E - R', en: 'Say: W - A - T - E - R', es: 'Di: W - A - T - E - R' } },
+      { id: 'q3', type: 'listen_and_identify', question: { pt: 'Qual a palavra?', en: 'Which word?', es: '¿Qué palabra es?' }, target: 'BOOK', options: ['BACK', 'BOOK', 'BOOT', 'LOOK'], audio_hint: 'B. O. O. K.' },
+      { id: 'q4', type: 'voice_dictation', question: { pt: 'Soletre: HOUSE', en: 'Spell: HOUSE', es: 'Deletrea: HOUSE' }, target: ['house', 'h o u s e'], instructions: { pt: 'Diga: H - O - U - S - E', en: 'Say: H - O - U - S - E', es: 'Di: H - O - U - S - E' } },
+      { id: 'q5', type: 'listen_and_identify', question: { pt: 'Identifique:', en: 'Identify:', es: 'Identifica:' }, target: 'MILK', options: ['MILD', 'MILE', 'MILK', 'SILK'], audio_hint: 'M. I. L. K.' },
+      { id: 'q6', type: 'voice_dictation', question: { pt: 'Soletre: NIGHT', en: 'Spell: NIGHT', es: 'Deletrea: NIGHT' }, target: ['night', 'n i g h t'], instructions: { pt: 'Diga: N - I - G - H - T', en: 'Say: N - I - G - H - T', es: 'Di: N - I - G - H - T' } },
+      { id: 'q7', type: 'listen_and_identify', question: { pt: 'Qual a palavra?', en: 'Which word?', es: '¿Qué palabra es?' }, target: 'BREAD', options: ['BREAD', 'BROAD', 'BRAIN', 'BEARD'], audio_hint: 'B. R. E. A. D.' },
+      { id: 'q8', type: 'voice_dictation', question: { pt: 'Soletre: MONEY', en: 'Spell: MONEY', es: 'Deletrea: MONEY' }, target: ['money', 'm o n e y'], instructions: { pt: 'Diga: M - O - N - E - Y', en: 'Say: M - O - N - E - Y', es: 'Di: M - O - N - E - Y' } },
+      { id: 'q9', type: 'listen_and_identify', question: { pt: 'Identifique:', en: 'Identify:', es: 'Identifica:' }, target: 'PINT', options: ['PINT', 'POINT', 'PAINT', 'PINK'], audio_hint: 'P. I. N. T.' },
+      { id: 'q10', type: 'voice_dictation', question: { pt: 'Soletre: TICKET', en: 'Spell: TICKET', es: 'Deletrea: TICKET' }, target: ['ticket', 't i c k e t'], instructions: { pt: 'Diga: T - I - C - K - E - T', en: 'Say: T - I - C - K - E - T', es: 'Di: T - I - C - K - E - T' } }
     ]
   },
   {
     id: 'alpha_level_6',
-    title: { pt: 'Spelling Bee (Soletração)', en: 'Spelling Bee Challenge', es: 'Concurso de Deletreo' },
+    title: { pt: 'Spelling Bee: Intermediário', en: 'Spelling Bee: Intermediate', es: 'Concurso de Deletreo: Intermedio' },
     questions: [
-      { id: 'q1', type: 'listen_and_identify', question: { pt: 'Ouça a soletração e marque a palavra:', en: 'Listen to the spelling and select the word:', es: 'Escucha el deletreo y selecciona la palabra:' }, target: 'BOOK', options: ['BACK', 'BOOK', 'BOOT', 'LOOK'], audio_hint: 'B. O. O. K.' },
-      { id: 'q2', type: 'voice_dictation', question: { pt: 'Soletre a palavra: WATER', en: 'Spell the word: WATER', es: 'Deletrea la palabra: WATER' }, target: ['water', 'w a t e r'], instructions: { pt: 'Diga letra por letra (W - A - T - E - R).', en: 'Say letter by letter (W - A - T - E - R).', es: 'Di letra por letra (W - A - T - E - R).' } },
-      { id: 'q3', type: 'listen_and_identify', question: { pt: 'Qual palavra foi soletrada?', en: 'Which word was spelled?', es: '¿Qué palabra fue deletreada?' }, target: 'DUBLIN', options: ['LONDON', 'DUBLIN', 'BERLIN', 'CORK'], audio_hint: 'D. U. B. L. I. N.' },
-      { id: 'q4', type: 'voice_dictation', question: { pt: 'Soletre a palavra: COFFEE', en: 'Spell the word: COFFEE', es: 'Deletrea la palabra: COFFEE' }, target: ['coffee', 'c o f f e e'], instructions: { pt: 'Cuidado com as letras duplas!', en: 'Watch out for double letters!', es: '¡Cuidado con las letras dobles!' } },
-      { id: 'q5', type: 'listen_and_identify', question: { pt: 'Ouça a soletração e marque a palavra:', en: 'Listen to the spelling and select the word:', es: 'Escucha el deletreo y selecciona la palabra:' }, target: 'MANAGER', options: ['MANAGE', 'MANAGER', 'MANGER', 'MANUAL'], audio_hint: 'M. A. N. A. G. E. R.' },
-      { id: 'q6', type: 'voice_dictation', question: { pt: 'Soletre a sigla: HACCP', en: 'Spell the acronym: HACCP', es: 'Deletrea las siglas: HACCP' }, target: ['haccp', 'h a c c p'], instructions: { pt: 'Sigla de segurança alimentar!', en: 'Food safety acronym!', es: '¡Siglas de seguridad alimentaria!' } },
-      { id: 'q7', type: 'listen_and_identify', question: { pt: 'Qual palavra foi soletrada?', en: 'Which word was spelled?', es: '¿Qué palabra fue deletreada?' }, target: 'PINT', options: ['PINT', 'PANT', 'POINT', 'PINK'], audio_hint: 'P. I. N. T.' },
-      { id: 'q8', type: 'voice_dictation', question: { pt: 'Soletre a palavra: TICKET', en: 'Spell the word: TICKET', es: 'Deletrea la palabra: TICKET' }, target: ['ticket', 't i c k e t'], instructions: { pt: 'Diga letra por letra.', en: 'Say it letter by letter.', es: 'Dilo letra por letra.' } },
-      { id: 'q9', type: 'listen_and_identify', question: { pt: 'Ouça com atenção:', en: 'Listen carefully:', es: 'Escucha con atención:' }, target: 'IRELAND', options: ['ISLAND', 'IRELAND', 'ENGLAND', 'ICELAND'], audio_hint: 'I. R. E. L. A. N. D.' },
-      { id: 'q10', type: 'voice_dictation', question: { pt: 'Soletre o nome: LUCCAS', en: 'Spell the name: LUCCAS', es: 'Deletrea el nombre: LUCCAS' }, target: ['luccas', 'l u c c a s'], instructions: { pt: 'Cuidado com o duplo C!', en: 'Watch out for the double C!', es: '¡Cuidado con la doble C!' } },
-      { id: 'q11', type: 'listen_and_identify', question: { pt: 'Qual palavra foi soletrada?', en: 'Which word was spelled?', es: '¿Qué palabra fue deletreada?' }, target: 'AIRPORT', options: ['AIRPLANE', 'AIRPORT', 'EXPORT', 'REPORT'], audio_hint: 'A. I. R. P. O. R. T.' },
-      { id: 'q12', type: 'voice_dictation', question: { pt: 'Soletre a palavra: FLIGHT', en: 'Spell the word: FLIGHT', es: 'Deletrea la palabra: FLIGHT' }, target: ['flight', 'f l i g h t'], instructions: { pt: 'Voo em inglês. F - L - I - G - H - T.', en: 'Flight. F - L - I - G - H - T.', es: 'Vuelo en inglés. F - L - I - G - H - T.' } },
-      { id: 'q13', type: 'listen_and_identify', question: { pt: 'Ouça a cor e selecione:', en: 'Listen to the color and select:', es: 'Escucha el color y selecciona:' }, target: 'YELLOW', options: ['HELLO', 'YELLOW', 'PILLOW', 'MELLOW'], audio_hint: 'Y. E. L. L. O. W.' },
-      { id: 'q14', type: 'voice_dictation', question: { pt: 'Soletre: BROTHER', en: 'Spell: BROTHER', es: 'Deletrea: BROTHER' }, target: ['brother', 'b r o t h e r'], instructions: { pt: 'Irmão em inglês.', en: 'Brother in English.', es: 'Hermano en inglés.' } },
-      { id: 'q15', type: 'listen_and_identify', question: { pt: 'A última! Qual palavra é?', en: 'The last one! Which word is it?', es: '¡La última! ¿Qué palabra es?' }, target: 'TROLLEY', options: ['VALLEY', 'TROLLEY', 'ALLEY', 'VOLLEY'], audio_hint: 'T. R. O. L. L. E. Y.' }
+      { id: 'q1', type: 'listen_and_identify', question: { pt: 'Ouça:', en: 'Listen:', es: 'Escucha:' }, target: 'FLIGHT', options: ['FLIGHT', 'FIGHT', 'LIGHT', 'FRIGHT'], audio_hint: 'F. L. I. G. H. T.' },
+      { id: 'q2', type: 'voice_dictation', question: { pt: 'Soletre: YELLOW', en: 'Spell: YELLOW', es: 'Deletrea: YELLOW' }, target: ['yellow', 'y e l l o w'], instructions: { pt: 'Y - E - L - L - O - W', en: 'Y - E - L - L - O - W', es: 'Y - E - L - L - O - W' } },
+      { id: 'q3', type: 'listen_and_identify', question: { pt: 'Qual a palavra?', en: 'Which word?', es: '¿Qué palabra?' }, target: 'BROTHER', options: ['BREATHER', 'BROTHER', 'BOTHER', 'BRIGHTER'], audio_hint: 'B. R. O. T. H. E. R.' },
+      { id: 'q4', type: 'voice_dictation', question: { pt: 'Soletre: TROLLEY', en: 'Spell: TROLLEY', es: 'Deletrea: TROLLEY' }, target: ['trolley', 't r o l l e y'], instructions: { pt: 'T - R - O - L - L - E - Y', en: 'T - R - O - L - L - E - Y', es: 'T - R - O - L - L - E - Y' } },
+      { id: 'q5', type: 'listen_and_identify', question: { pt: 'Identifique:', en: 'Identify:', es: 'Identifica:' }, target: 'KITCHEN', options: ['KITCHEN', 'CHICKEN', 'KITTEN', 'PITCHER'], audio_hint: 'K. I. T. C. H. E. N.' },
+      { id: 'q6', type: 'voice_dictation', question: { pt: 'Soletre: BARISTA', en: 'Spell: BARISTA', es: 'Deletrea: BARISTA' }, target: ['barista', 'b a r i s t a'], instructions: { pt: 'B - A - R - I - S - T - A', en: 'B - A - R - I - S - T - A', es: 'B - A - R - I - S - T - A' } },
+      { id: 'q7', type: 'listen_and_identify', question: { pt: 'Qual a palavra?', en: 'Which word?', es: '¿Qué palabra?' }, target: 'MANAGER', options: ['MANAGE', 'MANAGER', 'MANGER', 'MANUAL'], audio_hint: 'M. A. N. A. G. E. R.' },
+      { id: 'q8', type: 'voice_dictation', question: { pt: 'Soletre: MORNING', en: 'Spell: MORNING', es: 'Deletrea: MORNING' }, target: ['morning', 'm o r n i n g'], instructions: { pt: 'M - O - R - N - I - N - G', en: 'M - O - R - N - I - N - G', es: 'M - O - R - N - I - N - G' } },
+      { id: 'q9', type: 'listen_and_identify', question: { pt: 'Ouça:', en: 'Listen:', es: 'Escucha:' }, target: 'WEEKEND', options: ['WEEKDAY', 'WEEKEND', 'WEAKEN', 'WEAKNESS'], audio_hint: 'W. E. E. K. E. N. D.' },
+      { id: 'q10', type: 'voice_dictation', question: { pt: 'Soletre: COFFEE', en: 'Spell: COFFEE', es: 'Deletrea: COFFEE' }, target: ['coffee', 'c o f f e e'], instructions: { pt: 'C - O - F - F - E - E', en: 'C - O - F - F - E - E', es: 'C - O - F - F - E - E' } }
+    ]
+  },
+  {
+    id: 'alpha_level_7',
+    title: { pt: 'Spelling Bee: Avançado', en: 'Spelling Bee: Advanced', es: 'Concurso de Deletreo: Avanzado' },
+    questions: [
+      { id: 'q1', type: 'listen_and_identify', question: { pt: 'Ouça e marque:', en: 'Listen and mark:', es: 'Escucha y marca:' }, target: 'RESTAURANT', options: ['RESTAURANT', 'RESTART', 'RESTRAINT', 'RESTAURATE'], audio_hint: 'R. E. S. T. A. U. R. A. N. T.' },
+      { id: 'q2', type: 'voice_dictation', question: { pt: 'Soletre: PASSPORT', en: 'Spell: PASSPORT', es: 'Deletrea: PASSPORT' }, target: ['passport', 'p a s s p o r t'], instructions: { pt: 'P - A - S - S - P - O - R - T', en: 'P - A - S - S - P - O - R - T', es: 'P - A - S - S - P - O - R - T' } },
+      { id: 'q3', type: 'listen_and_identify', question: { pt: 'Qual a palavra?', en: 'Which word?', es: '¿Qué palabra es?' }, target: 'BEAUTIFUL', options: ['BEAUTY', 'BEAUTIFUL', 'BOUNTIFUL', 'DUTIFUL'], audio_hint: 'B. E. A. U. T. I. F. U. L.' },
+      { id: 'q4', type: 'voice_dictation', question: { pt: 'Soletre: UMBRELLA', en: 'Spell: UMBRELLA', es: 'Deletrea: UMBRELLA' }, target: ['umbrella', 'u m b r e l l a'], instructions: { pt: 'U - M - B - R - E - L - L - A', en: 'U - M - B - R - E - L - L - A', es: 'U - M - B - R - E - L - L - A' } },
+      { id: 'q5', type: 'listen_and_identify', question: { pt: 'Identifique:', en: 'Identify:', es: 'Identifica:' }, target: 'YESTERDAY', options: ['YESTERDAY', 'EVERYDAY', 'TODAY', 'SOMEDAY'], audio_hint: 'Y. E. S. T. E. R. D. A. Y.' },
+      { id: 'q6', type: 'voice_dictation', question: { pt: 'Soletre: CHOCOLATE', en: 'Spell: CHOCOLATE', es: 'Deletrea: CHOCOLATE' }, target: ['chocolate', 'c h o c o l a t e'], instructions: { pt: 'C - H - O - C - O - L - A - T - E', en: 'C - H - O - C - O - L - A - T - E', es: 'C - H - O - C - O - L - A - T - E' } },
+      { id: 'q7', type: 'listen_and_identify', question: { pt: 'Qual a palavra?', en: 'Which word?', es: '¿Qué palabra?' }, target: 'BREAKFAST', options: ['BREAKFAST', 'BREAKOUT', 'FASTING', 'BASKET'], audio_hint: 'B. R. E. A. K. F. A. S. T.' },
+      { id: 'q8', type: 'voice_dictation', question: { pt: 'Soletre: APARTMENT', en: 'Spell: APARTMENT', es: 'Deletrea: APARTMENT' }, target: ['apartment', 'a p a r t m e n t'], instructions: { pt: 'A - P - A - R - T - M - E - N - T', en: 'A - P - A - R - T - M - E - N - T', es: 'A - P - A - R - T - M - E - N - T' } },
+      { id: 'q9', type: 'listen_and_identify', question: { pt: 'Identifique:', en: 'Identify:', es: 'Identifica:' }, target: 'KNOWLEDGE', options: ['KNOWLEDGE', 'COLLEGE', 'ACKNOWLEDGE', 'KNOWING'], audio_hint: 'K. N. O. W. L. E. D. G. E.' },
+      { id: 'q10', type: 'voice_dictation', question: { pt: 'Soletre: IRELAND', en: 'Spell: IRELAND', es: 'Deletrea: IRELAND' }, target: ['ireland', 'i r e l a n d'], instructions: { pt: 'I - R - E - L - A - N - D', en: 'I - R - E - L - A - N - D', es: 'I - R - E - L - A - N - D' } }
+    ]
+  },
+  {
+    id: 'alpha_level_8',
+    title: { pt: 'Spelling Bee: Master', en: 'Spelling Bee: Master', es: 'Concurso de Deletreo: Maestro' },
+    questions: [
+      { id: 'q1', type: 'listen_and_identify', question: { pt: 'Ouça o super desafio:', en: 'Listen to the super challenge:', es: 'Escucha el súper desafío:' }, target: 'CONGRATULATIONS', options: ['CONGRATULATIONS', 'CONGREGATION', 'CONSTIPATION', 'CONSTELLATION'], audio_hint: 'C. O. N. G. R. A. T. U. L. A. T. I. O. N. S.' },
+      { id: 'q2', type: 'voice_dictation', question: { pt: 'Soletre: TEMPERATURE', en: 'Spell: TEMPERATURE', es: 'Deletrea: TEMPERATURE' }, target: ['temperature', 't e m p e r a t u r e'], instructions: { pt: 'T - E - M - P - E - R - A - T - U - R - E', en: 'T - E - M - P - E - R - A - T - U - R - E', es: 'T - E - M - P - E - R - A - T - U - R - E' } },
+      { id: 'q3', type: 'listen_and_identify', question: { pt: 'Qual a palavra?', en: 'Which word?', es: '¿Qué palabra?' }, target: 'ENVIRONMENT', options: ['ENTERTAINMENT', 'ENVIRONMENT', 'ENLIGHTENMENT', 'GOVERNMENT'], audio_hint: 'E. N. V. I. R. O. N. M. E. N. T.' },
+      { id: 'q4', type: 'voice_dictation', question: { pt: 'Soletre: PRONUNCIATION', en: 'Spell: PRONUNCIATION', es: 'Deletrea: PRONUNCIATION' }, target: ['pronunciation', 'p r o n u n c i a t i o n'], instructions: { pt: 'P - R - O - N - U - N - C - I - A - T - I - O - N', en: 'P - R - O - N - U - N - C - I - A - T - I - O - N', es: 'P - R - O - N - U - N - C - I - A - T - I - O - N' } },
+      { id: 'q5', type: 'listen_and_identify', question: { pt: 'Identifique:', en: 'Identify:', es: 'Identifica:' }, target: 'DESTINATION', options: ['DESIGNATION', 'DESTINATION', 'DECLARATION', 'FASCINATION'], audio_hint: 'D. E. S. T. I. N. A. T. I. O. N.' },
+      { id: 'q6', type: 'voice_dictation', question: { pt: 'Soletre: INDEPENDENT', en: 'Spell: INDEPENDENT', es: 'Deletrea: INDEPENDENT' }, target: ['independent', 'i n d e p e n d e n t'], instructions: { pt: 'I - N - D - E - P - E - N - D - E - N - T', en: 'I - N - D - E - P - E - N - D - E - N - T', es: 'I - N - D - E - P - E - N - D - E - N - T' } },
+      { id: 'q7', type: 'listen_and_identify', question: { pt: 'Qual a palavra?', en: 'Which word?', es: '¿Qué palabra?' }, target: 'UNIVERSITY', options: ['UNIVERSE', 'UNIVERSITY', 'DIVERSITY', 'ADVERSITY'], audio_hint: 'U. N. I. V. E. R. S. I. T. Y.' },
+      { id: 'q8', type: 'voice_dictation', question: { pt: 'Soletre: APPRECIATE', en: 'Spell: APPRECIATE', es: 'Deletrea: APPRECIATE' }, target: ['appreciate', 'a p p r e c i a t e'], instructions: { pt: 'A - P - P - R - E - C - I - A - T - E', en: 'A - P - P - R - E - C - I - A - T - E', es: 'A - P - P - R - E - C - I - A - T - E' } },
+      { id: 'q9', type: 'listen_and_identify', question: { pt: 'Identifique:', en: 'Identify:', es: 'Identifica:' }, target: 'VOCABULARY', options: ['VOCABULARY', 'VOLUNTARY', 'VALUABLE', 'VERBALLY'], audio_hint: 'V. O. C. A. B. U. L. A. R. Y.' },
+      { id: 'q10', type: 'voice_dictation', question: { pt: 'Soletre: PROFESSIONAL', en: 'Spell: PROFESSIONAL', es: 'Deletrea: PROFESSIONAL' }, target: ['professional', 'p r o f e s s i o n a l'], instructions: { pt: 'Cuidado: F único, SS duplo! (P - R - O - F - E - S - S - I - O - N - A - L)', en: 'Watch out: single F, double S!', es: '¡Cuidado: F sola, doble S!' } }
     ]
   }
 ];

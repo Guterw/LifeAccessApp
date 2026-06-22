@@ -1,53 +1,68 @@
 // src/features/languages/english/views/alpha-numbers/NumbersLearnView.jsx
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Volume2, Hash } from 'lucide-react';
+import { Volume2, Hash, PlayCircle } from 'lucide-react';
 import { useLanguage } from '../../../../../contexts/LanguageContext';
 import BackButton from '../../../../../components/BackButton';
 import FooterBrand from '../../../../../components/FooterBrand';
 
-const NUMBER_GROUPS = [
-  {
-    title: 'Unidades (0 - 9)',
-    items: [
-      { num: '0', word: 'Zero', phonetic: 'zírou' }, { num: '1', word: 'One', phonetic: 'uân' },
-      { num: '2', word: 'Two', phonetic: 'tchu' }, { num: '3', word: 'Three', phonetic: 'th-ri' },
-      { num: '4', word: 'Four', phonetic: 'fór' }, { num: '5', word: 'Five', phonetic: 'faiv' },
-      { num: '6', word: 'Six', phonetic: 'siks' }, { num: '7', word: 'Seven', phonetic: 'sévén' },
-      { num: '8', word: 'Eight', phonetic: 'eit' }, { num: '9', word: 'Nine', phonetic: 'nain' }
-    ]
-  },
-  {
-    title: 'Dezenas Irregulares (10 - 19)',
-    items: [
-      { num: '10', word: 'Ten', phonetic: 'ten' }, { num: '11', word: 'Eleven', phonetic: 'iléven' },
-      { num: '12', word: 'Twelve', phonetic: 'tchuélv' }, { num: '13', word: 'Thirteen', phonetic: 'th-rtín' },
-      { num: '14', word: 'Fourteen', phonetic: 'fortín' }, { num: '15', word: 'Fifteen', phonetic: 'fiftín' },
-      { num: '16', word: 'Sixteen', phonetic: 'sikstín' }, { num: '17', word: 'Seventeen', phonetic: 'seventín' },
-      { num: '18', word: 'Eighteen', phonetic: 'eitín' }, { num: '19', word: 'Nineteen', phonetic: 'naintín' }
-    ]
-  },
-  {
-    title: 'Dezenas (20 - 90)',
-    items: [
-      { num: '20', word: 'Twenty', phonetic: 'tchuênti' }, { num: '30', word: 'Thirty', phonetic: 'th-rti' },
-      { num: '40', word: 'Forty', phonetic: 'fórti' }, { num: '50', word: 'Fifty', phonetic: 'fifti' },
-      { num: '60', word: 'Sixty', phonetic: 'siksti' }, { num: '70', word: 'Seventy', phonetic: 'séventi' },
-      { num: '80', word: 'Eighty', phonetic: 'eiti' }, { num: '90', word: 'Ninety', phonetic: 'nainti' }
-    ]
-  },
-  {
-    title: 'Números Grandes',
-    items: [
-      { num: '100', word: 'One hundred', phonetic: 'uân rândred' },
-      { num: '1,000', word: 'One thousand', phonetic: 'uân tháuzand' }
-    ]
-  }
-];
-
 export default function NumbersLearnView() {
-  const { t } = useLanguage();
+  const { t, uiLang } = useLanguage();
   const navigate = useNavigate();
+
+  // Movido para dentro do componente para ter acesso ao `t()` e `uiLang`
+  const NUMBER_GROUPS = [
+    {
+      title: t('alpha.units', 'Unidades (0 - 9)'),
+      items: [
+        { num: '0', word: 'Zero', pt: 'zírou', es: 'zirou', en: 'zee-ro' },
+        { num: '1', word: 'One', pt: 'uân', es: 'uan', en: 'wun' },
+        { num: '2', word: 'Two', pt: 'tchu', es: 'chu', en: 'too' },
+        { num: '3', word: 'Three', pt: 'th-ri', es: 'z-ri', en: 'three' },
+        { num: '4', word: 'Four', pt: 'fór', es: 'for', en: 'for' },
+        { num: '5', word: 'Five', pt: 'faiv', es: 'faiv', en: 'fyv' },
+        { num: '6', word: 'Six', pt: 'siks', es: 'siks', en: 'siks' },
+        { num: '7', word: 'Seven', pt: 'sévén', es: 'seven', en: 'sev-en' },
+        { num: '8', word: 'Eight', pt: 'eit', es: 'eit', en: 'ayt' },
+        { num: '9', word: 'Nine', pt: 'nain', es: 'nain', en: 'nyn' }
+      ]
+    },
+    {
+      title: t('alpha.teens', 'Dezenas Irregulares (10 - 19)'),
+      items: [
+        { num: '10', word: 'Ten', pt: 'ten', es: 'ten', en: 'ten' },
+        { num: '11', word: 'Eleven', pt: 'iléven', es: 'ileven', en: 'ih-lev-en' },
+        { num: '12', word: 'Twelve', pt: 'tchuélv', es: 'chuelv', en: 'twelv' },
+        { num: '13', word: 'Thirteen', pt: 'th-rtín', es: 'z-rtin', en: 'thur-teen' },
+        { num: '14', word: 'Fourteen', pt: 'fortín', es: 'fortin', en: 'for-teen' },
+        { num: '15', word: 'Fifteen', pt: 'fiftín', es: 'fiftin', en: 'fif-teen' },
+        { num: '16', word: 'Sixteen', pt: 'sikstín', es: 'sikstin', en: 'siks-teen' },
+        { num: '17', word: 'Seventeen', pt: 'seventín', es: 'seventin', en: 'sev-en-teen' },
+        { num: '18', word: 'Eighteen', pt: 'eitín', es: 'eitin', en: 'ay-teen' },
+        { num: '19', word: 'Nineteen', pt: 'naintín', es: 'naintin', en: 'nyn-teen' }
+      ]
+    },
+    {
+      title: t('alpha.tens', 'Dezenas (20 - 90)'),
+      items: [
+        { num: '20', word: 'Twenty', pt: 'tchuênti', es: 'chuenti', en: 'twen-tee' },
+        { num: '30', word: 'Thirty', pt: 'th-rti', es: 'z-rti', en: 'thur-tee' },
+        { num: '40', word: 'Forty', pt: 'fórti', es: 'forti', en: 'for-tee' },
+        { num: '50', word: 'Fifty', pt: 'fifti', es: 'fifti', en: 'fif-tee' },
+        { num: '60', word: 'Sixty', pt: 'siksti', es: 'siksti', en: 'siks-tee' },
+        { num: '70', word: 'Seventy', pt: 'séventi', es: 'seventi', en: 'sev-en-tee' },
+        { num: '80', word: 'Eighty', pt: 'eiti', es: 'eiti', en: 'ay-tee' },
+        { num: '90', word: 'Ninety', pt: 'nainti', es: 'nainti', en: 'nyn-tee' }
+      ]
+    },
+    {
+      title: t('alpha.largeNumbers', 'Números Grandes'),
+      items: [
+        { num: '100', word: 'One hundred', pt: 'uân rândred', es: 'uan jandred', en: 'wun hun-dred' },
+        { num: '1,000', word: 'One thousand', pt: 'uân tháuzand', es: 'uan zauzand', en: 'wun thou-zand' }
+      ]
+    }
+  ];
 
   const playAudio = (text) => {
     if (!window.speechSynthesis) return;
@@ -74,12 +89,20 @@ export default function NumbersLearnView() {
           <Hash size={18} />
         </div>
         <h2 className="text-lg font-black text-white tracking-wide">
-          {t('numbers.title', 'Os Números')}
+          {t('alpha.numbersTitle', 'Os Números')}
         </h2>
       </div>
 
       {/* ÁREA DE ROLAGEM */}
       <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-8">
+        
+        {/* BANNER AVISO */}
+        <div className="bg-emerald-900/20 border border-emerald-500/20 rounded-2xl p-4 flex items-start gap-3 shadow-sm">
+          <PlayCircle size={20} className="text-emerald-400 shrink-0 mt-0.5" />
+          <p className="text-xs text-emerald-200 leading-relaxed font-medium">
+            {t('alpha.numbersBanner', 'Toque nos números para ouvir a pronúncia. O texto embaixo é como o número soa usando os sons do seu idioma.')}
+          </p>
+        </div>
         
         {NUMBER_GROUPS.map((group, groupIdx) => (
           <div key={groupIdx} className="w-full">
@@ -100,8 +123,9 @@ export default function NumbersLearnView() {
                   <span className="text-xs font-bold text-gray-300 mb-1">
                     {item.word}
                   </span>
+                  {/* Puxa a fonética correspondente ao idioma atual */}
                   <span className="text-[9px] font-bold text-gray-500 uppercase tracking-widest bg-gray-900/50 px-2 py-0.5 rounded-full">
-                    {item.phonetic}
+                    {item[uiLang] || item.pt}
                   </span>
                 </button>
               ))}

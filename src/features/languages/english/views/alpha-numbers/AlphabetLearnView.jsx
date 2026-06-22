@@ -6,24 +6,38 @@ import { useLanguage } from '../../../../../contexts/LanguageContext';
 import BackButton from '../../../../../components/BackButton';
 import FooterBrand from '../../../../../components/FooterBrand';
 
+// Fonética adaptada para cada idioma (Como a letra inglesa soa lendo com as regras daquele idioma)
 const ALPHABET = [
-  { letter: 'A', phonetic: 'ei' }, { letter: 'B', phonetic: 'bi' },
-  { letter: 'C', phonetic: 'si' }, { letter: 'D', phonetic: 'di' },
-  { letter: 'E', phonetic: 'i' },  { letter: 'F', phonetic: 'ef' },
-  { letter: 'G', phonetic: 'dji' }, { letter: 'H', phonetic: 'eitch' },
-  { letter: 'I', phonetic: 'ai' }, { letter: 'J', phonetic: 'djei' },
-  { letter: 'K', phonetic: 'kei' }, { letter: 'L', phonetic: 'el' },
-  { letter: 'M', phonetic: 'em' }, { letter: 'N', phonetic: 'en' },
-  { letter: 'O', phonetic: 'ou' }, { letter: 'P', phonetic: 'pi' },
-  { letter: 'Q', phonetic: 'kiu' }, { letter: 'R', phonetic: 'ar' },
-  { letter: 'S', phonetic: 'es' }, { letter: 'T', phonetic: 'ti' },
-  { letter: 'U', phonetic: 'iu' }, { letter: 'V', phonetic: 'vi' },
-  { letter: 'W', phonetic: 'dâbliu' }, { letter: 'X', phonetic: 'ex' },
-  { letter: 'Y', phonetic: 'uai' }, { letter: 'Z', phonetic: 'zed / zi' }
+  { letter: 'A', pt: 'ei', es: 'ei', en: 'ay' },
+  { letter: 'B', pt: 'bi', es: 'bi', en: 'bee' },
+  { letter: 'C', pt: 'si', es: 'si', en: 'see' },
+  { letter: 'D', pt: 'di', es: 'di', en: 'dee' },
+  { letter: 'E', pt: 'i', es: 'i', en: 'ee' },
+  { letter: 'F', pt: 'ef', es: 'ef', en: 'eff' },
+  { letter: 'G', pt: 'dji', es: 'yi', en: 'jee' },
+  { letter: 'H', pt: 'eitch', es: 'eich', en: 'aych' },
+  { letter: 'I', pt: 'ai', es: 'ai', en: 'eye' },
+  { letter: 'J', pt: 'djei', es: 'yei', en: 'jay' },
+  { letter: 'K', pt: 'kei', es: 'kei', en: 'kay' },
+  { letter: 'L', pt: 'el', es: 'el', en: 'ell' },
+  { letter: 'M', pt: 'em', es: 'em', en: 'em' },
+  { letter: 'N', pt: 'en', es: 'en', en: 'en' },
+  { letter: 'O', pt: 'ou', es: 'ou', en: 'oh' },
+  { letter: 'P', pt: 'pi', es: 'pi', en: 'pee' },
+  { letter: 'Q', pt: 'kiu', es: 'kiu', en: 'cue' },
+  { letter: 'R', pt: 'ar', es: 'ar', en: 'ar' },
+  { letter: 'S', pt: 'es', es: 'es', en: 'ess' },
+  { letter: 'T', pt: 'ti', es: 'ti', en: 'tee' },
+  { letter: 'U', pt: 'iu', es: 'iu', en: 'you' },
+  { letter: 'V', pt: 'vi', es: 'vi', en: 'vee' },
+  { letter: 'W', pt: 'dâbliu', es: 'dabel iu', en: 'double-u' },
+  { letter: 'X', pt: 'ex', es: 'eks', en: 'ex' },
+  { letter: 'Y', pt: 'uai', es: 'uai', en: 'why' },
+  { letter: 'Z', pt: 'zed / zi', es: 'zed / zi', en: 'zee / zed' }
 ];
 
 export default function AlphabetLearnView() {
-  const { t } = useLanguage();
+  const { t, uiLang } = useLanguage();
   const navigate = useNavigate();
 
   const playAudio = (text) => {
@@ -59,7 +73,7 @@ export default function AlphabetLearnView() {
           <Volume2 size={18} />
         </div>
         <h2 className="text-lg font-black text-white tracking-wide">
-          {t('alpha.title', 'O Alfabeto')}
+          {t('alpha.alphabet', 'Alfabeto')}
         </h2>
       </div>
 
@@ -68,7 +82,7 @@ export default function AlphabetLearnView() {
         <div className="mb-6 bg-blue-900/20 border border-blue-500/20 rounded-2xl p-4 flex items-start gap-3 shadow-sm">
           <PlayCircle size={20} className="text-blue-400 shrink-0 mt-0.5" />
           <p className="text-xs text-blue-200 leading-relaxed font-medium">
-            Toque nas letras para ouvir a pronúncia. O texto em baixo é como a letra soa usando os sons do português.
+            {t('alpha.alphabetBanner', 'Toque nas letras para ouvir a pronúncia. O texto embaixo é como a letra soa usando os sons do seu idioma.')}
           </p>
         </div>
 
@@ -83,8 +97,9 @@ export default function AlphabetLearnView() {
               <span aria-hidden="true" className="text-3xl font-black text-white mb-1 group-hover:text-blue-400 transition-colors">
                 {item.letter}
               </span>
+              {/* O `uiLang` decide se puxa a fonética em pt, es, ou en */}
               <span aria-hidden="true" className="text-[10px] font-bold text-gray-400 uppercase tracking-widest bg-gray-900/50 px-2 py-0.5 rounded-full">
-                {item.phonetic}
+                {item[uiLang] || item.pt}
               </span>
             </button>
           ))}

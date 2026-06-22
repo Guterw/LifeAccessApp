@@ -5,6 +5,8 @@ import { checkAllNotifications } from './utils/notificationService';
 import { db } from './config/dexieDb';
 import BottomNav from './components/BottomNav';
 import { useLanguage } from './contexts/LanguageContext';
+import FirstLaunchGuard from './components/FirstLaunchGuard';
+
 import WelcomeView from './features/onboarding/views/WelcomeView';
 import NameView from './features/onboarding/views/NameView';
 import MainDashboard from './features/dashboard/views/MainDashboard';
@@ -31,6 +33,7 @@ import AiChatTaskView from './features/languages/english/views/ai-chat/AiChatTas
 import AiVoiceFreeView from './features/languages/english/views/ai-voice/AiVoiceFreeView';
 import AiVoiceTaskView from './features/languages/english/views/ai-voice/AiVoiceTaskView';
 import AiVoiceTaskSelectionView from './features/languages/english/views/ai-voice/AiVoiceTaskSelectionView';
+import TrailView from './features/languages/english/views/TrailView';
 
 function App() {
   const { isFirstAccess } = useLanguage();
@@ -46,6 +49,7 @@ function App() {
     return () => clearInterval(interval);
   }, []);
   
+  // Telas iniciais (Idioma -> Nome). Após finalizar isFirstAccess vira false
   if (isFirstAccess) {
     if (onboardingStep === 1) return <WelcomeView onNext={() => setOnboardingStep(2)} />;
     if (onboardingStep === 2) return <NameView />;
@@ -53,46 +57,49 @@ function App() {
   
   return (
     <HashRouter>
-      <div className="min-h-screen bg-gray-900 text-white font-sans selection:bg-blue-500/30">
-        <div className="max-w-md mx-auto w-full px-4 pb-28">
-          <Routes>
-            <Route path="/" element={<MainDashboard />} />
-            <Route path="/settings" element={<SettingsView />} />
-            <Route path="/languages" element={<LanguagesDashboard />} />
-            
-            {/* Rotas do Módulo de Inglês */}
-            <Route path="/english" element={<EnglishDashboard />} />
-            <Route path="/levels" element={<LevelListView />} />
-            <Route path="/levels/group/:groupName" element={<LevelGroupView />} />
-            <Route path="/level/:id" element={<LevelView />} />
-            <Route path="/english/stats" element={<StatsView />} />
-            
-            {/* Fundamentos: Alfabeto e Números */}
-            <Route path="/english/alpha-numbers" element={<AlphaNumbersMenu />} />
-            <Route path="/english/alpha-numbers/alphabet" element={<AlphabetLearnView />} />
-            <Route path="/english/alpha-numbers/numbers" element={<NumbersLearnView />} />
-            {/* Fluxo de Treino: Seleção e Exercício */}
-            <Route path="/english/alpha-numbers/exercises/:mode" element={<ExerciseSelectionView />} />
-            <Route path="/english/alpha-numbers/exercise/:mode/:index" element={<AlphaNumbersExerciseView />} />
-            
-            {/* IA Inglês */}
-            <Route path="/english/ai-hub" element={<AiHubView />} />
-            <Route path="/english/ai-chat/free" element={<AiChatFreeView />} />
-            <Route path="/english/ai-chat/tasks" element={<AiTaskSelectionView />} />
-            <Route path="/english/ai-chat/tasks/:taskId" element={<AiChatTaskView />} />
-            <Route path="/english/ai-voice/free" element={<AiVoiceFreeView />} />
-            <Route path="/english/ai-voice/tasks/:taskId" element={<AiVoiceTaskView />} />
-            <Route path="/english/ai-voice/tasks" element={<AiVoiceTaskSelectionView />} />
-            
-            <Route path="/english/path" element={<div className="pt-8 text-center text-gray-400">Em breve</div>} />
+      {/* Guardião de Permissões: Aparece só DEPOIS do Onboarding e ANTES de liberar o app principal */}
+      <FirstLaunchGuard>
+        <div className="min-h-screen bg-gray-900 text-white font-sans selection:bg-blue-500/30">
+          <div className="max-w-md mx-auto w-full px-4 pb-28">
+            <Routes>
+              <Route path="/" element={<MainDashboard />} />
+              <Route path="/settings" element={<SettingsView />} />
+              <Route path="/languages" element={<LanguagesDashboard />} />
+              
+              {/* Rotas do Módulo de Inglês */}
+              <Route path="/english" element={<EnglishDashboard />} />
+              <Route path="/levels" element={<LevelListView />} />
+              <Route path="/levels/group/:groupName" element={<LevelGroupView />} />
+              <Route path="/level/:id" element={<LevelView />} />
+              <Route path="/english/stats" element={<StatsView />} />
+              
+              {/* Fundamentos: Alfabeto e Números */}
+              <Route path="/english/alpha-numbers" element={<AlphaNumbersMenu />} />
+              <Route path="/english/alpha-numbers/alphabet" element={<AlphabetLearnView />} />
+              <Route path="/english/alpha-numbers/numbers" element={<NumbersLearnView />} />
+              {/* Fluxo de Treino: Seleção e Exercício */}
+              <Route path="/english/alpha-numbers/exercises/:mode" element={<ExerciseSelectionView />} />
+              <Route path="/english/alpha-numbers/exercise/:mode/:index" element={<AlphaNumbersExerciseView />} />
+              
+              {/* IA Inglês */}
+              <Route path="/english/ai-hub" element={<AiHubView />} />
+              <Route path="/english/ai-chat/free" element={<AiChatFreeView />} />
+              <Route path="/english/ai-chat/tasks" element={<AiTaskSelectionView />} />
+              <Route path="/english/ai-chat/tasks/:taskId" element={<AiChatTaskView />} />
+              <Route path="/english/ai-voice/free" element={<AiVoiceFreeView />} />
+              <Route path="/english/ai-voice/tasks/:taskId" element={<AiVoiceTaskView />} />
+              <Route path="/english/ai-voice/tasks" element={<AiVoiceTaskSelectionView />} />
+              
+              <Route path="/english/trail" element={<TrailView />} />
 
-            <Route path="/fitness" element={<div className="pt-8 text-center text-gray-400">Em breve</div>} />
-            <Route path="/finance" element={<div className="pt-8 text-center text-gray-400">Em breve</div>} />
-            <Route path="/tasks" element={<div className="pt-8 text-center text-gray-400">Em breve</div>} />
-          </Routes>
+              <Route path="/fitness" element={<div className="pt-8 text-center text-gray-400">Em breve</div>} />
+              <Route path="/finance" element={<div className="pt-8 text-center text-gray-400">Em breve</div>} />
+              <Route path="/tasks" element={<div className="pt-8 text-center text-gray-400">Em breve</div>} />
+            </Routes>
+          </div>
+          <BottomNav />
         </div>
-        <BottomNav />
-      </div>
+      </FirstLaunchGuard>
     </HashRouter>
   );
 }

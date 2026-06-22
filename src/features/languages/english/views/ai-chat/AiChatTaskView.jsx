@@ -1,16 +1,22 @@
+// src/features/languages/english/views/ai-chat/AiChatTaskView.jsx
 import React, { useState, useEffect, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import { useLanguage } from '../../../../../contexts/LanguageContext';
 import { db } from '../../../../../config/dexieDb';
 import BackButton from '../../../../../components/BackButton';
-import { Send, Bot, MessageSquare, AlertCircle, Globe, Sparkles, ChevronDown, Target, CheckCircle, RotateCcw, AlertTriangle } from 'lucide-react';
+import { Send, Globe, Sparkles, ChevronDown, Target, CheckCircle, RotateCcw, AlertTriangle } from 'lucide-react';
 import { generateCloudResponse } from '../../../../../services/aiService';
 import FooterBrand from '../../../../../components/FooterBrand';
 import { useKeyboardOpen } from '../../../../../hooks/useKeyboardOpen';
 import { TASK_SCENARIOS } from '../../../../../data/taskScenarios';
+import { addXP } from '../../../../../utils/xpManager';
+import PigeonAvatar from '../../../../../components/PigeonAvatar';
+import PigeonAvatarFem from '../../../../../components/PigeonAvatarFem'; 
 
 const CEFR_LEVELS = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
-const NATIVE_LANG_NAMES = { pt: 'Brazilian Portuguese', es: 'Spanish', en: 'English' };
+
+// CORREÇÃO 1: Usar o nome nativo do idioma para forçar a IA a responder corretamente
+const NATIVE_LANG_NAMES = { pt: 'Português', es: 'Español', en: 'English' };
 
 const LEVEL_GUIDANCE = {
   A1: (lang) => `Write in very simple English (A1). Add short ${lang} glosses in parentheses often.`,
@@ -22,7 +28,7 @@ const LEVEL_GUIDANCE = {
 };
 
 function buildTaskPrompt(uiLang, level, scenario) {
-  const nativeLang = NATIVE_LANG_NAMES[uiLang] || 'Brazilian Portuguese';
+  const nativeLang = NATIVE_LANG_NAMES[uiLang] || 'Português';
   const guidance = (LEVEL_GUIDANCE[level] || LEVEL_GUIDANCE.A1)(nativeLang);
 
   return `You are acting in a roleplay scenario.
@@ -40,8 +46,8 @@ IMPORTANT RULES:
 Respond ONLY with a valid JSON object:
 {
   "reply": "your in-character response",
-  "translation": "a complete ${nativeLang} translation of the 'reply'",
-  "correction": "short explanation of any user grammar mistake, or empty string",
+  "translation": "a complete translation of your 'reply' INTO ${nativeLang}",
+  "correction": "short explanation of any user grammar mistake IN ${nativeLang}, or empty string",
   "isCompleted": boolean (true ONLY if objective is achieved)
 }`;
 }
@@ -62,25 +68,56 @@ function parseTaskJson(raw) {
   }
 }
 
+function getAccessoryForScenario(scenario) {
+  if (!scenario || !scenario.id) return 'teacher';
+  
+  if (scenario.id === 'chat_intro') return 'none'; 
+  
+  const searchString = `${scenario.id} ${scenario.title?.en} ${scenario.title?.pt}`.toLowerCase();
+
+  if (searchString.includes('coffee') || searchString.includes('café') || searchString.includes('pub') || searchString.includes('restaurant') || searchString.includes('pedido')) {
+    return 'barista';
+  }
+  if (searchString.includes('airport') || searchString.includes('aeroporto') || searchString.includes('immigration') || searchString.includes('imigração') || searchString.includes('alfândega')) {
+    return 'officer';
+  }
+  if (searchString.includes('job') || searchString.includes('emprego') || searchString.includes('interview') || searchString.includes('entrevista') || searchString.includes('work') || searchString.includes('trabalho') || searchString.includes('rent') || searchString.includes('alugando')) {
+    return 'manager';
+  }
+  if (searchString.includes('ticket') || searchString.includes('passagem') || searchString.includes('hotel') || searchString.includes('hostel') || searchString.includes('check-in') || searchString.includes('checkin') || searchString.includes('recepção') || searchString.includes('shopping') || searchString.includes('directions')) {
+    return 'receptionist';
+  }
+
+  return 'teacher'; 
+}
+
 export default function AiChatTaskView() {
   const { taskId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const { t, uiLang } = useLanguage();
   const isKeyboardOpen = useKeyboardOpen();
   
-  const scenario = TASK_SCENARIOS.find(s => s.id === taskId) || TASK_SCENARIOS[0];
+  const backRoute = location.state?.fromTrail 
+      ? '/english/trail' 
+      : '/english/ai-chat/tasks';
+
+  const scenario = TASK_SCENARIOS.find(s => String(s.id) === String(taskId)) || TASK_SCENARIOS[0];
+  
+  const isIntroTask = scenario.id === 'chat_intro';
+  const AvatarComponent = isIntroTask ? PigeonAvatarFem : PigeonAvatar;
+  const currentAccessory = getAccessoryForScenario(scenario);
 
   const [messages, setMessages] = useState(() => {
     const saved = localStorage.getItem(`aiTaskHistory_${taskId}`);
     if (saved) return JSON.parse(saved);
     
-    // Inicia a primeira mensagem já com as traduções e dicas do arquivo taskScenarios.js
     return [{
       role: 'assistant',
       content: scenario.firstMessage.text,
       translation: scenario.firstMessage.translation[uiLang] || scenario.firstMessage.translation.pt,
       correction: scenario.firstMessage.hint[uiLang] || scenario.firstMessage.hint.pt,
-      level: 'A1' // O default, que será atualizado pelo useEffect
+      level: 'A1'
     }];
   });
 
@@ -97,7 +134,6 @@ export default function AiChatTaskView() {
     return savedCompleted.includes(taskId);
   });
 
-  // Carrega o level salvo e aplica na primeira mensagem para adaptar a UI dinamicamente
   useEffect(() => {
     const loadLevel = async () => {
       const settings = await db.appSettings.get(1);
@@ -113,7 +149,6 @@ export default function AiChatTaskView() {
     loadLevel();
   }, []);
 
-  // Ao mudar de level na UI, atualiza a primeira mensagem pra esconder/mostrar a dica dinamicamente
   const handleLevelChange = async (newLevel) => {
     setLevel(newLevel);
     await db.appSettings.update(1, { aiChatLevel: newLevel });
@@ -140,7 +175,7 @@ export default function AiChatTaskView() {
 
   const confirmRestartChat = () => {
     const savedCompleted = JSON.parse(localStorage.getItem('completedAiTasks') || '[]');
-    const updatedCompleted = savedCompleted.filter(id => id !== taskId);
+    const updatedCompleted = savedCompleted.filter(id => String(id) !== String(taskId));
     localStorage.setItem('completedAiTasks', JSON.stringify(updatedCompleted));
     localStorage.removeItem(`aiTaskHistory_${taskId}`);
     
@@ -179,9 +214,10 @@ export default function AiChatTaskView() {
       if (isCompleted) {
         setTaskSuccess(true);
         const savedCompleted = JSON.parse(localStorage.getItem('completedAiTasks') || '[]');
-        if (!savedCompleted.includes(taskId)) {
+        if (!savedCompleted.includes(String(taskId)) && !savedCompleted.includes(Number(taskId))) {
           savedCompleted.push(taskId);
           localStorage.setItem('completedAiTasks', JSON.stringify(savedCompleted));
+          await addXP(20);
         }
       }
     } catch (err) {
@@ -198,29 +234,53 @@ export default function AiChatTaskView() {
     return () => { document.body.style.overflow = ''; };
   }, []);
 
+  // CORREÇÃO 3: Atualiza dinamicamente a primeira mensagem (Dica e Tradução) para o idioma ATUAL do app,
+  // ignorando o que quer que estivesse salvo no localStorage do passado!
+  const displayMessages = messages.map((msg, idx) => {
+    if (idx === 0) {
+      return {
+        ...msg,
+        translation: scenario.firstMessage.translation[uiLang] || scenario.firstMessage.translation.pt,
+        correction: scenario.firstMessage.hint[uiLang] || scenario.firstMessage.hint.pt,
+      };
+    }
+    return msg;
+  });
+
   const titleText = scenario.title[uiLang] || scenario.title.pt;
   const objectiveText = scenario.objective[uiLang] || scenario.objective.pt;
 
   return (
     <div className={`fixed inset-x-0 top-0 flex flex-col bg-gray-950 z-10 animate-fade-in transition-all duration-200 ${isKeyboardOpen ? 'bottom-0' : 'bottom-[80px]'}`}>
 
-      {/* HEADER PRINCIPAL */}
+      {/* HEADER PRINCIPAL COM AVATAR DINÂMICO */}
       <div className="shrink-0 h-16 w-full bg-gray-900 border-b border-gray-800 z-20 flex items-center justify-between px-2 sm:px-4 shadow-sm">
         <div className="flex items-center gap-2 sm:gap-3 min-w-0">
           <div className="shrink-0 mt-8">
-            <BackButton to="/english/ai-chat/tasks" label="" />
+            <BackButton to={backRoute} label="" />
           </div>
-          <div className="flex flex-col justify-center min-w-0">
-            <h2 className="text-base sm:text-lg font-black text-white tracking-wide leading-tight truncate">
+          
+          <div className="w-9 h-9 rounded-full bg-slate-800 border border-slate-600 flex items-center justify-center shrink-0 shadow-sm overflow-hidden relative">
+             <div className="absolute inset-0 bg-gradient-to-b from-blue-500/20 to-transparent"></div>
+             <AvatarComponent accessory={currentAccessory} className={`w-10 h-10 ${isIntroTask ? 'mt-0' : 'mt-1'} relative z-10`} />
+          </div>
+
+          <div className="flex flex-col justify-center min-w-0 ml-1">
+            <h2 className="text-sm sm:text-base font-black text-white tracking-wide leading-tight truncate">
               {titleText}
             </h2>
+            <span className="text-[10px] text-green-400 font-bold tracking-widest uppercase">{t('ai.online', 'Online')}</span>
           </div>
         </div>
-        {taskSuccess && (
-           <button onClick={() => setIsResetModalOpen(true)} className="p-2 text-gray-400 hover:text-red-400 transition-colors">
-             <RotateCcw size={18} />
-           </button>
-        )}
+
+        {/* CORREÇÃO 2: Botão de Resetar sempre visível à direita! */}
+        <button 
+          onClick={() => setIsResetModalOpen(true)} 
+          className="p-2 text-gray-400 hover:text-red-400 transition-colors shrink-0 ml-2"
+          title={t('ai.restartTaskTitle', 'Reiniciar')}
+        >
+          <RotateCcw size={18} />
+        </button>
       </div>
 
       {/* BANNER DE MISSÃO */}
@@ -258,26 +318,31 @@ export default function AiChatTaskView() {
 
       {/* ÁREA DE MENSAGENS */}
       <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-6 bg-gradient-to-b from-gray-950 to-gray-900 hide-scrollbar">
-        {messages.map((msg, idx) => {
+        {displayMessages.map((msg, idx) => {
           const isAssistant = msg.role !== 'user';
           const translationOpen = isAssistant && isTranslationOpen(msg, idx);
 
           return (
             <div key={idx} className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'} w-full`}>
               <div className={`flex gap-2 sm:gap-3 w-full ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                
+                {/* O AVATAR DAS MENSAGENS (DINÂMICO) */}
                 {isAssistant && (
-                  <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-blue-500/20 border border-blue-500/30 text-blue-400 flex items-center justify-center shrink-0 mt-1 shadow-sm">
-                    <Bot size={14} />
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-slate-800 border border-slate-600 flex items-center justify-center shrink-0 mt-1 shadow-sm overflow-hidden relative">
+                    <div className="absolute inset-0 bg-gradient-to-b from-blue-500/20 to-transparent"></div>
+                    <AvatarComponent accessory={currentAccessory} className={`w-10 h-10 ${isIntroTask ? 'mt-1' : 'mt-2'} relative z-10`} />
                   </div>
                 )}
+                
                 <div className={`max-w-[85%] sm:max-w-[80%] p-3 sm:p-4 rounded-2xl shadow-lg ${msg.role === 'user' ? 'bg-blue-600 text-white rounded-tr-sm' : 'bg-gray-800 text-gray-100 rounded-tl-sm border border-gray-700'}`}>
                   <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
                 </div>
               </div>
 
-              {isAssistant && (msg.translation || msg.correction) && (
+              {isAssistant && ((msg.translation && uiLang !== 'en') || msg.correction) && (
                 <div className="ml-9 sm:ml-11 mt-1.5 max-w-[85%] sm:max-w-[80%] space-y-1.5">
-                  {msg.translation && (
+                  {/* TRADUÇÃO SÓ APARECE SE IDIOMA NÃO FOR INGLÊS */}
+                  {msg.translation && uiLang !== 'en' && (
                     <div>
                       <button onClick={() => toggleTranslation(idx, translationOpen)} className="flex items-center gap-1 text-[10px] font-bold text-blue-400 hover:text-blue-300 uppercase">
                         <Globe size={11} /> {t('ai.translationLabel', 'Tradução')} <ChevronDown size={11} className={`transition-transform ${translationOpen ? 'rotate-180' : ''}`} />
@@ -287,6 +352,7 @@ export default function AiChatTaskView() {
                       )}
                     </div>
                   )}
+                  {/* CORREÇÃO/DICA SEMPRE APARECE */}
                   {msg.correction && (
                     <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-2.5 flex items-start gap-2">
                       <Sparkles size={13} className="shrink-0 mt-0.5 text-amber-400" />
@@ -306,18 +372,18 @@ export default function AiChatTaskView() {
       {/* INPUT OU TELA DE SUCESSO */}
       <div className="shrink-0 bg-gray-900 border-t border-gray-800 p-3 pb-[env(safe-area-inset-bottom)]">
         <div className="shrink-0 -mt-4">
-                  <FooterBrand direction="flex-row" textSize="text-[11px]" textColor="text-white-400" />
-                </div>
+          <FooterBrand direction="flex-row" textSize="text-[11px]" textColor="text-white-400" />
+        </div>
         {taskSuccess ? (
           <div className="bg-green-500/10 border border-green-500/30 rounded-2xl p-4 text-center animate-bounce-in max-w-4xl mx-auto">
             <CheckCircle size={32} className="text-green-500 mx-auto mb-2" />
             <h3 className="text-green-400 font-bold mb-1">{t('ai.missionComplete', 'Missão Concluída!')}</h3>
             <p className="text-xs text-green-200 mb-3">{t('ai.missionCompleteDesc', 'Você atingiu o objetivo desta tarefa de forma excelente.')}</p>
             <button 
-              onClick={() => navigate('/english/ai-chat/tasks')}
+              onClick={() => navigate(backRoute)}
               className="bg-green-600 hover:bg-green-500 text-white font-bold py-2.5 px-6 rounded-xl w-full transition-colors"
             >
-              {t('ai.backToScenarios', 'Voltar aos Cenários')}
+              {t('ai.backToScenarios', 'Concluir e Voltar')}
             </button>
           </div>
         ) : (
@@ -342,7 +408,7 @@ export default function AiChatTaskView() {
         )}
       </div>
 
-      {/* MODAL DE CONFIRMAÇÃO CUSTOMIZADO */}
+      {/* MODAL DE CONFIRMAÇÃO DE REINÍCIO */}
       {isResetModalOpen && (
         <div className="fixed inset-0 z-[100] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
           <div className="bg-gray-900 border border-gray-700 rounded-3xl p-6 w-full max-w-sm shadow-2xl flex flex-col items-center text-center">

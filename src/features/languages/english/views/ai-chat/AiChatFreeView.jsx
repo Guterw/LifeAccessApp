@@ -7,6 +7,7 @@ import { Send, Bot, MessageSquare, AlertCircle, Trash2, Globe, Sparkles, Chevron
 import { generateCloudResponse } from '../../../../../services/aiService';
 import FooterBrand from '../../../../../components/FooterBrand';
 import { useKeyboardOpen } from '../../../../../hooks/useKeyboardOpen';
+import PigeonAvatar from '../../../../../components/PigeonAvatar';
 
 const CEFR_LEVELS = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
 
@@ -163,7 +164,7 @@ export default function AiChatFreeView() {
             <BackButton to="/english/ai-hub" label="" />
           </div>
           <div className="w-9 h-9 sm:w-10 sm:h-10 bg-blue-500/10 text-blue-400 rounded-xl border border-blue-500/20 shadow-inner flex items-center justify-center shrink-0">
-            <MessageSquare size={18} />
+            <PigeonAvatar accessory="teacher" className="w-10 h-10 mt-2 relative z-10" />
           </div>
           <div className="flex flex-col justify-center min-w-0">
             <h2 className="text-base sm:text-lg font-black text-white tracking-wide leading-tight truncate">
@@ -217,8 +218,9 @@ export default function AiChatFreeView() {
             <div key={idx} className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'} w-full`}>
               <div className={`flex gap-2 sm:gap-3 w-full ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                 {isAssistant && (
-                  <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-blue-500/20 border border-blue-500/30 text-blue-400 flex items-center justify-center shrink-0 mt-1 shadow-sm">
-                    <Bot size={14} />
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-slate-800 border border-slate-600 flex items-center justify-center shrink-0 mt-1 shadow-sm overflow-hidden relative">
+                    <div className="absolute inset-0 bg-gradient-to-b from-purple-500/20 to-transparent"></div>
+                    <PigeonAvatar accessory="teacher" className="w-10 h-10 mt-2 relative z-10" />
                   </div>
                 )}
                 <div className={`max-w-[85%] sm:max-w-[80%] p-3 sm:p-4 rounded-2xl shadow-lg ${msg.role === 'user' ? 'bg-blue-600 text-white rounded-tr-sm' : 'bg-gray-800 text-gray-100 rounded-tl-sm border border-gray-700'}`}>

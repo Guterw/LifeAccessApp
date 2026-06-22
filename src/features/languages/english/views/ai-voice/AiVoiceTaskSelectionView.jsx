@@ -5,7 +5,7 @@ import BackButton from '../../../../../components/BackButton';
 import FooterBrand from '../../../../../components/FooterBrand';
 import { Headphones, ChevronRight, CheckCircle2, RotateCcw, AlertTriangle } from 'lucide-react';
 import { useLanguage } from '../../../../../contexts/LanguageContext';
-import { VOICE_SCENARIOS } from '../../../../../data/voiceScenarios'; // Importa os cenários de voz
+import { VOICE_SCENARIOS } from '../../../../../data/voiceScenarios';
 
 export default function AiVoiceTaskSelectionView() {
   const { t, uiLang } = useLanguage();
@@ -116,7 +116,7 @@ export default function AiVoiceTaskSelectionView() {
               {t('ai.restartTaskTitle', 'Reiniciar Tarefa?')}
             </h3>
             <p className="text-sm text-gray-400 mb-6 leading-relaxed">
-              {t('ai.restartTaskWarning', 'Deseja reiniciar esta tarefa? Todo o seu progresso será apagado permanentemente.')}
+              {t('ai.restartTaskWarning', 'Deseja reiniciar esta tarefa? Todo o seu progresso e histórico de conversa deste cenário serão apagados permanentemente.')}
             </p>
             <div className="flex w-full gap-3">
               <button

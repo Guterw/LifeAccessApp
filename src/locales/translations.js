@@ -1,3 +1,5 @@
+// src/data/translations.js
+
 export const translations = {
   pt: {
     welcome: "Bem-vindo ao LifeAccess",
@@ -16,7 +18,8 @@ export const translations = {
       fitness: "Fitness",
       home: "Home",
       finance: "Finanças",
-      tasks: "Tarefas"
+      tasks: "Tarefas",
+      calendar: "Calendário"
     },
     home: {
       greeting: "Bem-vindo(a),",
@@ -41,7 +44,21 @@ export const translations = {
       learned: "Aprendidas",
       mistakes: "Erros",
       completed: "Níveis Concluídos",
-      practiceBtn: "Praticar Vocabulário"
+      practiceBtn: "Praticar Vocabulário",
+      guidedJourney: "Jornada Guiada",
+      followTrail: "Siga a Trilha",
+      fundamentals: "Fundamentos",
+      alphaAndNumbers: "Alfabeto e Números",
+      conversationTrain: "Conversação e Treino"
+    },
+    trail: {
+      level: "Nível",
+      section1: "Seção 1",
+      fundamentals: "Os Fundamentos",
+      section2: "Seção 2",
+      dublinPrep: "Preparação para Dublin",
+      toBeContinued: "CONTINUA...",
+      newMissions: "Novas missões chegarão em breve."
     },
     levelList: {
       title: "Níveis Disponíveis",
@@ -86,10 +103,14 @@ export const translations = {
       profileSection: "Seu Perfil",
       statsSection: "Visão Geral",
       prefsSection: "Preferências",
-      langStat: "Idiomas",
+      langStat: "Inglês",
       streakTitle: "Ofensiva:",
+      streak: "Ofensiva",
+      xp: "XP",
+      level: "Lv.",
+      progress: "Progresso",
       days: "dias",
-      fitnessStat: "Fitness",
+      fitnessStat: "Treino",
       fitnessDesc: "Level Atual: 3",
       financeStat: "Finanças",
       financeDesc: "R$ 450,00 a pagar",
@@ -97,16 +118,19 @@ export const translations = {
       tasksDesc: "3 pendentes hoje",
       language: "Idioma do Aplicativo",
       notifications: "Notificações",
-      theme: "Tema Escuro"
+      theme: "Tema Escuro",
+      microphone: "Microfone (Voz)",
+      revokeAlert: "Para remover uma permissão já concedida, vá nas configurações do seu navegador (clique no ícone de cadeado na barra de endereço).",
+      offensive: "Ofensiva"
     },
     notifications: {
-    allow: "Permitir",
-    remove: "Remover",
-    language: "Lembretes de Idiomas",
-    tasks: "Tarefas e Agenda",
-    fitness: "Fitness"
-  },
-  ai: {
+      allow: "Permitir",
+      remove: "Remover",
+      language: "Lembretes de Idiomas",
+      tasks: "Tarefas e Agenda",
+      fitness: "Fitness"
+    },
+    ai: {
       teacherTitle: 'Professor IA',
       teacherDesc: 'Conversação por chat e voz',
       hubTitlePre: 'Central',
@@ -136,21 +160,48 @@ export const translations = {
       levelLabel: 'Nível',
       translationLabel: 'Tradução',
       correctionLabel: 'Dica',
+      missionLabel: "Missão",
+      thinking: "Pensando...",
+      missionComplete: "Missão Concluída!",
+      missionCompleteDesc: "Você atingiu o objetivo desta tarefa de forma excelente.",
+      backToScenarios: "Concluir e Voltar",
+      restartTaskTitle: "Reiniciar Tarefa?",
+      restartTaskWarning: "Deseja reiniciar esta tarefa? Todo o seu progresso e histórico de conversa deste cenário serão apagados permanentemente.",
       errorBanner: 'Algo deu errado. Tente enviar novamente.',
       errorMessage: "Desculpe, tive um erro interno de processamento. Pode tentar novamente?",
+      scenariosTitle: "Cenários Práticos",
+      scenariosDesc: "Escolha uma situação do dia a dia para praticar:",
+      restartTask: "Reiniciar Tarefa",
+      connectivityNote: "Atenção: Os recursos de IA utilizam processamento em nuvem. É necessária uma conexão ativa com a internet para conversar com os professores.",
+      voiceScenariosTitle: "Missões por Voz",
+      voiceScenariosDesc: "Pratique conversação em tempo real para o dia a dia:",
 
-      
       // MANTIDOS EM INGLÊS PROPOSITALMENTE (Configurações do Robô)
       initialGreeting: "Hello! I'm your English AI Teacher. How are you doing today? We can talk about anything you want!",
-      systemPromptFree: "You are a friendly and supportive English teacher. Speak naturally, keep answers conversational and clear, and gently correct any major grammar mistakes at the end of your response.",
-      errorMessage: "Sorry, I had an internal processing error. Could you try again?"
+      systemPromptFree: "You are a friendly and supportive English teacher. Speak naturally, keep answers conversational and clear, and gently correct any major grammar mistakes at the end of your response."
     },
     backToEnglish: 'Voltar',
     cancel: 'Cancelar',
+    confirm: 'Confirmar',
     alpha: {
       alphabet: "Alfabeto",
       numbers: "Números",
-      trainingMode: "Modo Treino"
+      trainingMode: "Modo Treino",
+      learn: "Aprender",
+      train: "Treinar",
+      alphaDesc: "Letras e Fonética",
+      numbersDesc: "Contagem e Dezenas",
+      exAlphabet: "Treino Alfabeto",
+      exAlphaDesc: "Soletração e Som",
+      exNumbers: "Treino Números",
+      exNumbersDesc: "Ditado e Sequência",
+      alphabetBanner: "Toque nas letras para ouvir a pronúncia. O texto embaixo é como a letra soa usando os sons do seu idioma.",
+      numbersTitle: "Os Números",
+      numbersBanner: "Toque nos números para ouvir a pronúncia. O texto embaixo é como o número soa usando os sons do seu idioma.",
+      units: "Unidades (0 - 9)",
+      teens: "Dezenas Irregulares (10 - 19)",
+      tens: "Dezenas (20 - 90)",
+      largeNumbers: "Números Grandes"
     },
     general: {
       exercise: "Exercício",
@@ -172,7 +223,7 @@ export const translations = {
       goesToQueue: "A resposta vai para o final da fila.",
       continue: "Continuar",
       backToMenu: "Voltar para o Menu"
-    },
+    }
   },
   
   en: {
@@ -192,7 +243,8 @@ export const translations = {
       fitness: "Fitness",
       home: "Home",
       finance: "Finance",
-      tasks: "Tasks"
+      tasks: "Tasks",
+      calendar: "Calendar"
     },
     home: {
       greeting: "Welcome,",
@@ -217,7 +269,21 @@ export const translations = {
       learned: "Learned",
       mistakes: "Mistakes",
       completed: "Completed Levels",
-      practiceBtn: "Practice Vocabulary"
+      practiceBtn: "Practice Vocabulary",
+      guidedJourney: "Guided Journey",
+      followTrail: "Follow the Trail",
+      fundamentals: "Fundamentals",
+      alphaAndNumbers: "Alphabet and Numbers",
+      conversationTrain: "Conversation and Training"
+    },
+    trail: {
+      level: "Level",
+      section1: "Section 1",
+      fundamentals: "The Fundamentals",
+      section2: "Section 2",
+      dublinPrep: "Preparing for Dublin",
+      toBeContinued: "TO BE CONTINUED...",
+      newMissions: "New missions arriving soon."
     },
     levelList: {
       title: "Available Levels",
@@ -262,8 +328,12 @@ export const translations = {
       profileSection: "Your Profile",
       statsSection: "Overview",
       prefsSection: "Preferences",
-      langStat: "Languages",
+      langStat: "English",
       streakTitle: "Streak:",
+      streak: "Streak",
+      xp: "XP",
+      level: "Lv.",
+      progress: "Progress",
       days: "days",
       fitnessStat: "Fitness",
       fitnessDesc: "Current Level: 3",
@@ -273,14 +343,17 @@ export const translations = {
       tasksDesc: "3 pending today",
       language: "App Language",
       notifications: "Notifications",
-      theme: "Dark Theme"
+      theme: "Dark Theme",
+      microphone: "Microphone (Voice)",
+      revokeAlert: "To remove a permission already granted, go to your browser settings (click the padlock icon in the address bar).",
+      offensive: "Offensive"
     },
     notifications: {
-    allow: "Allow",
-    remove: "Remove",
-    language: "Language Reminder",
-    tasks: "Agenda and Tasks",
-    fitness: "Fitness"
+      allow: "Allow",
+      remove: "Remove",
+      language: "Language Reminder",
+      tasks: "Agenda and Tasks",
+      fitness: "Fitness"
     },
     ai: {
       teacherTitle: 'AI Teacher',
@@ -312,20 +385,48 @@ export const translations = {
       levelLabel: 'Level',
       translationLabel: 'Translation',
       correctionLabel: 'Tip',
+      missionLabel: "Mission",
+      thinking: "Thinking...",
+      missionComplete: "Mission Complete!",
+      missionCompleteDesc: "You achieved the objective of this task excellently.",
+      backToScenarios: "Complete and Go Back",
+      restartTaskTitle: "Restart Task?",
+      restartTaskWarning: "Do you want to restart this task? All your progress and chat history for this scenario will be permanently deleted.",
       errorBanner: 'Something went wrong. Please try sending again.',
       errorMessage: "Sorry, I had an internal processing error. Could you try again?",
-            
+      scenariosTitle: "Practical Scenarios",
+      scenariosDesc: "Choose an everyday situation to practice:",
+      restartTask: "Restart Task",
+      connectivityNote: "Attention: AI features use cloud processing. An active internet connection is required to chat with the teachers.",
+      voiceScenariosTitle: "Voice Missions",
+      voiceScenariosDesc: "Practice real-time conversation for everyday situations:",
+
       // MANTIDOS EM INGLÊS PROPOSITALMENTE (Configurações do Robô)
       initialGreeting: "Hello! I'm your English AI Teacher. How are you doing today? We can talk about anything you want!",
-      systemPromptFree: "You are a friendly and supportive English teacher. Speak naturally, keep answers conversational and clear, and gently correct any major grammar mistakes at the end of your response.",
-      errorMessage: "Sorry, I had an internal processing error. Could you try again?"
+      systemPromptFree: "You are a friendly and supportive English teacher. Speak naturally, keep answers conversational and clear, and gently correct any major grammar mistakes at the end of your response."
     },
     backToEnglish: 'Back',
     cancel: 'Cancel',
+    confirm: 'Confirm',
     alpha: {
       alphabet: "Alphabet",
       numbers: "Numbers",
-      trainingMode: "Training Mode"
+      trainingMode: "Training Mode",
+      learn: "Learn",
+      train: "Train",
+      alphaDesc: "Letters and Phonetics",
+      numbersDesc: "Counting and Tens",
+      exAlphabet: "Alphabet Training",
+      exAlphaDesc: "Spelling and Sound",
+      exNumbers: "Numbers Training",
+      exNumbersDesc: "Dictation and Sequence",
+      alphabetBanner: "Tap the letters to hear the pronunciation. The text below shows how the letter sounds phonetically.",
+      numbersTitle: "The Numbers",
+      numbersBanner: "Tap the numbers to hear the pronunciation. The text below shows how the number sounds phonetically.",
+      units: "Units (0 - 9)",
+      teens: "Irregular Tens (10 - 19)",
+      tens: "Tens (20 - 90)",
+      largeNumbers: "Large Numbers"
     },
     general: {
       exercise: "Exercise",
@@ -347,7 +448,7 @@ export const translations = {
       goesToQueue: "The answer goes to the end of the queue.",
       continue: "Continue",
       backToMenu: "Back to Menu"
-    },
+    }
   },
 
   es: {
@@ -367,7 +468,8 @@ export const translations = {
       fitness: "Acondicionamiento",
       home: "Inicio",
       finance: "Finanzas",
-      tasks: "Tareas"
+      tasks: "Tareas",
+      calendar: "Calendario"
     },
     home: {
       greeting: "Bienvenido(a),",
@@ -392,7 +494,21 @@ export const translations = {
       learned: "Aprendidas",
       mistakes: "Errores",
       completed: "Niveles Completados",
-      practiceBtn: "Practicar Vocabulario"
+      practiceBtn: "Practicar Vocabulario",
+      guidedJourney: "Viaje Guiado",
+      followTrail: "Sigue el Camino",
+      fundamentals: "Fundamentos",
+      alphaAndNumbers: "Alfabeto y Números",
+      conversationTrain: "Conversación y Práctica"
+    },
+    trail: {
+      level: "Nivel",
+      section1: "Sección 1",
+      fundamentals: "Los Fundamentos",
+      section2: "Sección 2",
+      dublinPrep: "Preparación para Dublín",
+      toBeContinued: "CONTINUARÁ...",
+      newMissions: "Nuevas misiones llegarán pronto."
     },
     levelList: {
       title: "Niveles Disponibles",
@@ -437,10 +553,14 @@ export const translations = {
       profileSection: "Tu Perfil",
       statsSection: "Visión General",
       prefsSection: "Preferencias",
-      langStat: "Idiomas",
+      langStat: "Inglés",
       streakTitle: "Racha:",
+      streak: "Racha",
+      xp: "XP",
+      level: "Niv.",
+      progress: "Progreso",
       days: "días",
-      fitnessStat: "Acondicionamiento",
+      fitnessStat: "Entrenamiento",
       fitnessDesc: "Nivel Actual: 3",
       financeStat: "Finanzas",
       financeDesc: "$ 450.00 por pagar",
@@ -448,14 +568,17 @@ export const translations = {
       tasksDesc: "3 pendientes hoy",
       language: "Idioma de la App",
       notifications: "Notificaciones",
-      theme: "Tema Oscuro"
+      theme: "Tema Oscuro",
+      microphone: "Micrófono (Voz)",
+      revokeAlert: "Para quitar un permiso ya otorgado, vaya a la configuración de su navegador (haga clic en el icono del candado en la barra de direcciones).",
+      offensive: "Ofensiva"
     },
     notifications: {
-    allow: "Permitir",
-    remove: "Eliminar",
-    language: "Recordatorio de idioma",
-    tasks: "Agenda y Tareas",
-    fitness: "Fitness"
+      allow: "Permitir",
+      remove: "Eliminar",
+      language: "Recordatorio de idioma",
+      tasks: "Agenda y Tareas",
+      fitness: "Fitness"
     },
     ai: {
       teacherTitle: 'Profesor IA',
@@ -487,20 +610,48 @@ export const translations = {
       levelLabel: 'Nivel',
       translationLabel: 'Traducción',
       correctionLabel: 'Consejo',
+      missionLabel: "Misión",
+      thinking: "Pensando...",
+      missionComplete: "¡Misión Cumplida!",
+      missionCompleteDesc: "Alcanzaste el objetivo de esta tarea de manera excelente.",
+      backToScenarios: "Completar y Volver",
+      restartTaskTitle: "¿Reiniciar Tarea?",
+      restartTaskWarning: "¿Deseas reiniciar esta tarea? Todo tu progreso y el historial de chat de este escenario se eliminarán de forma permanente.",
       errorBanner: 'Algo salió mal. Intenta enviar de nuevo.',
       errorMessage: "Lo siento, tuve un error interno de procesamiento. ¿Podrías intentarlo de nuevo?",
-            
+      scenariosTitle: "Escenarios Prácticos",
+      scenariosDesc: "Elige una situación cotidiana para practicar:",
+      restartTask: "Reiniciar Tarea",
+      connectivityNote: "Atención: Las funciones de IA utilizan procesamiento en la nube. Se requiere una conexión activa a internet para conversar con los profesores.",
+      voiceScenariosTitle: "Misiones de Voz",
+      voiceScenariosDesc: "Practica conversación en tiempo real para el día a día:",
+      
       // MANTIDOS EM INGLÊS PROPOSITALMENTE (Configurações do Robô)
       initialGreeting: "Hello! I'm your English AI Teacher. How are you doing today? We can talk about anything you want!",
-      systemPromptFree: "You are a friendly and supportive English teacher. Speak naturally, keep answers conversational and clear, and gently correct any major grammar mistakes at the end of your response.",
-      errorMessage: "Sorry, I had an internal processing error. Could you try again?"
+      systemPromptFree: "You are a friendly and supportive English teacher. Speak naturally, keep answers conversational and clear, and gently correct any major grammar mistakes at the end of your response."
     },
     backToEnglish: 'Volver',
     cancel: 'Cancelar',
+    confirm: 'Confirmar',
     alpha: {
       alphabet: "Alfabeto",
       numbers: "Números",
-      trainingMode: "Modo Entrenamiento"
+      trainingMode: "Modo Entrenamiento",
+      learn: "Aprender",
+      train: "Entrenar",
+      alphaDesc: "Letras y Fonética",
+      numbersDesc: "Conteo y Decenas",
+      exAlphabet: "Entrenamiento del Alfabeto",
+      exAlphaDesc: "Deletreo y Sonido",
+      exNumbers: "Entrenamiento de Números",
+      exNumbersDesc: "Dictado y Secuencia",
+      alphabetBanner: "Toca las letras para escuchar la pronunciación. El texto a continuación muestra cómo suena la letra usando los sonidos de tu idioma.",
+      numbersTitle: "Los Números",
+      numbersBanner: "Toca los números para escuchar la pronunciación. El texto a continuación muestra cómo suena el número usando los sonidos de tu idioma.",
+      units: "Unidades (0 - 9)",
+      teens: "Decenas Irregulares (10 - 19)",
+      tens: "Decenas (20 - 90)",
+      largeNumbers: "Números Grandes"
     },
     general: {
       exercise: "Ejercicio",
@@ -522,6 +673,6 @@ export const translations = {
       goesToQueue: "La respuesta va al final de la cola.",
       continue: "Continuar",
       backToMenu: "Volver al Menú"
-    },
+    }
   }
 };

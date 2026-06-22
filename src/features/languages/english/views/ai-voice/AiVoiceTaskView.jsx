@@ -1,13 +1,15 @@
 // src/features/languages/english/views/ai-voice/AiVoiceTaskView.jsx
 import React, { useState, useEffect, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useLanguage } from '../../../../../contexts/LanguageContext';
 import { db } from '../../../../../config/dexieDb';
 import { PhoneOff, Mic, MicOff, Bot, Loader2, Volume2, Target, CheckCircle2, AlertTriangle, MessageSquare, RotateCcw, X, Globe, Sparkles, ChevronDown } from 'lucide-react';
 import { generateCloudResponse } from '../../../../../services/aiService';
 import { useSpeech } from '../../../../../hooks/useSpeech';
 import { VOICE_SCENARIOS } from '../../../../../data/voiceScenarios';
-import FooterBrand from '../../../../../components/FooterBrand'; // <-- Import do FooterBrand
+import FooterBrand from '../../../../../components/FooterBrand';
+import { addXP } from '../../../../../utils/xpManager';
+import PigeonAvatar from '../../../../../components/PigeonAvatar';
 
 const CEFR_LEVELS = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
 const NATIVE_LANG_NAMES = { pt: 'Brazilian Portuguese', es: 'Spanish', en: 'English' };
@@ -64,11 +66,35 @@ function parseVoiceTaskJson(raw) {
   }
 }
 
+// NOVO: Função para descobrir qual roupa o Paddy deve usar baseado na Task
+function getAccessoryForScenario(scenarioId) {
+  switch(scenarioId) {
+    case 'voice_coffee':
+    case 'ordering_pub':
+      return 'barista';
+    case 'dublin_airport':
+      return 'officer';
+    case 'job_hunting':
+    case 'hospitality_interview':
+      return 'manager';
+    case 'buy_ticket':
+    case 'hotel_checkin':
+      return 'receptionist';
+    default:
+      return 'teacher'; // Fallback caso seja uma task nova ainda não mapeada
+  }
+}
+
 export default function AiVoiceTaskView() {
   const { taskId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const { t, uiLang } = useLanguage();
   
+  const backRoute = location.state?.fromTrail 
+    ? '/english/trail' 
+    : '/english/ai-voice/tasks';
+
   const scenario = VOICE_SCENARIOS.find(s => s.id === taskId) || VOICE_SCENARIOS[0];
   const { transcript, isListening, startListening, stopListening, hasSupport } = useSpeech('en-IE');
 
@@ -159,7 +185,7 @@ export default function AiVoiceTaskView() {
       setCallState('speaking');
     };
 
-    utterance.onend = () => {
+    utterance.onend = async () => {
       if (isCompletedFlag) {
         setCallState('idle');
         setTaskSuccess(true); 
@@ -167,6 +193,8 @@ export default function AiVoiceTaskView() {
         if (!savedCompleted.includes(taskId)) {
           savedCompleted.push(taskId);
           localStorage.setItem('completedVoiceTasks', JSON.stringify(savedCompleted));
+          
+          await addXP(20);
         }
       } else {
         setCallState('idle');
@@ -201,7 +229,7 @@ export default function AiVoiceTaskView() {
   const endCall = () => {
     stopListening();
     synth.cancel();
-    navigate('/english/ai-voice/tasks'); 
+    navigate(backRoute);
   };
 
   const handleSendVoice = async (userText) => {
@@ -272,7 +300,7 @@ export default function AiVoiceTaskView() {
         
         <div className="flex flex-col gap-3 w-full max-w-xs">
           <button onClick={endCall} className="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-4 rounded-2xl transition-colors shadow-lg">
-            {t('ai.backToScenarios', 'Voltar aos Cenários')}
+            {t('ai.backToScenarios', 'Concluir e Voltar')}
           </button>
           <button onClick={() => setIsResetModalOpen(true)} className="w-full bg-gray-800 hover:bg-gray-700 text-white font-bold py-4 rounded-2xl transition-colors shadow-lg flex items-center justify-center gap-2">
             <RotateCcw size={20} />
@@ -352,26 +380,32 @@ export default function AiVoiceTaskView() {
         <div className="relative flex items-center justify-center shrink-0 my-2">
           {(callState === 'speaking' || callState === 'listening') && (
             <>
-              <div className="absolute w-28 h-28 bg-indigo-500/20 rounded-full animate-ping"></div>
-              <div className="absolute w-36 h-36 bg-indigo-500/10 rounded-full animate-pulse [animation-duration:2s]"></div>
+              <div className="absolute w-32 h-32 bg-indigo-500/20 rounded-full animate-ping"></div>
+              <div className="absolute w-40 h-40 bg-indigo-500/10 rounded-full animate-pulse [animation-duration:2s]"></div>
             </>
           )}
           
-          <div className={`relative z-10 w-24 h-24 sm:w-28 sm:h-28 rounded-full flex items-center justify-center shadow-2xl transition-colors duration-500 ${
-            callState === 'speaking' ? 'bg-indigo-600' : 
-            callState === 'listening' ? 'bg-green-600' : 
-            callState === 'thinking' ? 'bg-blue-600' : 'bg-gray-800 border-2 border-gray-700'
-          }`}>
-            {callState === 'thinking' ? (
-              <Loader2 className="text-white animate-spin" size={40} />
-            ) : callState === 'listening' ? (
-              <Mic className="text-white animate-pulse" size={40} />
-            ) : callState === 'speaking' ? (
-              <Volume2 className="text-white animate-pulse" size={40} />
-            ) : (
-              <Bot className="text-gray-400" size={40} />
-            )}
+          <div className="relative z-10 w-28 h-28 sm:w-32 sm:h-32 rounded-full shadow-2xl bg-slate-800 border-4 border-slate-700 overflow-hidden flex items-end justify-center">
+            <PigeonAvatar accessory={getAccessoryForScenario(taskId)} className="w-25 h-25 mt-6" />
+            
+            <div className={`absolute inset-0 transition-opacity duration-300 ${
+              callState === 'speaking' ? 'bg-indigo-500/20' : 
+              callState === 'listening' ? 'bg-green-500/20' : 
+              callState === 'thinking' ? 'bg-blue-500/20' : 'bg-transparent'
+            }`}></div>
           </div>
+
+          {(callState !== 'idle') && (
+            <div className={`absolute bottom-0 right-0 w-10 h-10 rounded-full flex items-center justify-center shadow-lg border-[3px] border-gray-950 z-20 transition-all duration-300 ${
+              callState === 'speaking' ? 'bg-indigo-600' : 
+              callState === 'listening' ? 'bg-green-600' : 
+              callState === 'thinking' ? 'bg-blue-600' : 'bg-gray-800'
+            }`}>
+              {callState === 'thinking' && <Loader2 className="text-white animate-spin" size={18} />}
+              {callState === 'listening' && <Mic className="text-white animate-pulse" size={18} />}
+              {callState === 'speaking' && <Volume2 className="text-white animate-pulse" size={18} />}
+            </div>
+          )}
         </div>
 
         {/* Textos */}
@@ -459,11 +493,14 @@ export default function AiVoiceTaskView() {
               return (
                 <div key={idx} className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'} w-full`}>
                   <div className={`flex gap-2 sm:gap-3 w-full ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                    
                     {isAssistant && (
-                      <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-indigo-500/20 border border-indigo-500/30 text-indigo-400 flex items-center justify-center shrink-0 mt-1 shadow-sm">
-                        <Bot size={14} />
+                      <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-slate-800 border border-slate-600 flex items-center justify-center shrink-0 mt-1 shadow-sm overflow-hidden relative">
+                        <div className="absolute inset-0 bg-gradient-to-b from-indigo-500/20 to-transparent"></div>
+                        <PigeonAvatar accessory={getAccessoryForScenario(taskId)} className="w-8 h-8 mt-1.5 relative z-10" />
                       </div>
                     )}
+
                     <div className={`max-w-[85%] sm:max-w-[80%] p-3 sm:p-4 rounded-2xl shadow-lg ${msg.role === 'user' ? 'bg-indigo-600 text-white rounded-tr-sm' : 'bg-gray-800 text-gray-100 rounded-tl-sm border border-gray-700'}`}>
                       <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
                     </div>
@@ -499,7 +536,6 @@ export default function AiVoiceTaskView() {
             <div ref={chatEndRef} className="h-4" />
           </div>
 
-          {/* MARCA NO RELATÓRIO */}
           <div className="shrink-0 py-3 bg-gray-900/80 border-t border-gray-800 flex items-center justify-center">
             <FooterBrand direction="flex-col" textSize="text-xs" textColor="text-white-400" />
           </div>

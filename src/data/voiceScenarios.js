@@ -1,6 +1,93 @@
-// src/features/languages/english/views/ai-voice/voiceScenarios.js
+// src/data/voiceScenarios.js
 
 export const VOICE_SCENARIOS = [
+  {
+    id: 'voice_coffee',
+    title: { pt: 'Pedindo no Café', es: 'Pidiendo en el Café', en: 'Ordering at the Cafe' },
+    description: { 
+      pt: 'Faça um pedido em um café movimentado.', 
+      es: 'Haz un pedido en un café concurrido.', 
+      en: 'Place an order in a busy cafe.' 
+    },
+    objective: { 
+      pt: 'Faça seu pedido para o barista e pergunte o preço total.', 
+      es: 'Haz tu pedido al barista y pregunta el precio total.', 
+      en: 'Place your order with the barista and ask for the total price.' 
+    },
+    aiRole: 'You are a busy but polite barista at a popular Dublin cafe. Ask the customer what they would like to have.',
+    completionCondition: 'Once the user orders a drink and asks for the total price, tell them the price and set isCompleted to true.',
+    firstMessage: {
+      text: 'Next, please! Hi, what can I get for you today?',
+      translation: { 
+        pt: 'O próximo, por favor! Olá, o que posso preparar para você hoje?', 
+        es: '¡El siguiente, por favor! Hola, ¿qué te puedo preparar hoy?', 
+        en: 'Next, please! Hi, what can I get for you today?' 
+      },
+      hint: { 
+        pt: 'Faça o seu pedido. Para manter a sua promessa de tomar apenas água, experimente: "Can I have a bottle of water, please? How much is it?".', 
+        es: 'Haz tu pedido de agua. (ej: "Can I have a bottle of water, please? How much is it?").', 
+        en: 'Place your order for water and ask the price. (e.g., "Can I have a bottle of water, please? How much is it?").' 
+      }
+    }
+  },
+  {
+    id: 'buy_ticket',
+    title: { pt: 'Comprando Passagem', es: 'Comprando Billete', en: 'Buying a Ticket' },
+    description: { 
+      pt: 'Compre uma passagem de ônibus ou trem.', 
+      es: 'Compra un billete de autobús o tren.', 
+      en: 'Buy a bus or train ticket.' 
+    },
+    objective: { 
+      pt: 'Peça uma passagem para o centro da cidade (City Centre).', 
+      es: 'Pide un billete para el centro de la ciudad (City Centre).', 
+      en: 'Ask for a ticket to the City Centre.' 
+    },
+    aiRole: 'You are a ticket agent at a station in Dublin. Ask the customer where they are going and issue the ticket when they say "City Centre".',
+    completionCondition: 'Once the user asks for a ticket to the City Centre, tell them the platform number and set isCompleted to true.',
+    firstMessage: {
+      text: 'Next! Hello, where would you like to go today?',
+      translation: { 
+        pt: 'Próximo! Olá, para onde você gostaria de ir hoje?', 
+        es: '¡Siguiente! Hola, ¿a dónde le gustaría ir hoy?', 
+        en: 'Next! Hello, where would you like to go today?' 
+      },
+      hint: { 
+        pt: 'Peça uma passagem para o centro da cidade (ex: "One ticket to the City Centre, please.").', 
+        es: 'Pida un billete para el centro (ej: "One ticket to the City Centre, please.").', 
+        en: 'Ask for a ticket to the city centre (e.g., "One ticket to the City Centre, please.").' 
+      }
+    }
+  },
+  {
+    id: 'hotel_checkin',
+    title: { pt: 'Check-in no Hostel', es: 'Check-in en el Hostal', en: 'Hostel Check-in' },
+    description: { 
+      pt: 'Chegue na acomodação e faça o check-in.', 
+      es: 'Llega al alojamiento y haz el check-in.', 
+      en: 'Arrive at the accommodation and check in.' 
+    },
+    objective: { 
+      pt: 'Diga que tem uma reserva e informe seu nome.', 
+      es: 'Di que tienes una reserva e informa tu nombre.', 
+      en: 'Say you have a reservation and state your name.' 
+    },
+    aiRole: 'You are a friendly receptionist at a busy Dublin hostel. Ask the guest if they have a reservation and what their name is.',
+    completionCondition: 'Once the user says they have a reservation and provides a name, welcome them and set isCompleted to true.',
+    firstMessage: {
+      text: 'Hi, welcome to Dublin City Hostel! How can I help you today?',
+      translation: { 
+        pt: 'Oi, bem-vindo ao Dublin City Hostel! Como posso ajudar você hoje?', 
+        es: '¡Hola, bienvenido a Dublin City Hostel! ¿Cómo puedo ayudarte hoy?', 
+        en: 'Hi, welcome to Dublin City Hostel! How can I help you today?' 
+      },
+      hint: { 
+        pt: 'Diga que você tem uma reserva e fale seu nome (ex: "Hi, I have a reservation under the name Luccas.").', 
+        es: 'Diga que tiene una reserva y su nombre (ej: "Hi, I have a reservation under the name Luccas.").', 
+        en: 'Say you have a reservation and your name (e.g., "Hi, I have a reservation under the name Luccas.").' 
+      }
+    }
+  },
   {
     id: 'dublin_airport',
     title: { pt: 'Imigração em Dublin', es: 'Inmigración en Dublín', en: 'Dublin Immigration' },

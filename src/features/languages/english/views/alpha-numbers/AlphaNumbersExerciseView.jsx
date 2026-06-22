@@ -1,6 +1,6 @@
 // src/features/languages/english/views/alpha-numbers/AlphaNumbersExerciseView.jsx
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Mic, CheckCircle2, XCircle, ChevronRight, PlayCircle, StopCircle, PartyPopper, Volume2 } from 'lucide-react';
 import { useSpeech } from '../../../../../hooks/useSpeech';
 import { useLanguage } from '../../../../../contexts/LanguageContext';
@@ -8,6 +8,7 @@ import { ALPHABET_EXERCISES } from '../../../../../data/alphabetExercises';
 import { NUMBER_EXERCISES } from '../../../../../data/numberExercises';
 import { db } from '../../../../../config/dexieDb';
 import BackButton from '../../../../../components/BackButton';
+import { addXP } from '../../../../../utils/xpManager';
 
 // =========================================
 // FUNÇÕES DE ÁUDIO
@@ -69,9 +70,13 @@ const playCompletionSound = () => {
 export default function AlphaNumbersExerciseView() {
   const { mode, index } = useParams();
   const navigate = useNavigate();
-  const { t, uiLang } = useLanguage(); // NOVO: Trazendo o idioma atual
+  const location = useLocation();
+  const { t, uiLang } = useLanguage(); 
 
-  // Função robusta para extrair o texto de objetos de tradução ou strings diretas
+  const backRoute = location.state?.fromTrail 
+    ? '/english/trail' 
+    : `/english/alpha-numbers/exercises/${mode}`;
+
   const getText = (textData) => {
     if (!textData) return '';
     if (typeof textData === 'string') return textData;
@@ -144,11 +149,7 @@ export default function AlphaNumbersExerciseView() {
     if (!window.speechSynthesis) return;
     window.speechSynthesis.cancel();
     
-    // 1. Pega o texto e limpa sujeiras
     let cleanText = String(text).replace(/[^a-zA-Z0-9\s.]/g, ''); 
-    
-    // 2. A MÁGICA PARA O IPHONE: Transforma tudo em minúsculo!
-    // Isso impede o iOS Safari de falar "Capital A" ou "Cap B".
     cleanText = cleanText.toLowerCase();
     
     const utterance = new SpeechSynthesisUtterance(cleanText);
@@ -221,9 +222,10 @@ export default function AlphaNumbersExerciseView() {
           mode,
           exerciseIndex,
           completedAt: new Date().toISOString(),
-          xp: 0,
+          xp: 20,
         });
         await db.alphaNumProgress.delete([mode, exerciseIndex]);
+        await addXP(20);
         playCompletionSound();
       } else {
         await db.alphaNumProgress.put({
@@ -272,7 +274,7 @@ export default function AlphaNumbersExerciseView() {
         <h2 className="text-4xl font-black text-white mb-4">{t('level.completedTitle', 'Exercício Concluído!')}</h2>
         <p className="text-gray-400 font-medium mb-12">{t('level.masteredAll', 'Você dominou todas as questões deste nível.')}</p>
         <button
-          onClick={() => navigate(`/english/alpha-numbers/exercises/${mode}`)}
+          onClick={() => navigate(backRoute)}
           className="px-8 py-4 bg-white text-black font-black rounded-full hover:bg-gray-200 transition-all shadow-xl active:scale-95"
         >
           {t('general.backToMenu', 'Voltar para o Menu')}
@@ -286,7 +288,7 @@ export default function AlphaNumbersExerciseView() {
   return (
     <div className="w-full pt-8 animate-fade-in px-4 min-h-screen flex flex-col relative overflow-y-auto">
       <div className="shrink-0 mb-4">
-        <BackButton to={`/english/alpha-numbers/exercises/${mode}`} label={t('general.saveAndExit', 'Salvar e Sair')} />
+        <BackButton to={backRoute} label={t('general.saveAndExit', 'Salvar e Sair')} />
       </div>
 
       {totalQuestions > 0 && (
@@ -304,7 +306,7 @@ export default function AlphaNumbersExerciseView() {
         <span className="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-3 block bg-indigo-500/10 py-1 px-3 rounded-full w-max mx-auto">
           {t('general.remaining', 'Faltam')} {queue.length} {queue.length === 1 ? t('general.question', 'questão') : t('general.questions', 'questões')}
         </span>
-        <h2 className="text-2xl sm:text-3xl font-black text-white leading-tight mb-2 animate-fade-in">
+        <h2 className="text-2xl sm:text-3xl font-black text-white leading-tight mb-2 animate-fade-in px-2">
           {getText(currentEx?.question)}
         </h2>
         {currentEx?.instructions && <p className="text-gray-400 text-sm font-medium">{getText(currentEx.instructions)}</p>}
@@ -321,14 +323,18 @@ export default function AlphaNumbersExerciseView() {
                 <PlayCircle size={48} />
               </button>
             )}
-            <div className="grid grid-cols-2 gap-4 w-full">
+            
+            {/* GRID DAS RESPOSTAS COM TEXTO RESPONSIVO */}
+            <div className="grid grid-cols-2 gap-3 sm:gap-4 w-full">
               {currentEx.options?.map(opt => (
                 <button
                   key={opt}
                   onClick={() => !feedback && handleChoice(opt)}
                   disabled={!!feedback}
-                  className="p-5 bg-gray-800 rounded-3xl border-2 border-gray-700 hover:border-indigo-400 hover:bg-gray-700 active:scale-95 transition-all text-2xl font-black shadow-lg"
+                  // Aqui está a MÁGICA: text-sm a text-xl responsivo, break-words, leading-snug e flex centralizado
+                  className="p-3 sm:p-5 bg-gray-800 rounded-[1.5rem] border-2 border-gray-700 hover:border-indigo-400 hover:bg-gray-700 active:scale-95 transition-all text-sm sm:text-lg md:text-xl font-black shadow-lg flex items-center justify-center text-center break-words w-full min-h-[80px] leading-snug"
                 >
+                  {/* Mantido como puro para não ser traduzido pelo i18n */}
                   {opt}
                 </button>
               ))}

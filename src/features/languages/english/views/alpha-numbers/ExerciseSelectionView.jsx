@@ -13,13 +13,13 @@ import FooterBrand from '../../../../../components/FooterBrand';
 export default function ExerciseSelectionView() {
   const { mode } = useParams();
   const navigate = useNavigate();
-  const { t, uiLang } = useLanguage(); // NOVO: Contexto de idiomas
+  const { t, uiLang } = useLanguage();
 
-  // Extrai o texto do formato novo (objeto) ou antigo (string)
+  // CORREÇÃO APLICADA: Substituído 'textData.pt' por 'textObj.pt'
   const getTranslated = (textObj) => {
     if (!textObj) return '';
     if (typeof textObj === 'string') return textObj;
-    return textObj[uiLang] || textData.pt || '';
+    return textObj[uiLang] || textObj.pt || '';
   };
 
   const exercises = mode === 'alphabet' ? ALPHABET_EXERCISES : NUMBER_EXERCISES;
@@ -61,7 +61,7 @@ export default function ExerciseSelectionView() {
   };
 
   return (
-    <div className="w-full pt-8 animate-fade-in px-4 pb-24 min-h-screen">
+    <div className="w-full pt-8 animate-fade-in px-4 pb-24 min-h-screen -mt-5 -mb-20">
       <BackButton to="/english/alpha-numbers" label={t('general.back', 'Voltar')} />
 
       <div className="flex items-center justify-between gap-3 my-8 px-1">
@@ -176,7 +176,7 @@ export default function ExerciseSelectionView() {
                 onClick={() => setPendingReset(null)}
                 className="flex-1 py-3 rounded-2xl bg-gray-700 hover:bg-gray-600 text-white font-bold transition-colors"
               >
-                {t('general.cancel', 'Cancelar')}
+                {t('cancel', 'Cancelar')}
               </button>
               <button
                 onClick={confirmRestart}

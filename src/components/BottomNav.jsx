@@ -1,6 +1,6 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Home, Globe, Dumbbell, Wallet, Gamepad2 } from 'lucide-react';
+import { Home, Globe, Dumbbell, Wallet, CalendarCheck, Calendar } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useKeyboardOpen } from '../hooks/useKeyboardOpen';
 
@@ -74,8 +74,8 @@ export default function BottomNav() {
         onClick={() => navigate('/tasks')} 
         className={`flex flex-col items-center justify-center w-16 transition-colors ${isTasksActive ? 'text-purple-500' : 'text-gray-500 hover:text-gray-400'}`}
       >
-        <Gamepad2 size={24} />
-        <span className="text-[10px] font-bold mt-1">{t('nav.tasks')}</span>
+        <Calendar size={24} />
+        <span className="text-[10px] font-bold mt-1">{t('nav.calendar')}</span>
       </button>
 
     </div>

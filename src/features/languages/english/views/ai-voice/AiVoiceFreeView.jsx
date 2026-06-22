@@ -7,6 +7,7 @@ import { PhoneOff, Mic, MicOff, Bot, Loader2, Volume2, AlertTriangle, MessageSqu
 import { generateCloudResponse } from '../../../../../services/aiService';
 import { useSpeech } from '../../../../../hooks/useSpeech';
 import FooterBrand from '../../../../../components/FooterBrand'; // <-- Import do FooterBrand
+import PigeonAvatar from '../../../../../components/PigeonAvatar';
 
 const CEFR_LEVELS = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
 const NATIVE_LANG_NAMES = { pt: 'Brazilian Portuguese', es: 'Spanish', en: 'English' };
@@ -331,7 +332,7 @@ export default function AiVoiceFreeView() {
             ) : callState === 'speaking' ? (
               <Volume2 className="text-white animate-pulse" size={40} />
             ) : (
-              <Bot className="text-gray-400" size={40} />
+              <PigeonAvatar accessory="teacher" className="w-20 h-20 mt-4 ml-1" />
             )}
           </div>
         </div>
@@ -423,8 +424,9 @@ export default function AiVoiceFreeView() {
                 <div key={idx} className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'} w-full`}>
                   <div className={`flex gap-2 sm:gap-3 w-full ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                     {isAssistant && (
-                      <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-blue-500/20 border border-blue-500/30 text-blue-400 flex items-center justify-center shrink-0 mt-1 shadow-sm">
-                        <Bot size={14} />
+                      <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-slate-800 border border-slate-600 flex items-center justify-center shrink-0 mt-1 shadow-sm overflow-hidden relative">
+                        <div className="absolute inset-0 bg-gradient-to-b from-purple-500/20 to-transparent"></div>
+                        <PigeonAvatar accessory="teacher" className="w-8 h-8 mt-1.5 relative z-10" />
                       </div>
                     )}
                     <div className={`max-w-[85%] sm:max-w-[80%] p-3 sm:p-4 rounded-2xl shadow-lg ${msg.role === 'user' ? 'bg-blue-600 text-white rounded-tr-sm' : 'bg-gray-800 text-gray-100 rounded-tl-sm border border-gray-700'}`}>
