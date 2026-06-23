@@ -3,6 +3,14 @@
 export const translations = {
   pt: {
     welcome: "Bem-vindo ao LifeAccess",
+    syncChoice: {
+      subtitle: "Seu ecossistema completo de evolução pessoal, idiomas e organização.",
+      googleBtn: "Entrar com Google",
+      or: "OU",
+      offlineBtn: "Continuar Offline",
+      offlineSub: "Salvo apenas neste dispositivo",
+      googleAlert: "A integração com o Google será ativada no próximo passo!"
+    },
     selectLanguage: "Selecione o idioma do aplicativo",
     continueBtn: "Continuar",
     nameTitle: "Como devemos te chamar?",
@@ -129,15 +137,42 @@ export const translations = {
       theme: "Tema Escuro",
       microphone: "Microfone (Voz)",
       revokeAlert: "Para remover uma permissão já concedida, vá nas configurações do seu navegador (clique no ícone de cadeado na barra de endereço).",
-      offensive: "Ofensiva"
+      offensive: "Ofensiva",
+      backupSection: "Backup e Dados",
+      exportData: "Exportar Dados",
+      exportDesc: "Salvar backup no seu dispositivo",
+      importData: "Importar Dados",
+      importDesc: "Restaurar de um arquivo de backup",
+      exportSuccess: "Backup exportado com sucesso! Guarde este arquivo em um local seguro.",
+      exportError: "Ocorreu um erro ao exportar seus dados.",
+      importConfirm: "Isso apagará seus dados atuais e os substituirá pelo backup. Deseja continuar?",
+      importSuccess: "Backup restaurado com sucesso! O aplicativo será recarregado.",
+      importError: "Arquivo de backup inválido ou corrompido."
     },
     notifications: {
       allow: "Permitir",
       remove: "Remover",
       language: "Lembretes de Idiomas",
       tasks: "Tarefas e Agenda",
-      fitness: "Fitness"
+      fitness: "Fitness",
     },
+    // Firebase & Auth
+      connectCloud: "Conectar à Nuvem",
+      connectCloudDesc: "Salve seu progresso com segurança no Google",
+      cloudConnected: "Conectado à Nuvem",
+      syncNow: "Sincronizar",
+      connectSuccess: "Conectado com sucesso! Seus dados agora podem ser sincronizados.",
+      connectError: "Erro ao conectar. Tente novamente.",
+      disconnectConfirm: "Tem certeza que deseja desconectar sua conta? Seus dados não serão mais sincronizados na nuvem.",
+      syncStart: "Sincronizando dados com a nuvem... (Em breve: Passo 4)",
+      
+      // Apagar Dados
+      deleteData: "Apagar Todos os Dados",
+      deleteDesc: "Ação irreversível",
+      deleteCloudWarn: "ATENÇÃO: Como você está conectado, isso apagará todos os seus dados deste dispositivo E DA NUVEM permanentemente. Tem certeza absoluta?",
+      deleteLocalWarn: "ATENÇÃO: Isso apagará todos os seus dados deste dispositivo permanentemente. Tem certeza absoluta?",
+      deleteSuccess: "Todos os dados foram apagados.",
+      deleteError: "Erro ao tentar apagar os dados.",
     ai: {
       teacherTitle: 'Professor IA',
       teacherDesc: 'Conversação por chat e voz',
@@ -249,6 +284,14 @@ export const translations = {
   
   en: {
     welcome: "Welcome to LifeAccess",
+    syncChoice: {
+      subtitle: "Your complete ecosystem for personal growth, languages, and organization.",
+      googleBtn: "Sign in with Google",
+      or: "OR",
+      offlineBtn: "Continue Offline",
+      offlineSub: "Saved only on this device",
+      googleAlert: "Google integration will be enabled in the next step!"
+    },
     selectLanguage: "Select the app language",
     continueBtn: "Continue",
     nameTitle: "What should we call you?",
@@ -374,7 +417,17 @@ export const translations = {
       theme: "Dark Theme",
       microphone: "Microphone (Voice)",
       revokeAlert: "To remove a permission already granted, go to your browser settings (click the padlock icon in the address bar).",
-      offensive: "Offensive"
+      offensive: "Offensive",
+      backupSection: "Backup & Data",
+      exportData: "Export Data",
+      exportDesc: "Save backup to your device",
+      importData: "Import Data",
+      importDesc: "Restore from a backup file",
+      exportSuccess: "Backup exported successfully! Keep this file in a safe place.",
+      exportError: "An error occurred while exporting your data.",
+      importConfirm: "This will overwrite your current data with the backup. Do you want to continue?",
+      importSuccess: "Backup restored successfully! The app will reload.",
+      importError: "Invalid or corrupted backup file.",
     },
     notifications: {
       allow: "Allow",
@@ -383,6 +436,21 @@ export const translations = {
       tasks: "Agenda and Tasks",
       fitness: "Fitness"
     },
+      connectCloud: "Connect to Cloud",
+      connectCloudDesc: "Safely save your progress with Google",
+      cloudConnected: "Cloud Connected",
+      syncNow: "Sync Now",
+      connectSuccess: "Successfully connected! Your data can now be synced.",
+      connectError: "Error connecting. Please try again.",
+      disconnectConfirm: "Are you sure you want to disconnect? Your data will no longer sync to the cloud.",
+      syncStart: "Syncing data with the cloud... (Coming soon: Step 4)",
+      
+      deleteData: "Delete All Data",
+      deleteDesc: "Irreversible action",
+      deleteCloudWarn: "WARNING: Since you are connected, this will permanently delete all your data from this device AND THE CLOUD. Are you absolutely sure?",
+      deleteLocalWarn: "WARNING: This will permanently delete all your data from this device. Are you absolutely sure?",
+      deleteSuccess: "All data has been deleted.",
+      deleteError: "Error attempting to delete data.",
     ai: {
       teacherTitle: 'AI Teacher',
       teacherDesc: 'Chat and voice conversation',
@@ -495,6 +563,14 @@ export const translations = {
 
   es: {
     welcome: "Bienvenido a LifeAccess",
+    syncChoice: {
+      subtitle: "Tu ecosistema completo para el crecimiento personal, los idiomas y la organización.",
+      googleBtn: "Iniciar sesión con Google",
+      or: "O",
+      offlineBtn: "Continuar sin conexión",
+      offlineSub: "Guardado solo en este dispositivo",
+      googleAlert: "¡La integración con Google se activará en el siguiente paso!"
+    },
     selectLanguage: "Selecciona el idioma de la aplicación",
     continueBtn: "Continuar",
     nameTitle: "¿Cómo debemos llamarte?",
@@ -620,7 +696,17 @@ export const translations = {
       theme: "Tema Oscuro",
       microphone: "Micrófono (Voz)",
       revokeAlert: "Para quitar un permiso ya otorgado, vaya a la configuración de su navegador (haga clic en el icono del candado en la barra de direcciones).",
-      offensive: "Ofensiva"
+      offensive: "Ofensiva",
+      backupSection: "Copia de Seguridad y Datos",
+      exportData: "Exportar Datos",
+      exportDesc: "Guardar copia en tu dispositivo",
+      importData: "Importar Datos",
+      importDesc: "Restaurar desde un archivo",
+      exportSuccess: "¡Copia exportada con éxito! Guarda este archivo en un lugar seguro.",
+      exportError: "Ocurrió un error al exportar tus datos.",
+      importConfirm: "Esto sobrescribirá tus datos actuales con la copia. ¿Deseas continuar?",
+      importSuccess: "¡Copia restaurada con éxito! La aplicación se recargará.",
+      importError: "Archivo de copia inválido o corrupto.",
     },
     notifications: {
       allow: "Permitir",
@@ -629,6 +715,21 @@ export const translations = {
       tasks: "Agenda y Tareas",
       fitness: "Fitness"
     },
+      connectCloud: "Conectar a la Nube",
+      connectCloudDesc: "Guarda tu progreso de forma segura con Google",
+      cloudConnected: "Conectado a la Nube",
+      syncNow: "Sincronizar",
+      connectSuccess: "¡Conectado con éxito! Tus datos ahora pueden sincronizarse.",
+      connectError: "Error al conectar. Inténtalo de nuevo.",
+      disconnectConfirm: "¿Estás seguro de que deseas desconectarte? Tus datos ya no se sincronizarán en la nube.",
+      syncStart: "Sincronizando datos con la nube... (Próximamente: Paso 4)",
+      
+      deleteData: "Borrar Todos los Datos",
+      deleteDesc: "Acción irreversible",
+      deleteCloudWarn: "ADVERTENCIA: Como estás conectado, esto borrará permanentemente todos tus datos de este dispositivo Y DE LA NUBE. ¿Estás completamente seguro?",
+      deleteLocalWarn: "ADVERTENCIA: Esto borrará permanentemente todos tus datos de este dispositivo. ¿Estás completamente seguro?",
+      deleteSuccess: "Todos los datos han sido borrados.",
+      deleteError: "Error al intentar borrar los datos.",
     ai: {
       teacherTitle: 'Profesor IA',
       teacherDesc: 'Conversación por chat y voz',

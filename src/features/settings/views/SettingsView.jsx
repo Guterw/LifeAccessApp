@@ -1,12 +1,19 @@
 // src/features/settings/views/SettingsView.jsx
-import React, { useState, useEffect } from 'react';
-import { User, Flame, Dumbbell, Receipt, CalendarCheck, Globe, Bell, Moon, Mic, Zap } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { User, Flame, Dumbbell, Receipt, CalendarCheck, Globe, Bell, Moon, Mic, Zap, HardDrive, Download, Upload, Cloud, LogOut, RefreshCw, Trash2 } from 'lucide-react';
 import { useLanguage } from '../../../contexts/LanguageContext';
 import BackButton from '../../../components/BackButton';
 import { db } from '../../../config/dexieDb';
 import { useLiveQuery } from 'dexie-react-hooks';
 import FooterBrand from '../../../components/FooterBrand';
 import PigeonAvatar from '../../../components/PigeonAvatar';
+
+// Importações do Firebase
+import { auth, googleProvider } from '../../../config/firebaseConfig';
+import { signInWithPopup, signOut, onAuthStateChanged } from 'firebase/auth';
+
+// Importação do nosso Motor de Nuvem
+import { pushToCloud, deleteCloudData } from '../../../utils/cloudSync';
 
 export default function SettingsView() {
   const { t, userName, uiLang, changeLanguage, languageStreak } = useLanguage();
@@ -15,24 +22,33 @@ export default function SettingsView() {
   const [permission, setPermission] = useState(typeof Notification !== 'undefined' ? Notification.permission : 'default');
   const [micPermission, setMicPermission] = useState('prompt');
   
+  // Estado de Autenticação na Nuvem
+  const [authUser, setAuthUser] = useState(null);
+  
+  const fileInputRef = useRef(null);
+
   // Preferências
   const [notifLang, setNotifLang] = useState(true);
   const [notifTasks, setNotifTasks] = useState(true);
   const [notifFitness, setNotifFitness] = useState(false);
 
-  // PUXANDO O PERFIL COMPLETO (XP, Level e Skin Equipado)
+  // PUXANDO O PERFIL COMPLETO
   const userProfile = useLiveQuery(() => db.userProfile.get(1)) || { 
     currentLevel: 1, 
     totalXp: 0,
-    equippedSkin: 'none' // Prepara o terreno para o sistema de skins
+    equippedSkin: 'none'
   };
   const englishXP = userProfile.totalXp;
   
-  // Para quando criar os outros módulos:
   const fitnessXP = parseInt(localStorage.getItem('fitnessXP') || '0', 10);
   const fitnessStreak = parseInt(localStorage.getItem('fitnessStreak') || '0', 10);
 
   useEffect(() => {
+    // Escuta mudanças no login do Firebase em tempo real
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setAuthUser(user);
+    });
+
     const loadSettingsAndStats = async () => {
       const settings = await db.appSettings.get(1);
       if (settings) {
@@ -49,8 +65,9 @@ export default function SettingsView() {
         } catch(e) {}
       }
     };
-
     loadSettingsAndStats();
+
+    return () => unsubscribe();
   }, []);
 
   const handleToggleChange = async (key, setter, value) => {
@@ -90,6 +107,144 @@ export default function SettingsView() {
     }
   };
 
+  // ==========================================
+  // LÓGICA DE FIREBASE (LOGIN / LOGOUT / SYNC)
+  // ==========================================
+  const handleConnectGoogle = async () => {
+    try {
+      const result = await signInWithPopup(auth, googleProvider);
+      const user = result.user;
+      const settings = await db.appSettings.get(1) || { id: 1 };
+      settings.userName = user.displayName.split(' ')[0];
+      settings.userEmail = user.email;
+      await db.appSettings.put(settings);
+      
+      // Sincroniza logo após conectar!
+      await pushToCloud(user.uid);
+      
+      alert(t('settings.connectSuccess', 'Conectado com sucesso! Seus dados agora podem ser sincronizados.'));
+    } catch (error) {
+      alert(t('settings.connectError', 'Erro ao conectar. Tente novamente.'));
+    }
+  };
+
+  const handleDisconnectGoogle = async () => {
+    if (window.confirm(t('settings.disconnectConfirm', 'Tem certeza que deseja desconectar sua conta? Seus dados não serão mais sincronizados na nuvem.'))) {
+      await signOut(auth);
+      const settings = await db.appSettings.get(1);
+      if (settings) {
+        settings.userEmail = null;
+        await db.appSettings.put(settings);
+      }
+    }
+  };
+
+  const handleCloudSync = async () => {
+    if (!authUser) return;
+    try {
+      await pushToCloud(authUser.uid);
+      alert(t('settings.syncSuccess', 'Progresso salvo na nuvem com sucesso!'));
+    } catch (error) {
+      alert(t('settings.syncError', 'Erro ao sincronizar. Verifique sua conexão.'));
+    }
+  };
+
+  // ==========================================
+  // FUNÇÕES DE EXPORTAÇÃO E IMPORTAÇÃO (MANUAL)
+  // ==========================================
+  const handleExportData = async () => {
+    try {
+      const data = {};
+      for (const table of db.tables) {
+        data[table.name] = await table.toArray();
+      }
+      const jsonStr = JSON.stringify(data);
+      const blob = new Blob([jsonStr], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `lifeaccess_backup_${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      alert(t('settings.exportSuccess', 'Backup exportado com sucesso!'));
+    } catch (error) {
+      alert(t('settings.exportError', 'Erro ao exportar dados.'));
+    }
+  };
+
+  const handleImportClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async (event) => {
+      try {
+        const data = JSON.parse(event.target.result);
+        if (!window.confirm(t('settings.importConfirm', 'Isso apagará seus dados atuais. Deseja continuar?'))) {
+          e.target.value = ''; 
+          return;
+        }
+
+        await db.transaction('rw', db.tables, async () => {
+          for (const table of db.tables) {
+            if (data[table.name]) {
+              await table.clear();
+              await table.bulkAdd(data[table.name]);
+            }
+          }
+        });
+        
+        // Se após a importação ele estiver conectado na nuvem, já sobe a versão nova
+        if (authUser) {
+          await pushToCloud(authUser.uid);
+        }
+        
+        alert(t('settings.importSuccess', 'Backup restaurado com sucesso!'));
+        window.location.reload();
+      } catch (error) {
+        alert(t('settings.importError', 'Arquivo inválido.'));
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = ''; 
+  };
+
+  // ==========================================
+  // ZONA DE PERIGO: APAGAR DADOS
+  // ==========================================
+  const handleDeleteAllData = async () => {
+    const warningMsg = authUser 
+      ? t('settings.deleteCloudWarn', 'ATENÇÃO: Como você está conectado, isso apagará todos os seus dados deste dispositivo E DA NUVEM permanentemente. Tem certeza absoluta?')
+      : t('settings.deleteLocalWarn', 'ATENÇÃO: Isso apagará todos os seus dados deste dispositivo permanentemente. Tem certeza absoluta?');
+
+    if (window.confirm(warningMsg)) {
+      try {
+        // Se estiver conectado, apaga tudo do Firebase primeiro
+        if (authUser) { 
+          await deleteCloudData(authUser.uid); 
+          await signOut(auth);
+        }
+
+        // Apaga banco de dados local e localStorage
+        await Promise.all(db.tables.map(table => table.clear()));
+        localStorage.clear();
+        
+        alert(t('settings.deleteSuccess', 'Todos os dados foram apagados.'));
+        window.location.reload();
+      } catch (error) {
+        alert(t('settings.deleteError', 'Erro ao tentar apagar os dados.'));
+      }
+    }
+  };
+
   // Lógica do Level Global
   const totalXP = englishXP + fitnessXP;
   const userLevel = userProfile.currentLevel || 1;
@@ -103,15 +258,11 @@ export default function SettingsView() {
 
       <h2 className="text-3xl font-black text-white -mt-4 mb-6 tracking-wide">{t('settings.title')}</h2>
 
-      {/* SEÇÃO DE PERFIL COM O LEVEL GLOBAL E BARRA DE PROGRESSO */}
+      {/* SEÇÃO DE PERFIL */}
       <div className="bg-gray-800 p-5 sm:p-6 rounded-3xl border border-gray-700 flex items-center gap-4 sm:gap-5 shadow-lg mb-8">
-        
-        {/* Avatar - Agora lê a skin equipada dinamicamente do banco de dados! */}
         <div className="w-16 h-16 sm:w-20 sm:h-20 bg-blue-500/20 rounded-full border-2 border-blue-500 flex items-center justify-center shrink-0">
              <PigeonAvatar accessory={userProfile.equippedSkin || 'none'} className="w-8 h-8 sm:w-10 sm:h-10 mt-1" />
         </div>
-        
-        {/* Infos e Progresso */}
         <div className="flex-1 min-w-0">
           <h3 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2 truncate">
             <span className="truncate">{userName}</span>
@@ -120,8 +271,6 @@ export default function SettingsView() {
             </span>
           </h3>
           <p className="text-xs sm:text-sm text-blue-400 font-semibold uppercase tracking-wider mb-2">LifeAccess Member</p>
-          
-          {/* BARRA DE PROGRESSO ANIMADA */}
           <div className="w-full pr-2">
             <div className="flex justify-between items-center mb-1.5">
               <span className="text-[9px] sm:text-[10px] font-bold text-gray-400 uppercase tracking-wider">
@@ -138,15 +287,12 @@ export default function SettingsView() {
               ></div>
             </div>
           </div>
-
         </div>
       </div>
 
-      {/* VISÃO GERAL (ESTATÍSTICAS INTEGRADAS) */}
+      {/* VISÃO GERAL */}
       <h3 className="font-bold text-gray-400 mb-4 uppercase tracking-wider text-sm">{t('settings.statsSection', 'Visão Geral')}</h3>
       <div className="grid grid-cols-2 gap-4 mb-8">
-        
-        {/* Card de Estatísticas do Inglês */}
         <div className="bg-gray-800 p-4 rounded-2xl border border-gray-700 shadow-md flex flex-col justify-between">
           <div className="flex items-center gap-2 mb-3">
             <Globe className="text-blue-400" size={20} />
@@ -164,7 +310,6 @@ export default function SettingsView() {
           </div>
         </div>
 
-        {/* Card de Estatísticas do Fitness (Treino) */}
         <div className="bg-gray-800 p-4 rounded-2xl border border-gray-700 shadow-md flex flex-col justify-between">
           <div className="flex items-center gap-2 mb-3">
             <Dumbbell className="text-green-400" size={20} />
@@ -182,7 +327,6 @@ export default function SettingsView() {
           </div>
         </div>
 
-        {/* Cards de Módulos Futuros */}
         <div className="bg-gray-800/50 p-4 rounded-2xl border border-gray-700 shadow-sm opacity-60">
           <Receipt className="text-red-400 mb-2" size={24} />
           <h4 className="text-white font-bold">{t('settings.financeStat', 'Finanças')}</h4>
@@ -193,15 +337,14 @@ export default function SettingsView() {
           <h4 className="text-white font-bold">{t('settings.tasksStat', 'Tarefas')}</h4>
           <p className="text-[10px] text-gray-400 mt-1 uppercase tracking-wider">{t('inDev', 'Em Breve')}</p>
         </div>
-
         <div className="col-span-2 text-center text-xs text-gray-500 italic mt-[-4px]">
           {today.charAt(0).toUpperCase() + today.slice(1)}
         </div>
       </div>
 
-      {/* Preferências */}
+      {/* PREFERÊNCIAS */}
       <h3 className="font-bold text-gray-400 mb-4 uppercase tracking-wider text-sm">{t('settings.prefsSection')}</h3>
-      <div className="bg-gray-800 rounded-3xl border border-gray-700 divide-y divide-gray-700 overflow-hidden shadow-lg">
+      <div className="bg-gray-800 rounded-3xl border border-gray-700 divide-y divide-gray-700 overflow-hidden shadow-lg mb-8">
         
         {/* Idioma */}
         <div className="p-5 flex items-center justify-between">
@@ -220,7 +363,7 @@ export default function SettingsView() {
           </select>
         </div>
 
-        {/* Permissão de Microfone */}
+        {/* Microfone */}
         <div className="p-5 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="p-2 bg-blue-500/20 rounded-lg text-blue-400"><Mic size={20} /></div>
@@ -238,7 +381,7 @@ export default function SettingsView() {
           </button>
         </div>
 
-        {/* Notificações Moderna */}
+        {/* Notificações */}
         <div className="p-5">
            <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-4">
@@ -282,8 +425,107 @@ export default function SettingsView() {
           <Toggle checked={true} onChange={() => {}} />
         </div>
       </div>
+
+      {/* BACKUP, DADOS E NUVEM */}
+      <h3 className="font-bold text-gray-400 mb-4 uppercase tracking-wider text-sm">{t('settings.backupSection', 'Backup e Dados')}</h3>
+      <div className="bg-gray-800 rounded-3xl border border-gray-700 divide-y divide-gray-700 overflow-hidden shadow-lg mb-8">
+        
+        {/* Input invisível para a importação */}
+        <input 
+          type="file" 
+          accept=".json" 
+          ref={fileInputRef} 
+          style={{ display: 'none' }} 
+          onChange={handleFileChange}
+        />
+
+        {/* MÓDULO NUVEM (Firebase) */}
+        {authUser ? (
+          <>
+            <div className="p-5 bg-blue-900/10 flex flex-col gap-3 border-b border-gray-700">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-blue-500/20 rounded-lg text-blue-400"><Cloud size={20} /></div>
+                <div>
+                  <h4 className="font-bold text-white text-sm">{t('settings.cloudConnected', 'Conectado à Nuvem')}</h4>
+                  <p className="text-xs text-gray-400 mt-0.5">{authUser.email}</p>
+                </div>
+              </div>
+              <div className="flex gap-2 mt-2">
+                <button 
+                  onClick={handleCloudSync}
+                  className="flex-1 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold py-2.5 rounded-xl flex items-center justify-center gap-2 transition-colors"
+                >
+                  <RefreshCw size={14} />
+                  {t('settings.syncNow', 'Sincronizar')}
+                </button>
+                <button 
+                  onClick={handleDisconnectGoogle}
+                  className="bg-gray-700 hover:bg-gray-600 text-white text-xs font-bold px-4 py-2.5 rounded-xl flex items-center justify-center transition-colors"
+                  title="Desconectar"
+                >
+                  <LogOut size={14} />
+                </button>
+              </div>
+            </div>
+          </>
+        ) : (
+          <button 
+            onClick={handleConnectGoogle}
+            className="w-full p-5 flex items-center justify-between hover:bg-gray-700/50 transition-colors text-left border-b border-gray-700"
+          >
+            <div className="flex items-center gap-4">
+              <div className="p-2 bg-blue-500/20 rounded-lg text-blue-400"><Cloud size={20} /></div>
+              <div>
+                <h4 className="font-bold text-white">{t('settings.connectCloud', 'Conectar à Nuvem')}</h4>
+                <p className="text-[11px] text-gray-400 mt-0.5">{t('settings.connectCloudDesc', 'Salve seu progresso com segurança no Google')}</p>
+              </div>
+            </div>
+          </button>
+        )}
+
+        {/* MÓDULO MANUAL */}
+        <button 
+          onClick={handleExportData}
+          className="w-full p-5 flex items-center justify-between hover:bg-gray-700/50 transition-colors text-left"
+        >
+          <div className="flex items-center gap-4">
+            <div className="p-2 bg-green-500/20 rounded-lg text-green-400"><Download size={20} /></div>
+            <div>
+              <h4 className="font-bold text-white">{t('settings.exportData', 'Exportar Dados')}</h4>
+              <p className="text-[11px] text-gray-400 mt-0.5">{t('settings.exportDesc', 'Salvar backup no seu dispositivo')}</p>
+            </div>
+          </div>
+        </button>
+
+        <button 
+          onClick={handleImportClick}
+          className="w-full p-5 flex items-center justify-between hover:bg-gray-700/50 transition-colors text-left border-b border-gray-700"
+        >
+          <div className="flex items-center gap-4">
+            <div className="p-2 bg-orange-500/20 rounded-lg text-orange-400"><Upload size={20} /></div>
+            <div>
+              <h4 className="font-bold text-white">{t('settings.importData', 'Importar Dados')}</h4>
+              <p className="text-[11px] text-gray-400 mt-0.5">{t('settings.importDesc', 'Restaurar de um arquivo de backup')}</p>
+            </div>
+          </div>
+        </button>
+
+        {/* ZONA DE PERIGO */}
+        <button 
+          onClick={handleDeleteAllData}
+          className="w-full p-5 flex items-center justify-between hover:bg-red-900/20 transition-colors text-left group"
+        >
+          <div className="flex items-center gap-4">
+            <div className="p-2 bg-red-500/10 rounded-lg text-red-500 group-hover:bg-red-500/20 transition-colors"><Trash2 size={20} /></div>
+            <div>
+              <h4 className="font-bold text-red-500">{t('settings.deleteData', 'Apagar Todos os Dados')}</h4>
+              <p className="text-[11px] text-red-400/70 mt-0.5">{t('settings.deleteDesc', 'Ação irreversível')}</p>
+            </div>
+          </div>
+        </button>
+
+      </div>
       
-      {/* FOOTER DA MARCA */}
       <div className="shrink-0 mt-4">
           <FooterBrand direction="flex-col" textSize="text-xs" textColor="text-gray-500" />
       </div>

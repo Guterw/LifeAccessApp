@@ -51,16 +51,19 @@ export default function LevelGroupView() {
     <div className="fixed inset-x-0 top-0 bottom-[80px] bg-gray-950 flex flex-col animate-fade-in z-10 overflow-hidden">
       
       {/* HEADER FIXO */}
-      <div className="shrink-0 h-16 w-full bg-gray-900 border-b border-gray-800 z-20 flex items-center px-4 shadow-lg">
-        <div className="shrink-0 mt-9 mr-3">
+      <div className="shrink-0 h-16 w-full bg-gray-900 border-b border-gray-800 z-20 flex items-center justify-between px-4 shadow-lg">
+        <div className="flex items-center justify-between">
+          <div className="shrink-0 mt-9 mr-3">
           <BackButton to="/levels" label="" />
         </div>
+        
         <div className="w-9 h-9 bg-blue-500/10 text-blue-400 rounded-xl border border-blue-500/20 shadow-inner flex items-center justify-center shrink-0 mr-3">
           <span className="font-black text-sm">{groupName}</span>
         </div>
         <h2 className="text-lg font-black text-white tracking-wide">
           Level {groupName}
         </h2>
+        </div>
         {/* POMBO NO PERFIL */}
         <UserProfileBadge />
       </div>

@@ -8,7 +8,9 @@ import { useLanguage } from './contexts/LanguageContext';
 import FirstLaunchGuard from './components/FirstLaunchGuard';
 
 import WelcomeView from './features/onboarding/views/WelcomeView';
+import SyncChoiceView from './features/onboarding/views/SyncChoiceView'; // <-- NOVA TELA IMPORTADA AQUI
 import NameView from './features/onboarding/views/NameView';
+
 import MainDashboard from './features/dashboard/views/MainDashboard';
 import LanguagesDashboard from './features/languages/views/LanguagesDashboard';
 import SettingsView from './features/settings/views/SettingsView';
@@ -49,10 +51,16 @@ function App() {
     return () => clearInterval(interval);
   }, []);
   
-  // Telas iniciais (Idioma -> Nome). Após finalizar isFirstAccess vira false
+  // ==========================================
+  // FLUXO DE ONBOARDING ATUALIZADO
+  // Passo 1: Idioma
+  // Passo 2: Google vs Offline (NOVO)
+  // Passo 3: Digitar Nome (Apenas se escolheu offline)
+  // ==========================================
   if (isFirstAccess) {
     if (onboardingStep === 1) return <WelcomeView onNext={() => setOnboardingStep(2)} />;
-    if (onboardingStep === 2) return <NameView />;
+    if (onboardingStep === 2) return <SyncChoiceView onOffline={() => setOnboardingStep(3)} />;
+    if (onboardingStep === 3) return <NameView />;
   }
   
   return (
@@ -77,7 +85,6 @@ function App() {
               <Route path="/english/alpha-numbers" element={<AlphaNumbersMenu />} />
               <Route path="/english/alpha-numbers/alphabet" element={<AlphabetLearnView />} />
               <Route path="/english/alpha-numbers/numbers" element={<NumbersLearnView />} />
-              {/* Fluxo de Treino: Seleção e Exercício */}
               <Route path="/english/alpha-numbers/exercises/:mode" element={<ExerciseSelectionView />} />
               <Route path="/english/alpha-numbers/exercise/:mode/:index" element={<AlphaNumbersExerciseView />} />
               
