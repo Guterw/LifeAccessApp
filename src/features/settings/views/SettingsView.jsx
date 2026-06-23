@@ -12,7 +12,7 @@ import PigeonAvatar from '../../../components/PigeonAvatar';
 import { auth, googleProvider } from '../../../config/firebaseConfig';
 import { signInWithPopup, signOut, onAuthStateChanged } from 'firebase/auth';
 
-// Importação do nosso Motor de Nuvem
+// Importação do Motor de Nuvem
 import { pushToCloud, deleteCloudData } from '../../../utils/cloudSync';
 
 export default function SettingsView() {
@@ -24,7 +24,6 @@ export default function SettingsView() {
   
   // Estado de Autenticação na Nuvem
   const [authUser, setAuthUser] = useState(null);
-  
   const fileInputRef = useRef(null);
 
   // Preferências
@@ -39,35 +38,45 @@ export default function SettingsView() {
     equippedSkin: 'none'
   };
   const englishXP = userProfile.totalXp;
-  
   const fitnessXP = parseInt(localStorage.getItem('fitnessXP') || '0', 10);
   const fitnessStreak = parseInt(localStorage.getItem('fitnessStreak') || '0', 10);
 
   useEffect(() => {
-    // Escuta mudanças no login do Firebase em tempo real
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setAuthUser(user);
     });
 
     const loadSettingsAndStats = async () => {
-      const settings = await db.appSettings.get(1);
-      if (settings) {
-        setNotifLang(settings.notifLang ?? true);
-        setNotifTasks(settings.notifTasks ?? true);
-        setNotifFitness(settings.notifFitness ?? false);
-      }
+      const settings = await db.appSettings.get(1) || { id: 1 };
+      setNotifLang(settings.notifLang ?? true);
+      setNotifTasks(settings.notifTasks ?? true);
+      setNotifFitness(settings.notifFitness ?? false);
 
-      // Lógica Original, Limpa e Nativa do Microfone
+      // ==========================================
+      // CORREÇÃO: VERIFICAÇÃO HÍBRIDA DO MICROFONE (PC + iPHONE)
+      // ==========================================
+      let isIosSafari = false;
+
       if (navigator.permissions) {
         try {
            const mStatus = await navigator.permissions.query({ name: 'microphone' });
            setMicPermission(mStatus.state);
            mStatus.onchange = () => setMicPermission(mStatus.state);
-        } catch(e) {}
+        } catch(e) {
+           // Se caiu aqui, é o Safari do iPhone bloqueando a API
+           isIosSafari = true; 
+        }
+      } else {
+        isIosSafari = true;
+      }
+
+      // Se for iPhone/Safari, nós usamos a memória do nosso banco local (Dexie)
+      if (isIosSafari && settings.iosMicGranted) {
+         setMicPermission('granted');
       }
     };
-    loadSettingsAndStats();
 
+    loadSettingsAndStats();
     return () => unsubscribe();
   }, []);
 
@@ -95,16 +104,24 @@ export default function SettingsView() {
   };
 
   // ==========================================
-  // PERMISSÃO DO MICROFONE (ORIGINAL)
+  // PEDIR PERMISSÃO DO MICROFONE
   // ==========================================
   const handleMicPermission = async () => {
     if (micPermission === 'granted') {
       alert(t('settings.revokeAlert', "Para remover, vá nas configurações do seu navegador."));
     } else {
       try {
+        // Na Web, ligar o microfone é a única forma de mostrar a janela "Permitir"
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        stream.getTracks().forEach(t => t.stop());
+        stream.getTracks().forEach(t => t.stop()); // Desliga na mesma hora
+        
         setMicPermission('granted');
+
+        // Salva no banco local para o iPhone lembrar que já foi dado!
+        const settings = await db.appSettings.get(1) || { id: 1 };
+        settings.iosMicGranted = true;
+        await db.appSettings.put(settings);
+
       } catch(e) {
         setMicPermission('denied');
       }
@@ -124,7 +141,6 @@ export default function SettingsView() {
       await db.appSettings.put(settings);
       
       await pushToCloud(user.uid);
-      
       alert(t('settings.connectSuccess', 'Conectado com sucesso! Seus dados agora podem ser sincronizados.'));
     } catch (error) {
       alert(t('settings.connectError', 'Erro ao conectar. Tente novamente.'));
@@ -179,9 +195,7 @@ export default function SettingsView() {
     }
   };
 
-  const handleImportClick = () => {
-    fileInputRef.current?.click();
-  };
+  const handleImportClick = () => fileInputRef.current?.click();
 
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
@@ -205,9 +219,7 @@ export default function SettingsView() {
           }
         });
         
-        if (authUser) {
-          await pushToCloud(authUser.uid);
-        }
+        if (authUser) await pushToCloud(authUser.uid);
         
         alert(t('settings.importSuccess', 'Backup restaurado com sucesso!'));
         window.location.reload();
@@ -346,7 +358,6 @@ export default function SettingsView() {
       <h3 className="font-bold text-gray-400 mb-4 uppercase tracking-wider text-sm">{t('settings.prefsSection')}</h3>
       <div className="bg-gray-800 rounded-3xl border border-gray-700 divide-y divide-gray-700 overflow-hidden shadow-lg mb-8">
         
-        {/* Idioma */}
         <div className="p-5 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="p-2 bg-blue-500/20 rounded-lg text-blue-400"><Globe size={20} /></div>
@@ -363,7 +374,6 @@ export default function SettingsView() {
           </select>
         </div>
 
-        {/* Microfone */}
         <div className="p-5 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="p-2 bg-blue-500/20 rounded-lg text-blue-400"><Mic size={20} /></div>
@@ -381,7 +391,6 @@ export default function SettingsView() {
           </button>
         </div>
 
-        {/* Notificações */}
         <div className="p-5">
            <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-4">
@@ -416,7 +425,6 @@ export default function SettingsView() {
           </div>
         </div>
 
-        {/* Tema */}
         <div className="p-5 flex items-center justify-between opacity-50">
           <div className="flex items-center gap-4">
             <div className="p-2 bg-gray-700 rounded-lg text-gray-300"><Moon size={20} /></div>
@@ -430,7 +438,6 @@ export default function SettingsView() {
       <h3 className="font-bold text-gray-400 mb-4 uppercase tracking-wider text-sm">{t('settings.backupSection', 'Backup e Dados')}</h3>
       <div className="bg-gray-800 rounded-3xl border border-gray-700 divide-y divide-gray-700 overflow-hidden shadow-lg mb-8">
         
-        {/* Input invisível para a importação */}
         <input 
           type="file" 
           accept=".json" 
@@ -439,7 +446,6 @@ export default function SettingsView() {
           onChange={handleFileChange}
         />
 
-        {/* MÓDULO NUVEM (Firebase) */}
         {authUser ? (
           <>
             <div className="p-5 bg-blue-900/10 flex flex-col gap-3 border-b border-gray-700">
@@ -483,7 +489,6 @@ export default function SettingsView() {
           </button>
         )}
 
-        {/* MÓDULO MANUAL */}
         <button 
           onClick={handleExportData}
           className="w-full p-5 flex items-center justify-between hover:bg-gray-700/50 transition-colors text-left"
@@ -510,7 +515,6 @@ export default function SettingsView() {
           </div>
         </button>
 
-        {/* ZONA DE PERIGO */}
         <button 
           onClick={handleDeleteAllData}
           className="w-full p-5 flex items-center justify-between hover:bg-red-900/20 transition-colors text-left group"
