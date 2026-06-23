@@ -55,26 +55,14 @@ export default function SettingsView() {
         setNotifLang(settings.notifLang ?? true);
         setNotifTasks(settings.notifTasks ?? true);
         setNotifFitness(settings.notifFitness ?? false);
-        
-        // CORREÇÃO: Lê do banco de dados local se já foi permitido antes
-        if (settings.micPermissionGranted) {
-           setMicPermission('granted');
-        }
       }
 
-      // Tenta observar mudanças reais no navegador também
+      // Lógica Original, Limpa e Nativa do Microfone
       if (navigator.permissions) {
         try {
            const mStatus = await navigator.permissions.query({ name: 'microphone' });
-           if (mStatus.state === 'denied') setMicPermission('denied');
-           if (mStatus.state === 'granted') setMicPermission('granted');
-           
-           mStatus.onchange = () => {
-              setMicPermission(mStatus.state);
-              if (mStatus.state === 'denied') {
-                  db.appSettings.update(1, { micPermissionGranted: false });
-              }
-           };
+           setMicPermission(mStatus.state);
+           mStatus.onchange = () => setMicPermission(mStatus.state);
         } catch(e) {}
       }
     };
@@ -107,24 +95,16 @@ export default function SettingsView() {
   };
 
   // ==========================================
-  // CORREÇÃO: PERMISSÃO DO MICROFONE 
+  // PERMISSÃO DO MICROFONE (ORIGINAL)
   // ==========================================
   const handleMicPermission = async () => {
     if (micPermission === 'granted') {
       alert(t('settings.revokeAlert', "Para remover, vá nas configurações do seu navegador."));
     } else {
       try {
-        // Regra da Web: Precisa chamar o getUserMedia para o aviso aparecer.
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        stream.getTracks().forEach(t => t.stop()); // Desliga na mesma hora!
-        
+        stream.getTracks().forEach(t => t.stop());
         setMicPermission('granted');
-        
-        // CORREÇÃO: Salva no Dexie para não esquecer quando recarregar o app
-        const settings = await db.appSettings.get(1) || { id: 1 };
-        settings.micPermissionGranted = true;
-        await db.appSettings.put(settings);
-
       } catch(e) {
         setMicPermission('denied');
       }
