@@ -6,11 +6,13 @@ import { db } from '../../../../../config/dexieDb';
 import { PhoneOff, Mic, MicOff, Bot, Loader2, Volume2, AlertTriangle, MessageSquare, Trash2, X, Globe, Sparkles, ChevronDown } from 'lucide-react';
 import { generateCloudResponse } from '../../../../../services/aiService';
 import { useSpeech } from '../../../../../hooks/useSpeech';
-import FooterBrand from '../../../../../components/FooterBrand'; // <-- Import do FooterBrand
+import FooterBrand from '../../../../../components/FooterBrand'; 
 import PigeonAvatar from '../../../../../components/PigeonAvatar';
 
 const CEFR_LEVELS = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
-const NATIVE_LANG_NAMES = { pt: 'Brazilian Portuguese', es: 'Spanish', en: 'English' };
+
+// Nomes nativos para a IA gerar o feedback no idioma correto
+const NATIVE_LANG_NAMES = { pt: 'Português', es: 'Español', en: 'English' };
 
 const LEVEL_GUIDANCE = {
   A1: "Speak very simply and slowly using basic vocabulary.",
@@ -22,7 +24,7 @@ const LEVEL_GUIDANCE = {
 };
 
 function buildVoiceFreePrompt(uiLang, level) {
-  const nativeLang = NATIVE_LANG_NAMES[uiLang] || 'Brazilian Portuguese';
+  const nativeLang = NATIVE_LANG_NAMES[uiLang] || 'Português';
   
   let translationInstruction = `"translation": "FULL translation of your 'reply' in ${nativeLang}"`;
   if (level === 'B1' || level === 'B2') {
@@ -88,12 +90,7 @@ export default function AiVoiceFreeView() {
   const [history, setHistory] = useState(() => {
     const saved = localStorage.getItem('aiVoiceFreeHistory');
     if (saved) {
-      const parsedHistory = JSON.parse(saved);
-      if (parsedHistory.length > 0 && !parsedHistory[0].translation && parsedHistory[0].content === FIRST_MESSAGE.en) {
-        parsedHistory[0].translation = FIRST_MESSAGE[uiLang] || FIRST_MESSAGE.pt;
-        parsedHistory[0].level = 'A1';
-      }
-      return parsedHistory;
+      return JSON.parse(saved);
     }
     
     return [{ 
@@ -105,8 +102,19 @@ export default function AiVoiceFreeView() {
     }];
   });
 
-  const lastAiMessageObj = history.filter(m => m.role === 'assistant').pop();
-  const currentAssistantText = lastAiMessageObj?.content || "Tap the microphone to start.";
+  // Atualiza dinamicamente a primeira mensagem para o idioma atual do app
+  const displayHistory = history.map((msg, idx) => {
+    if (idx === 0) {
+      return {
+        ...msg,
+        translation: FIRST_MESSAGE[uiLang] || FIRST_MESSAGE.pt,
+      };
+    }
+    return msg;
+  });
+
+  const lastAiMessageObj = displayHistory.filter(m => m.role === 'assistant').pop();
+  const currentAssistantText = lastAiMessageObj?.content || "...";
   const currentHint = lastAiMessageObj?.correction || "";
   const currentTranslation = lastAiMessageObj?.translation || "";
 
@@ -150,8 +158,9 @@ export default function AiVoiceFreeView() {
     setMainTranslationOpen(false);
   }, [currentAssistantText]);
 
+  // Regra de exibição da tradução APENAS se o idioma não for inglês
   const showMainHint = ['A1', 'A2', 'B1'].includes(level) && currentHint && (callState === 'idle' || callState === 'listening');
-  const showMainTranslation = ['A1', 'A2', 'B1', 'B2'].includes(level) && currentTranslation && callState !== 'listening' && callState !== 'thinking';
+  const showMainTranslation = uiLang !== 'en' && ['A1', 'A2', 'B1', 'B2'].includes(level) && currentTranslation && callState !== 'listening' && callState !== 'thinking';
 
   const toggleTranslation = (idx) => {
     setManualToggles(prev => ({ ...prev, [idx]: !prev[idx] }));
@@ -247,9 +256,9 @@ export default function AiVoiceFreeView() {
     return (
       <div className="fixed inset-0 bg-gray-950 flex flex-col items-center justify-center p-6 text-center z-50">
         <AlertTriangle className="text-yellow-500 mb-4" size={48} />
-        <h2 className="text-xl text-white font-bold mb-2">Microfone não suportado</h2>
-        <p className="text-gray-400">Seu navegador não suporta a API de voz.</p>
-        <button onClick={endCall} className="mt-6 bg-blue-600 text-white px-6 py-3 rounded-2xl font-bold">Voltar</button>
+        <h2 className="text-xl text-white font-bold mb-2">{t('ai.micNotSupported', 'Microfone não suportado')}</h2>
+        <p className="text-gray-400">{t('ai.micNotSupportedDesc', 'Seu navegador não suporta a API de voz.')}</p>
+        <button onClick={endCall} className="mt-6 bg-blue-600 text-white px-6 py-3 rounded-2xl font-bold">{t('general.back', 'Voltar')}</button>
       </div>
     );
   }
@@ -260,17 +269,17 @@ export default function AiVoiceFreeView() {
       {/* HEADER E NÍVEL */}
       <div className="flex flex-col w-full shrink-0">
         <div className="flex items-center justify-between p-4 bg-gray-900 border-b border-gray-800">
-          <button onClick={() => setShowHistoryModal(true)} className="p-2 bg-gray-800 text-blue-400 rounded-full hover:bg-gray-700 transition-colors shadow-sm" title="Ver Histórico">
+          <button onClick={() => setShowHistoryModal(true)} className="p-2 bg-gray-800 text-blue-400 rounded-full hover:bg-gray-700 transition-colors shadow-sm" title={t('ai.callReport', 'Relatório da Chamada')}>
             <MessageSquare size={20} />
           </button>
 
           <h2 className="text-gray-400 font-bold tracking-widest uppercase text-[10px]">
-            {callState === 'speaking' ? 'Assistant Speaking...' : 
-             callState === 'listening' ? 'Listening to you...' : 
-             callState === 'thinking' ? 'Connecting...' : 'Call Connected'}
+            {callState === 'speaking' ? t('ai.assistantSpeaking', 'Assistant Speaking...') : 
+             callState === 'listening' ? t('ai.listeningToYou', 'Listening to you...') : 
+             callState === 'thinking' ? t('ai.connecting', 'Connecting...') : t('ai.callConnected', 'Call Connected')}
           </h2>
 
-          <button onClick={() => setIsResetModalOpen(true)} className="p-2 bg-gray-800 text-red-400 rounded-full hover:bg-gray-700 transition-colors shadow-sm" title="Limpar Conversa">
+          <button onClick={() => setIsResetModalOpen(true)} className="p-2 bg-gray-800 text-red-400 rounded-full hover:bg-gray-700 transition-colors shadow-sm" title={t('ai.clearChat', 'Limpar Conversa')}>
             <Trash2 size={20} />
           </button>
         </div>
@@ -358,7 +367,7 @@ export default function AiVoiceFreeView() {
                     onClick={() => setMainTranslationOpen(!mainTranslationOpen)} 
                     className="flex items-center gap-1.5 text-[10px] font-bold text-blue-400 hover:text-blue-300 uppercase bg-gray-800/80 px-3 py-1.5 rounded-full border border-gray-700 transition-colors shadow-sm"
                   >
-                    <Globe size={12} /> {['B1', 'B2'].includes(level) ? 'Palavras-Chave' : 'Tradução'} 
+                    <Globe size={12} /> {['B1', 'B2'].includes(level) ? t('ai.keywords', 'Palavras-Chave') : t('ai.translationLabel', 'Tradução')} 
                     <ChevronDown size={12} className={`transition-transform ${mainTranslationOpen ? 'rotate-180' : ''}`} />
                   </button>
                   
@@ -408,7 +417,7 @@ export default function AiVoiceFreeView() {
           <div className="shrink-0 h-16 bg-gray-900 border-b border-gray-800 flex items-center justify-between px-4">
             <h2 className="text-lg font-bold text-white flex items-center gap-2">
               <MessageSquare className="text-blue-400" size={20} />
-              Relatório da Conversa
+              {t('ai.conversationReport', 'Relatório da Conversa')}
             </h2>
             <button onClick={() => setShowHistoryModal(false)} className="p-2 text-gray-400 hover:text-white">
               <X size={24} />
@@ -416,7 +425,7 @@ export default function AiVoiceFreeView() {
           </div>
           
           <div className="flex-1 overflow-y-auto p-4 space-y-6">
-            {history.map((msg, idx) => {
+            {displayHistory.map((msg, idx) => {
               const isAssistant = msg.role !== 'user';
               const translationOpen = manualToggles[idx] !== undefined ? manualToggles[idx] : false;
 
@@ -434,7 +443,7 @@ export default function AiVoiceFreeView() {
                     </div>
                   </div>
 
-                  {isAssistant && (msg.translation || msg.correction) && (
+                  {isAssistant && ((msg.translation && uiLang !== 'en') || msg.correction) && (
                     <div className="ml-9 sm:ml-11 mt-1.5 max-w-[85%] sm:max-w-[80%] space-y-2">
                       
                       {msg.correction && (
@@ -444,10 +453,10 @@ export default function AiVoiceFreeView() {
                         </div>
                       )}
 
-                      {msg.translation && (
+                      {msg.translation && uiLang !== 'en' && (
                         <div>
                           <button onClick={() => toggleTranslation(idx)} className="flex items-center gap-1 text-[10px] font-bold text-blue-400 hover:text-blue-300 uppercase">
-                            <Globe size={11} /> {['B1', 'B2'].includes(msg.level) ? 'Palavras-Chave' : 'Tradução'} <ChevronDown size={11} className={`transition-transform ${translationOpen ? 'rotate-180' : ''}`} />
+                            <Globe size={11} /> {['B1', 'B2'].includes(msg.level) ? t('ai.keywords', 'Palavras-Chave') : t('ai.translationLabel', 'Tradução')} <ChevronDown size={11} className={`transition-transform ${translationOpen ? 'rotate-180' : ''}`} />
                           </button>
                           {translationOpen && (
                             <div className="mt-1 bg-blue-500/10 border border-blue-500/20 rounded-xl p-2.5 text-xs text-blue-200 leading-relaxed animate-fade-in whitespace-pre-wrap">
@@ -478,11 +487,11 @@ export default function AiVoiceFreeView() {
             <div className="w-14 h-14 rounded-full bg-red-500/10 text-red-500 flex items-center justify-center mb-4 border border-red-500/20">
               <AlertTriangle size={28} />
             </div>
-            <h3 className="text-xl font-bold text-white mb-2">Limpar Conversa?</h3>
-            <p className="text-sm text-gray-400 mb-6 leading-relaxed">Deseja apagar o histórico atual? A conversa será reiniciada.</p>
+            <h3 className="text-xl font-bold text-white mb-2">{t('ai.clearChat', 'Limpar Conversa')}</h3>
+            <p className="text-sm text-gray-400 mb-6 leading-relaxed">{t('ai.clearChatWarning', 'Deseja apagar o histórico atual? A conversa será reiniciada.')}</p>
             <div className="flex w-full gap-3">
-              <button onClick={() => setIsResetModalOpen(false)} className="flex-1 py-3.5 rounded-2xl bg-gray-800 text-white font-bold hover:bg-gray-700 transition-colors">Cancelar</button>
-              <button onClick={confirmResetChat} className="flex-1 py-3.5 rounded-2xl bg-red-600 text-white font-bold hover:bg-red-500 transition-colors">Limpar</button>
+              <button onClick={() => setIsResetModalOpen(false)} className="flex-1 py-3.5 rounded-2xl bg-gray-800 text-white font-bold hover:bg-gray-700 transition-colors">{t('cancel', 'Cancelar')}</button>
+              <button onClick={confirmResetChat} className="flex-1 py-3.5 rounded-2xl bg-red-600 text-white font-bold hover:bg-red-500 transition-colors">{t('general.restart', 'Limpar')}</button>
             </div>
           </div>
         </div>

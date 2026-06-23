@@ -11,9 +11,10 @@ import PigeonAvatar from '../../../../../components/PigeonAvatar';
 
 const CEFR_LEVELS = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
 
+// Nomes nativos para a IA gerar no idioma correto
 const NATIVE_LANG_NAMES = {
-  pt: 'Brazilian Portuguese',
-  es: 'Spanish',
+  pt: 'Português',
+  es: 'Español',
   en: 'English',
 };
 
@@ -28,7 +29,7 @@ const LEVEL_GUIDANCE = {
 };
 
 function buildSystemPrompt(uiLang, level) {
-  const nativeLang = NATIVE_LANG_NAMES[uiLang] || 'Brazilian Portuguese';
+  const nativeLang = NATIVE_LANG_NAMES[uiLang] || 'Português';
   const guidance = (LEVEL_GUIDANCE[level] || LEVEL_GUIDANCE.A1)(nativeLang);
 
   return `You are a friendly, encouraging English teacher chatting with a student whose native language is ${nativeLang}, currently at CEFR level ${level}.
@@ -70,15 +71,27 @@ export default function AiChatFreeView() {
     const saved = localStorage.getItem('chatHistory');
     return saved ? JSON.parse(saved) : [{
       role: 'assistant',
-      content: t('ai.initialGreeting', "Hello! I'm your English AI Teacher. How are you doing today? We can talk about anything you want!")
+      content: t('ai.initialGreeting', "Hello! I'm your English AI Teacher. How are you doing today? We can talk about anything you want!"),
+      // Adicionado tradução base para a primeira mensagem caso não haja cache
+      translation: t('ai.initialGreetingTrans', "Olá! Sou seu Professor de Inglês com IA. Como você está hoje? Podemos falar sobre o que você quiser!")
     }];
+  });
+
+  // Atualiza dinamicamente a tradução da primeira mensagem para o idioma atual do app
+  const displayMessages = messages.map((msg, idx) => {
+    if (idx === 0) {
+      return {
+        ...msg,
+        translation: t('ai.initialGreetingTrans', "Olá! Sou seu Professor de Inglês com IA. Como você está hoje? Podemos falar sobre o que você quiser!")
+      };
+    }
+    return msg;
   });
 
   const [inputVal, setInputVal] = useState('');
   const [isThinking, setIsThinking] = useState(false);
   const [hasError, setHasError] = useState(false);
   const [level, setLevel] = useState('A1');
-  // Permite que o usuário abra/feche manualmente uma tradução, sobrepondo o padrão do nível
   const [manualToggles, setManualToggles] = useState({});
   const chatEndRef = useRef(null);
 
@@ -108,13 +121,14 @@ export default function AiChatFreeView() {
     setManualToggles({});
     setMessages([{
       role: 'assistant',
-      content: t('ai.initialGreeting', "Hello! I'm your English AI Teacher. How are you doing today? We can talk about anything you want!")
+      content: t('ai.initialGreeting', "Hello! I'm your English AI Teacher. How are you doing today? We can talk about anything you want!"),
+      translation: t('ai.initialGreetingTrans', "Olá! Sou seu Professor de Inglês com IA. Como você está hoje? Podemos falar sobre o que você quiser!")
     }]);
   };
 
   const isTranslationOpen = (msg, idx) => {
     if (idx in manualToggles) return manualToggles[idx];
-    return msg.level === 'A1'; // suporte máximo: já vem aberto
+    return msg.level === 'A1'; 
   };
 
   const toggleTranslation = (idx, currentlyOpen) => {
@@ -174,7 +188,7 @@ export default function AiChatFreeView() {
         </div>
 
         <div className="flex items-center gap-2 shrink-0">
-          <button onClick={clearChat} className="p-2 text-gray-400 hover:text-red-400 transition-colors" title="Limpar conversa">
+          <button onClick={clearChat} className="p-2 text-gray-400 hover:text-red-400 transition-colors" title={t('ai.clearChat', 'Limpar conversa')}>
             <Trash2 size={18} />
           </button>
           <div className="px-2 py-1 bg-green-500/10 border border-green-500/30 rounded-full flex items-center gap-1.5">
@@ -210,7 +224,7 @@ export default function AiChatFreeView() {
 
       {/* ÁREA DE MENSAGENS */}
       <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-6 bg-gradient-to-b from-gray-950 to-gray-900">
-        {messages.map((msg, idx) => {
+        {displayMessages.map((msg, idx) => {
           const isAssistant = msg.role !== 'user';
           const translationOpen = isAssistant && isTranslationOpen(msg, idx);
 
@@ -228,10 +242,11 @@ export default function AiChatFreeView() {
                 </div>
               </div>
 
-              {/* Tradução + correção, anexadas embaixo da bolha da IA */}
-              {isAssistant && (msg.translation || msg.correction) && (
+              {/* Lógica condicional: Ocultar tradução se app em inglês */}
+              {isAssistant && ((msg.translation && uiLang !== 'en') || msg.correction) && (
                 <div className="ml-9 sm:ml-11 mt-1.5 max-w-[85%] sm:max-w-[80%] space-y-1.5">
-                  {msg.translation && (
+                  {/* TRADUÇÃO SÓ APARECE SE IDIOMA NÃO FOR INGLÊS */}
+                  {msg.translation && uiLang !== 'en' && (
                     <div>
                       <button
                         onClick={() => toggleTranslation(idx, translationOpen)}
@@ -249,6 +264,7 @@ export default function AiChatFreeView() {
                     </div>
                   )}
 
+                  {/* CORREÇÃO/DICA SEMPRE APARECE SE HOUVER */}
                   {msg.correction && (
                     <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-2.5 flex items-start gap-2">
                       <Sparkles size={13} className="shrink-0 mt-0.5 text-amber-400" />

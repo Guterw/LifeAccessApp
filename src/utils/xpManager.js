@@ -1,3 +1,4 @@
+// src/utils/xpManager.js
 import { db } from '../config/dexieDb';
 
 export const addXP = async (amount = 20) => {
@@ -6,18 +7,19 @@ export const addXP = async (amount = 20) => {
     let profile = await db.userProfile.get(1);
     
     if (!profile) {
-      profile = { id: 1, currentLevel: 0, totalXp: 0 };
+      // Level inicial corrigido para 1
+      profile = { id: 1, currentLevel: 1, totalXp: 0 };
     }
 
     const previousLevel = profile.currentLevel;
     
     // Adiciona o XP e calcula o novo nível (a cada 100 XP = 1 Nível)
+    // +1 garante que 0 a 99 XP seja Nível 1.
     profile.totalXp += amount;
-    profile.currentLevel = Math.floor(profile.totalXp / 100);
+    profile.currentLevel = Math.floor(profile.totalXp / 100) + 1;
     
     await db.userProfile.put(profile);
 
-    // Retorna os dados para sabermos se ele subiu de nível nesta rodada
     return {
       ...profile,
       leveledUp: profile.currentLevel > previousLevel

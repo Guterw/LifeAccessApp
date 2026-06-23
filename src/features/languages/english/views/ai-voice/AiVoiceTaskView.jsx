@@ -12,10 +12,12 @@ import { addXP } from '../../../../../utils/xpManager';
 import PigeonAvatar from '../../../../../components/PigeonAvatar';
 
 const CEFR_LEVELS = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
-const NATIVE_LANG_NAMES = { pt: 'Brazilian Portuguese', es: 'Spanish', en: 'English' };
+
+// Nomes nativos para a IA gerar no idioma correto
+const NATIVE_LANG_NAMES = { pt: 'Português', es: 'Español', en: 'English' };
 
 function buildVoiceTaskPrompt(uiLang, level, scenario) {
-  const nativeLang = NATIVE_LANG_NAMES[uiLang] || 'Brazilian Portuguese';
+  const nativeLang = NATIVE_LANG_NAMES[uiLang] || 'Português';
   
   let translationInstruction = `"translation": "FULL translation of your 'reply' in ${nativeLang}"`;
   if (level === 'B1' || level === 'B2') {
@@ -66,7 +68,6 @@ function parseVoiceTaskJson(raw) {
   }
 }
 
-// NOVO: Função para descobrir qual roupa o Paddy deve usar baseado na Task
 function getAccessoryForScenario(scenarioId) {
   switch(scenarioId) {
     case 'voice_coffee':
@@ -81,7 +82,7 @@ function getAccessoryForScenario(scenarioId) {
     case 'hotel_checkin':
       return 'receptionist';
     default:
-      return 'teacher'; // Fallback caso seja uma task nova ainda não mapeada
+      return 'teacher'; 
   }
 }
 
@@ -121,8 +122,20 @@ export default function AiVoiceTaskView() {
     }];
   });
 
-  const lastAiMessageObj = history.filter(m => m.role === 'assistant').pop();
-  const currentAssistantText = lastAiMessageObj?.content || "Tap the microphone to start.";
+  // Atualiza dinamicamente a primeira mensagem para o idioma atual do app
+  const displayHistory = history.map((msg, idx) => {
+    if (idx === 0) {
+      return {
+        ...msg,
+        translation: scenario.firstMessage.translation[uiLang] || scenario.firstMessage.translation.pt,
+        correction: scenario.firstMessage.hint[uiLang] || scenario.firstMessage.hint.pt,
+      };
+    }
+    return msg;
+  });
+
+  const lastAiMessageObj = displayHistory.filter(m => m.role === 'assistant').pop();
+  const currentAssistantText = lastAiMessageObj?.content || "...";
   const currentHint = lastAiMessageObj?.correction || "";
   const currentTranslation = lastAiMessageObj?.translation || "";
 
@@ -166,8 +179,9 @@ export default function AiVoiceTaskView() {
     setMainTranslationOpen(false);
   }, [currentAssistantText]);
 
+  // Exibir a tradução principal APENAS se o idioma não for o Inglês
   const showMainHint = ['A1', 'A2', 'B1'].includes(level) && currentHint && (callState === 'idle' || callState === 'listening');
-  const showMainTranslation = ['A1', 'A2', 'B1', 'B2'].includes(level) && currentTranslation && callState !== 'listening' && callState !== 'thinking';
+  const showMainTranslation = uiLang !== 'en' && ['A1', 'A2', 'B1', 'B2'].includes(level) && currentTranslation && callState !== 'listening' && callState !== 'thinking';
 
   const toggleTranslation = (idx) => {
     setManualToggles(prev => ({ ...prev, [idx]: !prev[idx] }));
@@ -280,9 +294,9 @@ export default function AiVoiceTaskView() {
     return (
       <div className="fixed inset-0 bg-gray-950 flex flex-col items-center justify-center p-6 text-center z-50">
         <AlertTriangle className="text-yellow-500 mb-4" size={48} />
-        <h2 className="text-xl text-white font-bold mb-2">Microfone não suportado</h2>
-        <p className="text-gray-400">Seu navegador não suporta a API de voz.</p>
-        <button onClick={endCall} className="mt-6 bg-blue-600 text-white px-6 py-3 rounded-2xl font-bold">Voltar</button>
+        <h2 className="text-xl text-white font-bold mb-2">{t('ai.micNotSupported', 'Microfone não suportado')}</h2>
+        <p className="text-gray-400">{t('ai.micNotSupportedDesc', 'Seu navegador não suporta a API de voz.')}</p>
+        <button onClick={endCall} className="mt-6 bg-blue-600 text-white px-6 py-3 rounded-2xl font-bold">{t('general.back', 'Voltar')}</button>
       </div>
     );
   }
@@ -304,7 +318,7 @@ export default function AiVoiceTaskView() {
           </button>
           <button onClick={() => setIsResetModalOpen(true)} className="w-full bg-gray-800 hover:bg-gray-700 text-white font-bold py-4 rounded-2xl transition-colors shadow-lg flex items-center justify-center gap-2">
             <RotateCcw size={20} />
-            Reiniciar Tarefa
+            {t('ai.restartTask', 'Reiniciar Tarefa')}
           </button>
         </div>
       </div>
@@ -317,17 +331,17 @@ export default function AiVoiceTaskView() {
       {/* HEADER E NÍVEL */}
       <div className="flex flex-col w-full shrink-0">
         <div className="flex items-center justify-between p-4 bg-gray-900 border-b border-gray-800">
-          <button onClick={() => setShowHistoryModal(true)} className="p-2 bg-gray-800 text-indigo-400 rounded-full hover:bg-gray-700 transition-colors shadow-sm" title="Ver Histórico">
+          <button onClick={() => setShowHistoryModal(true)} className="p-2 bg-gray-800 text-indigo-400 rounded-full hover:bg-gray-700 transition-colors shadow-sm" title={t('ai.callReport', 'Relatório da Chamada')}>
             <MessageSquare size={20} />
           </button>
 
           <h2 className="text-gray-400 font-bold tracking-widest uppercase text-[10px]">
-            {callState === 'speaking' ? 'Assistant Speaking...' : 
-             callState === 'listening' ? 'Listening to you...' : 
-             callState === 'thinking' ? 'Connecting...' : 'Call Connected'}
+            {callState === 'speaking' ? t('ai.assistantSpeaking', 'Assistant Speaking...') : 
+             callState === 'listening' ? t('ai.listeningToYou', 'Listening to you...') : 
+             callState === 'thinking' ? t('ai.connecting', 'Connecting...') : t('ai.callConnected', 'Call Connected')}
           </h2>
 
-          <button onClick={() => setIsResetModalOpen(true)} className="p-2 bg-gray-800 text-red-400 rounded-full hover:bg-gray-700 transition-colors shadow-sm" title="Reiniciar Tarefa">
+          <button onClick={() => setIsResetModalOpen(true)} className="p-2 bg-gray-800 text-red-400 rounded-full hover:bg-gray-700 transition-colors shadow-sm" title={t('ai.restartTaskTitle', 'Reiniciar Tarefa?')}>
             <RotateCcw size={20} />
           </button>
         </div>
@@ -362,7 +376,7 @@ export default function AiVoiceTaskView() {
         </div>
       </div>
 
-      {/* ÁREA CENTRAL - FLUIDA E RESPONSIVA COM GAP */}
+      {/* ÁREA CENTRAL */}
       <div className="flex-1 flex flex-col items-center justify-start px-4 sm:px-8 py-6 overflow-y-auto w-full gap-6">
         
         {/* Dica */}
@@ -370,7 +384,7 @@ export default function AiVoiceTaskView() {
           <div className="w-full max-w-sm bg-amber-500/10 border border-amber-500/20 rounded-2xl p-3 flex items-start gap-2 shadow-lg animate-fade-in shrink-0">
             <Sparkles size={16} className="shrink-0 mt-0.5 text-amber-400" />
             <p className="text-xs text-amber-100 leading-relaxed text-left">
-              <span className="font-bold text-amber-400">Dica: </span>
+              <span className="font-bold text-amber-400">{t('ai.correctionLabel', 'Dica')}: </span>
               {currentHint}
             </p>
           </div>
@@ -428,7 +442,7 @@ export default function AiVoiceTaskView() {
                     onClick={() => setMainTranslationOpen(!mainTranslationOpen)} 
                     className="flex items-center gap-1.5 text-[10px] font-bold text-indigo-400 hover:text-indigo-300 uppercase bg-gray-800/80 px-3 py-1.5 rounded-full border border-gray-700 transition-colors shadow-sm"
                   >
-                    <Globe size={12} /> {['B1', 'B2'].includes(level) ? 'Palavras-Chave' : 'Tradução'} 
+                    <Globe size={12} /> {['B1', 'B2'].includes(level) ? t('ai.keywords', 'Palavras-Chave') : t('ai.translationLabel', 'Tradução')} 
                     <ChevronDown size={12} className={`transition-transform ${mainTranslationOpen ? 'rotate-180' : ''}`} />
                   </button>
                   
@@ -478,7 +492,7 @@ export default function AiVoiceTaskView() {
           <div className="shrink-0 h-16 bg-gray-900 border-b border-gray-800 flex items-center justify-between px-4">
             <h2 className="text-lg font-bold text-white flex items-center gap-2">
               <MessageSquare className="text-indigo-400" size={20} />
-              Relatório da Chamada
+              {t('ai.callReport', 'Relatório da Chamada')}
             </h2>
             <button onClick={() => setShowHistoryModal(false)} className="p-2 text-gray-400 hover:text-white">
               <X size={24} />
@@ -486,7 +500,7 @@ export default function AiVoiceTaskView() {
           </div>
           
           <div className="flex-1 overflow-y-auto p-4 space-y-6">
-            {history.map((msg, idx) => {
+            {displayHistory.map((msg, idx) => {
               const isAssistant = msg.role !== 'user';
               const translationOpen = manualToggles[idx] !== undefined ? manualToggles[idx] : false;
 
@@ -506,20 +520,21 @@ export default function AiVoiceTaskView() {
                     </div>
                   </div>
 
-                  {isAssistant && (msg.translation || msg.correction) && (
+                  {/* Somente exibe dica ou (tradução se for pt/es) */}
+                  {isAssistant && ((msg.translation && uiLang !== 'en') || msg.correction) && (
                     <div className="ml-9 sm:ml-11 mt-1.5 max-w-[85%] sm:max-w-[80%] space-y-2">
                       
                       {msg.correction && (
                         <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-2.5 flex items-start gap-2">
                           <Sparkles size={13} className="shrink-0 mt-0.5 text-amber-400" />
-                          <p className="text-xs text-amber-100"><span className="font-bold text-amber-400">Feedback: </span>{msg.correction}</p>
+                          <p className="text-xs text-amber-100"><span className="font-bold text-amber-400">{t('ai.correctionLabel', 'Dica')}: </span>{msg.correction}</p>
                         </div>
                       )}
 
-                      {msg.translation && (
+                      {msg.translation && uiLang !== 'en' && (
                         <div>
                           <button onClick={() => toggleTranslation(idx)} className="flex items-center gap-1 text-[10px] font-bold text-indigo-400 hover:text-indigo-300 uppercase">
-                            <Globe size={11} /> {['B1', 'B2'].includes(msg.level) ? 'Palavras-Chave' : 'Tradução'} <ChevronDown size={11} className={`transition-transform ${translationOpen ? 'rotate-180' : ''}`} />
+                            <Globe size={11} /> {['B1', 'B2'].includes(msg.level) ? t('ai.keywords', 'Palavras-Chave') : t('ai.translationLabel', 'Tradução')} <ChevronDown size={11} className={`transition-transform ${translationOpen ? 'rotate-180' : ''}`} />
                           </button>
                           {translationOpen && (
                             <div className="mt-1 bg-indigo-500/10 border border-indigo-500/20 rounded-xl p-2.5 text-xs text-indigo-200 leading-relaxed animate-fade-in whitespace-pre-wrap">
@@ -549,11 +564,11 @@ export default function AiVoiceTaskView() {
             <div className="w-14 h-14 rounded-full bg-red-500/10 text-red-500 flex items-center justify-center mb-4 border border-red-500/20">
               <AlertTriangle size={28} />
             </div>
-            <h3 className="text-xl font-bold text-white mb-2">Reiniciar Tarefa?</h3>
-            <p className="text-sm text-gray-400 mb-6 leading-relaxed">Todo o seu progresso e histórico desta chamada serão apagados.</p>
+            <h3 className="text-xl font-bold text-white mb-2">{t('ai.restartTaskTitle', 'Reiniciar Tarefa?')}</h3>
+            <p className="text-sm text-gray-400 mb-6 leading-relaxed">{t('ai.restartVoiceWarning', 'Todo o seu progresso e histórico desta chamada serão apagados.')}</p>
             <div className="flex w-full gap-3">
-              <button onClick={() => setIsResetModalOpen(false)} className="flex-1 py-3.5 rounded-2xl bg-gray-800 text-white font-bold hover:bg-gray-700 transition-colors">Cancelar</button>
-              <button onClick={confirmRestartTask} className="flex-1 py-3.5 rounded-2xl bg-red-600 text-white font-bold hover:bg-red-500 transition-colors">Confirmar</button>
+              <button onClick={() => setIsResetModalOpen(false)} className="flex-1 py-3.5 rounded-2xl bg-gray-800 text-white font-bold hover:bg-gray-700 transition-colors">{t('cancel', 'Cancelar')}</button>
+              <button onClick={confirmRestartTask} className="flex-1 py-3.5 rounded-2xl bg-red-600 text-white font-bold hover:bg-red-500 transition-colors">{t('confirm', 'Confirmar')}</button>
             </div>
           </div>
         </div>

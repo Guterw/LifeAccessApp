@@ -11,6 +11,7 @@ import { useLanguage } from '../../../../contexts/LanguageContext';
 import { db } from '../../../../config/dexieDb';
 import BackButton from '../../../../components/BackButton';
 import PigeonAvatar from '../../../../components/PigeonAvatar';
+import UserProfileBadge from '../../../../components/UserProfileBadge';
 
 const IconMap = { Type, Hash, MessageCircle, Users, Bot, Coffee };
 
@@ -128,31 +129,22 @@ export default function TrailView() {
   return (
     <div className="w-screen relative left-1/2 -translate-x-1/2 min-h-screen flex flex-col overflow-x-hidden bg-slate-950 m-0 p-0">
       
-      {/* HEADER FIXO SUPERIOR */}
-      <div className="fixed top-0 inset-x-0 h-24 bg-slate-950/50 backdrop-blur-2xl z-[100] flex items-center px-4 sm:px-8 border-b border-white/10 shadow-[0_10px_40px_rgba(0,0,0,0.8)]">
-        <BackButton to="/english" label={t('general.back', 'Voltar')} />
-        
-        <div className="ml-auto flex items-center gap-3 bg-slate-900/80 backdrop-blur-xl py-1.5 px-2 pr-5 rounded-full border border-white/10 shadow-2xl">
-          {/* POMBO NO PERFIL */}
-          <div className="w-12 h-12 bg-slate-800 rounded-full flex items-center justify-center border-2 border-slate-600 shadow-inner overflow-hidden relative shrink-0">
-             <div className="absolute inset-0 bg-gradient-to-b from-blue-500/20 to-transparent"></div>
-             <PigeonAvatar accessory="none" className="w-10 h-10 mt-1" />
-          </div>
-          <div className="flex flex-col items-end ml-1">
-            <span className="text-[10px] font-black text-yellow-400 uppercase tracking-widest drop-shadow-md">
-              {t('trail.level', 'Nível')} {userProfile.currentLevel}
-            </span>
-            <span className="text-xs font-bold text-gray-300">
-              {userProfile.totalXp % 100} / 100 {t('settings.xp', 'XP')}
-            </span>
-          </div>
+      {/* HEADER FIXO SUPERIOR COM JUSTIFY-BETWEEN */}
+      <div className="fixed top-0 inset-x-0 h-20 bg-slate-950/85 backdrop-blur-xl z-[100] flex items-center justify-between px-4 sm:px-8 border-b border-white/10 shadow-lg">
+        <div className="shrink-0 mt-5">
+          {/* Label vazio para mostrar apenas a setinha, igual ao seu print */}
+          <BackButton to="/english" label="" />
         </div>
+        
+        {/* O Avatar Badge alinhado à direita */}
+        <UserProfileBadge className="-mt-1 -mr-2 shrink-0" />
       </div>
 
       {/* ========================================== */}
       {/* SEÇÃO 1: OS FUNDAMENTOS (Céu Noturno/Espaço) */}
       {/* ========================================== */}
-      <div className="relative w-full bg-gradient-to-b from-slate-950 via-indigo-950 to-[#2e1065] pt-36 pb-32">
+      {/* pt-28 em vez de pt-36 para compensar a diminuição do header */}
+      <div className="relative w-full bg-gradient-to-b from-slate-950 via-indigo-950 to-[#2e1065] pt-28 pb-32">
         
         {/* EFEITOS FULL-BLEED */}
         <div className="absolute top-[10%] left-[-10%] w-[120%] h-[300px] bg-indigo-600/10 rounded-[100%] blur-[120px] pointer-events-none"></div>

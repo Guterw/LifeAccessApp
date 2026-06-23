@@ -1,16 +1,17 @@
+// src/config/dexieDb.js
 import Dexie from 'dexie';
 
 export const db = new Dexie('LifeAccessDB');
 
-// Subimos para a versão 7: novo módulo de progresso para Alfabeto/Números (Fundamentos),
-// substituindo o controle que antes vivia solto no localStorage.
-db.version(7).stores({
+// Subimos para a versão 8: Criação oficial da tabela userProfile
+// para começarmos a salvar e rastrear o XP e o Level do usuário globalmente.
+db.version(8).stores({
   // ==========================================
   // ⚙️ MÓDULO: CONFIGURAÇÕES DO SISTEMA
   // ==========================================
   appSettings: 'id, uiLanguage, isFirstAccess, userName', // id será sempre 1 para termos um registro único
-  // ==========================================
 
+  // ==========================================
   // 📚 MÓDULO: INGLÊS & APRENDIZADO
   // ==========================================
   learnedWords: 'en, translation, level, category, learnedAt',
@@ -22,16 +23,21 @@ db.version(7).stores({
   // ==========================================
   // 🔤 MÓDULO: FUNDAMENTOS (Alfabeto & Números)
   // ==========================================
-  // Chave composta [mode+exerciseIndex] identifica cada exercício de forma única
-  // e estável, igual ao padrão já usado em levelProgress/completedLevels.
   alphaNumProgress: '[mode+exerciseIndex], mode, exerciseIndex, pendingQueue, correctCount, total, updatedAt',
   completedAlphaNum: '[mode+exerciseIndex], mode, exerciseIndex, completedAt, xp',
 
   // ==========================================
-  // ⚔️ MÓDULO: TAREFAS & RPG (Em Breve)
+  // ⚔️ MÓDULO: XPs & Gamificação TASKS
   // ==========================================
+  // Tabela DESCOMENTADA para o XP Global funcionar perfeitamente!
+  userProfile: 'id, currentLevel, totalXp, bodyRanks',
+  
   // tasks: '++id, title, xpReward, isCompleted, date',
-  // userProfile: 'id, currentLevel, totalXp, bodyRanks',
+
+  // ==========================================
+  // MÓDULO: CALENDARIO, TAREFAS E LEMBRETES
+  // ==========================================
+  //
 
   // ==========================================
   // 🏋️‍♂️ MÓDULO: FITNESS & SAÚDE (Em Breve)

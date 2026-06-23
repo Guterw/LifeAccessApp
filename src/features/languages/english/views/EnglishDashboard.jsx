@@ -9,6 +9,7 @@ import BackButton from '../../../../components/BackButton';
 import FlagIcon from '../../../../components/FlagIcon';
 import FooterBrand from '../../../../components/FooterBrand';
 import PigeonAvatar from '../../../../components/PigeonAvatar';
+import UserProfileBadge from '../../../../components/UserProfileBadge';
 
 export default function EnglishDashboard() {
   const navigate = useNavigate();
@@ -17,13 +18,21 @@ export default function EnglishDashboard() {
   const learnedCount = useLiveQuery(() => db.learnedWords?.count() ?? 0, []) || 0;
   const mistakesCount = useLiveQuery(() => db.mistakesLog?.count() ?? 0, []) || 0;
   const isStreakActive = languageStreak > 0;
+  const userProfile = useLiveQuery(() => db.userProfile.get(1)) || { currentLevel: 1, totalXp: 0 };
 
   return (
     <div className="w-full pt-8 animate-fade-in px-4 pb-24 -mt-5 -mb-20">
-      <BackButton to="/languages" label={t('backToLanguages', 'Voltar')} />
+      
+      {/* HEADER SUPERIOR: Botão Voltar (Esquerda) e Avatar XP (Direita) */}
+      <div className="flex items-center justify-between mb-2 -ml-4 -mr-4">
+        <BackButton to="/languages" label="" />
+        
+        {/* POMBO PERFIL */}
+        <UserProfileBadge className='-mr-2 -mt-1 mb-5'/>
+      </div>
 
-      {/* CABEÇALHO */}
-      <div className="flex flex-col items-center mb-8 -mt-5">
+      {/* CABEÇALHO DA BANDEIRA */}
+      <div className="flex flex-col items-center mb-8 -mt-2">
         <div className="w-20 h-20 rounded-full overflow-hidden border-4 border-gray-800 shadow-xl mb-6">
           <FlagIcon code="gb" />
         </div>

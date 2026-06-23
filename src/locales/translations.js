@@ -28,7 +28,7 @@ export const translations = {
       langDesc: "Inglês, Espanhol, Francês...",
       fitnessModule: "Fitness",
       financeModule: "Finanças",
-      tasksModule: "Tarefas & RPG"
+      calendarModule: "Calendario, Lembretes e Tarefas"
     },
     languages: {
       title: "Central de Idiomas",
@@ -62,7 +62,8 @@ export const translations = {
     },
     levelList: {
       title: "Níveis Disponíveis",
-      wordsToMaster: "palavras para dominar"
+      wordsToMaster: "palavras para dominar",
+      lessonsAvailable: "lições disponíveis"
     },
     level: {
       progress: "Progresso",
@@ -80,7 +81,14 @@ export const translations = {
       streakUpdated: "Ofensiva Atualizada!",
       dedicateBtn: "Vou me dedicar!",
       excellent: "Excelente!",
-      validOptions: "Opções válidas:"
+      validOptions: "Opções válidas:",
+      skipBtnMain: "Pular",
+      skipBtnSub: "Não sei",
+      xpReward: "XP de Idiomas",
+      xpAlreadyEarned: "XP diário já resgatado nesta lição",
+      restartLevelTitle: "Reiniciar Nível?",
+      restartLevelWarning: "Deseja apagar seu progresso e refazer este nível do zero?",
+
     },
     stats: {
       myProgress: "Meu Progresso",
@@ -175,6 +183,19 @@ export const translations = {
       connectivityNote: "Atenção: Os recursos de IA utilizam processamento em nuvem. É necessária uma conexão ativa com a internet para conversar com os professores.",
       voiceScenariosTitle: "Missões por Voz",
       voiceScenariosDesc: "Pratique conversação em tempo real para o dia a dia:",
+      callReport: "Relatório da Chamada",
+      keywords: "Palavras-Chave",
+      restartVoiceWarning: "Todo o seu progresso e histórico desta chamada serão apagados.",
+      assistantSpeaking: "Assistente Falando...",
+      listeningToYou: "Ouvindo...",
+      connecting: "Conectando...",
+      callConnected: "Chamada Conectada",
+      micNotSupported: "Microfone não suportado",
+      micNotSupportedDesc: "Seu navegador não suporta a API de voz.",
+      conversationReport: "Relatório da Conversa",
+      clearChat: "Limpar Conversa",
+      clearChatWarning: "Deseja apagar o histórico atual? A conversa será reiniciada.",
+      initialGreetingTrans: "Olá! Sou seu Professor de Inglês com IA. Como você está hoje? Podemos falar sobre o que você quiser!",
 
       // MANTIDOS EM INGLÊS PROPOSITALMENTE (Configurações do Robô)
       initialGreeting: "Hello! I'm your English AI Teacher. How are you doing today? We can talk about anything you want!",
@@ -253,7 +274,7 @@ export const translations = {
       langDesc: "English, Spanish, French...",
       fitnessModule: "Fitness",
       financeModule: "Finance",
-      tasksModule: "Tasks & RPG"
+      calendarModule: "Calendar, Reminders and Tasks"
     },
     languages: {
       title: "Language Center",
@@ -287,7 +308,8 @@ export const translations = {
     },
     levelList: {
       title: "Available Levels",
-      wordsToMaster: "words to master"
+      wordsToMaster: "words to master",
+      lessonsAvailable: "lessons available",
     },
     level: {
       progress: "Progress",
@@ -305,7 +327,13 @@ export const translations = {
       streakUpdated: "Streak Updated!",
       dedicateBtn: "I'll keep it up!",
       excellent: "Excellent!",
-      validOptions: "Valid options:"
+      validOptions: "Valid options:",
+      skipBtnMain: "Skip",
+      skipBtnSub: "I don't know",
+      xpReward: "Languages XP",
+      xpAlreadyEarned: "Daily XP already collected for this lesson",
+      restartLevelTitle: "Restart Level?",
+      restartLevelWarning: "Do you want to delete your progress and redo this level from scratch?",
     },
     stats: {
       myProgress: "My Progress",
@@ -400,6 +428,20 @@ export const translations = {
       connectivityNote: "Attention: AI features use cloud processing. An active internet connection is required to chat with the teachers.",
       voiceScenariosTitle: "Voice Missions",
       voiceScenariosDesc: "Practice real-time conversation for everyday situations:",
+      callReport: "Call Report",
+      keywords: "Keywords",
+      restartVoiceWarning: "All your progress and call history will be deleted.",
+      assistantSpeaking: "Assistant Speaking...",
+      listeningToYou: "Listening to you...",
+      connecting: "Connecting...",
+      callConnected: "Call Connected",
+      micNotSupported: "Microphone not supported",
+      micNotSupportedDesc: "Your browser does not support the Voice API.",
+      conversationReport: "Conversation Report",
+      clearChat: "Clear Chat",
+      clearChatWarning: "Do you want to delete the current history? The conversation will be restarted.",
+      initialGreetingTrans: "Olá! Sou seu Professor de Inglês com IA. Como você está hoje? Podemos falar sobre o que você quiser!",
+      initialGreetingTrans: "Hi! I'm your English AI Teacher. How are you doing today? We can talk about anything you want!",
 
       // MANTIDOS EM INGLÊS PROPOSITALMENTE (Configurações do Robô)
       initialGreeting: "Hello! I'm your English AI Teacher. How are you doing today? We can talk about anything you want!",
@@ -478,7 +520,7 @@ export const translations = {
       langDesc: "Inglés, Español, Francés...",
       fitnessModule: "Acondicionamiento",
       financeModule: "Finanzas",
-      tasksModule: "Tareas y RPG"
+      calendarModule: "Calendario, Lembretes y Tareas"
     },
     languages: {
       title: "Centro de Idiomas",
@@ -512,7 +554,8 @@ export const translations = {
     },
     levelList: {
       title: "Niveles Disponibles",
-      wordsToMaster: "palabras para dominar"
+      wordsToMaster: "palabras para dominar",
+      lessonsAvailable: "lecciones disponibles",
     },
     level: {
       progress: "Progreso",
@@ -530,7 +573,13 @@ export const translations = {
       streakUpdated: "¡Racha Actualizada!",
       dedicateBtn: "¡A seguir así!",
       excellent: "¡Excelente!",
-      validOptions: "Opciones válidas:"
+      validOptions: "Opciones válidas:",
+      skipBtnMain: "Saltar",
+      skipBtnSub: "No sé",
+      xpReward: "XP de Idiomas",
+      xpAlreadyEarned: "XP diario ya reclamado en esta lección",
+      restartLevelTitle: "¿Reiniciar Nivel?",
+      restartLevelWarning: "¿Deseas borrar tu progreso y rehacer este nivel desde cero?",
     },
     stats: {
       myProgress: "Mi Progreso",
@@ -625,6 +674,19 @@ export const translations = {
       connectivityNote: "Atención: Las funciones de IA utilizan procesamiento en la nube. Se requiere una conexión activa a internet para conversar con los profesores.",
       voiceScenariosTitle: "Misiones de Voz",
       voiceScenariosDesc: "Practica conversación en tiempo real para el día a día:",
+      callReport: "Reporte de la Llamada",
+      keywords: "Palabras Clave",
+      restartVoiceWarning: "Todo tu progreso e historial de esta llamada serán eliminados.",
+      assistantSpeaking: "Asistente Hablando...",
+      listeningToYou: "Escuchando...",
+      connecting: "Conectando...",
+      callConnected: "Llamada Conectada",
+      micNotSupported: "Micrófono no soportado",
+      micNotSupportedDesc: "Tu navegador no soporta la API de voz.",
+      conversationReport: "Reporte de la Conversación",
+      clearChat: "Limpiar Conversación",
+      clearChatWarning: "¿Deseas borrar el historial actual? La conversación se reiniciará.",
+      initialGreetingTrans: "¡Hola! Soy tu Profesor de Inglés con IA. ¿Cómo estás hoy? ¡Podemos hablar de lo que quieras!",
       
       // MANTIDOS EM INGLÊS PROPOSITALMENTE (Configurações do Robô)
       initialGreeting: "Hello! I'm your English AI Teacher. How are you doing today? We can talk about anything you want!",

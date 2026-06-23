@@ -211,8 +211,8 @@ export const vocabulariesLevels = {
     group: ['A2'],
     words: [
       // A Magia da Educação em Inglês
-      { en: 'Can I have...?', pt: ['me vê...?', 'você me vê...?', 'posso ter...?'], es: ['¿me das...?', '¿puedo tener...?'], category: 'Pedidos Educados' },
-      { en: 'Could I have...?', pt: ['você poderia me ver...?', 'eu poderia ter...?'], es: ['¿podría darme...?'], category: 'Pedidos Educados' },
+      { en: 'Can I have?', pt: ['me vê?', 'me ve?', 'me ve', 'você me vê?','me da', 'posso ter?'], es: ['¿me das?', '¿puedo tener?'], category: 'Pedidos Educados' },
+      { en: 'Could I have?', pt: ['você poderia me ver?', 'eu poderia ter?'], es: ['¿podría darme?'], category: 'Pedidos Educados' },
       { en: 'I would like', pt: ['eu gostaria de', 'eu queria'], es: ['me gustaría', 'yo quisiera'], category: 'Pedidos Educados' },
       { en: 'I\'d like', pt: ['eu gostaria de', 'eu queria'], es: ['me gustaría'], category: 'Pedidos Educados' },
       
@@ -291,8 +291,8 @@ export const vocabulariesLevels = {
       // Verbo Haver/Existir (There to be)
       { en: 'There is', pt: ['tem', 'há', 'existe'], es: ['hay'], category: 'Existência (Singular)' },
       { en: 'There are', pt: ['têm', 'há', 'existem'], es: ['hay'], category: 'Existência (Plural)' },
-      { en: 'Is there...?', pt: ['tem...?', 'há...?'], es: ['¿hay...?'], category: 'Perguntas' },
-      { en: 'Are there...?', pt: ['têm...?', 'há...?'], es: ['¿hay...?'], category: 'Perguntas' },
+      { en: 'Is there?', pt: ['tem?', 'há?'], es: ['¿hay?'], category: 'Perguntas' },
+      { en: 'Are there?', pt: ['têm?', 'há?'], es: ['¿hay?'], category: 'Perguntas' },
       
       // Quantidades Básico-Intermediárias
       { en: 'Some', pt: ['algum', 'alguns', 'um pouco'], es: ['algún', 'algunos', 'un poco'], category: 'Quantidades' },
@@ -302,7 +302,7 @@ export const vocabulariesLevels = {
       { en: 'Much', pt: ['muito', 'muita'], es: ['mucho', 'mucha'], category: 'Quantidades' },
       
       // Preposições e Direções
-      { en: 'Where is...?', pt: ['onde está...?', 'onde é...?'], es: ['¿dónde está...?'], category: 'Perguntas' },
+      { en: 'Where is?', pt: ['onde está?', 'onde é?'], es: ['¿dónde está?'], category: 'Perguntas' },
       { en: 'Next to', pt: ['ao lado de', 'perto de'], es: ['al lado de', 'junto a'], category: 'Direções' },
       { en: 'Behind', pt: ['atrás', 'atrás de'], es: ['detrás', 'detrás de'], category: 'Direções' },
       { en: 'In front of', pt: ['na frente de', 'em frente'], es: ['enfrente de', 'delante de'], category: 'Direções' },

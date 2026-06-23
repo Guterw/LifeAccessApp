@@ -1,3 +1,4 @@
+// src/features/languages/english/views/LevelView.jsx
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { db } from '../../../../config/dexieDb';
@@ -13,9 +14,12 @@ import { addXP } from '../../../../utils/xpManager';
 const speakWord = (text, rate = 0.9) => {
   if (!window.speechSynthesis) return;
   window.speechSynthesis.cancel(); 
-  const utterance = new SpeechSynthesisUtterance(text);
+  
+  let cleanText = String(text).replace(/[^a-zA-Z0-9\s.]/g, '').toLowerCase();
+
+  const utterance = new SpeechSynthesisUtterance(cleanText);
   utterance.lang = 'en-US';
-  utterance.rate = rate; // Agora a velocidade é dinâmica
+  utterance.rate = rate; 
   window.speechSynthesis.speak(utterance);
 };
 
@@ -26,12 +30,14 @@ const playCorrectSound = () => {
   osc.connect(gain);
   gain.connect(ctx.destination);
   osc.type = 'sine';
-  osc.frequency.setValueAtTime(523.25, ctx.currentTime); 
-  osc.frequency.exponentialRampToValueAtTime(1046.50, ctx.currentTime + 0.1); 
-  gain.gain.setValueAtTime(0.3, ctx.currentTime);
-  gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+  osc.frequency.setValueAtTime(659.25, ctx.currentTime);
+  osc.frequency.setValueAtTime(830.61, ctx.currentTime + 0.1);
+  gain.gain.setValueAtTime(0, ctx.currentTime);
+  gain.gain.linearRampToValueAtTime(0.4, ctx.currentTime + 0.02);
+  gain.gain.setValueAtTime(0.4, ctx.currentTime + 0.1);
+  gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
   osc.start(ctx.currentTime);
-  osc.stop(ctx.currentTime + 0.5);
+  osc.stop(ctx.currentTime + 0.4);
 };
 
 const playWrongSound = () => {
@@ -47,6 +53,28 @@ const playWrongSound = () => {
   gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
   osc.start(ctx.currentTime);
   osc.stop(ctx.currentTime + 0.3);
+};
+
+const playCompletionSound = () => {
+  const ctx = new (window.AudioContext || window.webkitAudioContext)();
+  const now = ctx.currentTime;
+  const playNote = (freq, startTime, duration, vol = 0.3) => {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.type = 'sine'; 
+    osc.frequency.value = freq;
+    gain.gain.setValueAtTime(0, startTime);
+    gain.gain.linearRampToValueAtTime(vol, startTime + 0.05);
+    gain.gain.exponentialRampToValueAtTime(0.01, startTime + duration);
+    osc.start(startTime);
+    osc.stop(startTime + duration);
+  };
+  playNote(392.00, now, 0.15);       
+  playNote(523.25, now + 0.15, 0.15); 
+  playNote(659.25, now + 0.30, 0.15);  
+  playNote(1046.50, now + 0.45, 0.8, 0.4); 
 };
 
 export default function LevelView() {
@@ -65,7 +93,6 @@ export default function LevelView() {
   const [feedback, setFeedback] = useState(null);
   const [isFinished, setIsFinished] = useState(false);
 
-  // Estados do Modal Fullscreen
   const [streakUpdate, setStreakUpdate] = useState(null);
   const [showStreakModal, setShowStreakModal] = useState(false);
   const [fireIgnited, setFireIgnited] = useState(false);
@@ -81,9 +108,6 @@ export default function LevelView() {
     currentWord.pt 
   ) : [];
 
-  // =========================================
-  // AUTO-PLAY DA PALAVRA (Velocidade Normal)
-  // =========================================
   useEffect(() => {
     if (currentWord && currentWord.en) {
       speakWord(currentWord.en, 0.9);
@@ -145,7 +169,7 @@ export default function LevelView() {
 
     if (isCorrect) {
       setFeedback('correct');
-      playCorrectSound(); // Toca o som de acerto
+      playCorrectSound(); 
 
       await db.learnedWords.put({
         en: currentWord.en,
@@ -164,7 +188,7 @@ export default function LevelView() {
 
     } else {
       setFeedback('wrong');
-      playWrongSound(); // Toca o som de erro
+      playWrongSound();
 
       await db.mistakesLog.add({
         word: currentWord.en,
@@ -185,15 +209,19 @@ export default function LevelView() {
       setFeedback(null);
       
       if (newQueue.length === 0) {
+        playCompletionSound();
+
         const streakResult = await registerLanguageActivity();
         setStreakUpdate(streakResult);
 
+        // LÓGICA DE XP ATUALIZADA: Ganha 20 XP sempre que completar
+        await addXP(20);
+
+        // Salva a conclusão no banco para atualizar o card na tela anterior
         await db.completedLevels.put({
           level: currentLevelId,
           completedAt: new Date().toISOString()
         });
-
-        await addXP(20);
 
         setIsFinished(true);
       } else {
@@ -203,9 +231,6 @@ export default function LevelView() {
     }, delay);
   };
 
-  // =========================================
-  // LÓGICA DO BOTÃO PULAR
-  // =========================================
   const handleSkip = async () => {
     if (feedback !== null || !currentWord) return;
 
@@ -274,7 +299,7 @@ export default function LevelView() {
       </div>
 
       {!isFinished ? (
-        <div className="bg-gray-800 p-8 rounded-2xl shadow-xl border border-gray-700 text-center relative overflow-hidden">
+        <div className="bg-gray-800 p-6 sm:p-8 rounded-2xl shadow-xl border border-gray-700 text-center relative overflow-hidden">
           
           {feedback === 'correct' && (
             <div className="absolute inset-0 bg-gray-900/95 flex flex-col items-center justify-center z-10 backdrop-blur-md animate-fade-in px-4">
@@ -299,37 +324,34 @@ export default function LevelView() {
               <p className="text-gray-300 text-sm font-bold uppercase tracking-widest mb-1">
                 {t('level.correctIs', 'O correto é:')}
               </p>
-              <p className="text-white text-3xl font-black text-center">{currentValidAnswers.join('/')}</p>
+              <p className="text-white text-2xl sm:text-3xl font-black text-center">{currentValidAnswers.join('/')}</p>
             </div>
           )}
 
-          <p className="text-gray-400 text-sm mb-2">{t('level.translateThis', 'Traduza esta palavra')}</p>
+          <p className="text-gray-400 text-xs sm:text-sm mb-2">{t('level.translateThis', 'Traduza esta palavra')}</p>
           
-          {/* ÁREA DA PALAVRA COM BOTÕES DE ÁUDIO (FLUTUANTES) */}
-          <div className="relative flex items-center justify-center w-full mb-8 min-h-[48px]">
-            {/* Grupo de botões flutuando à esquerda para não empurrar a palavra */}
-            <div className="absolute left-0 flex items-center gap-2">
+          <div className="relative flex items-center justify-center w-full mb-8 min-h-[60px]">
+            <div className="absolute left-0 flex items-center gap-1.5 sm:gap-2 z-10">
               <button 
                 type="button"
                 onClick={() => speakWord(currentWord?.en, 0.2)}
-                className="w-10 h-10 flex items-center justify-center bg-yellow-500/20 text-yellow-500 rounded-full hover:bg-yellow-500/30 transition-colors shrink-0"
+                className="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center bg-yellow-500/20 text-yellow-500 rounded-full hover:bg-yellow-500/30 transition-colors shrink-0"
                 title="Ouvir bem devagar"
               >
-                <Turtle size={18} />
+                <Turtle className="w-4 h-4 sm:w-5 sm:h-5" />
               </button>
 
               <button 
                 type="button"
                 onClick={() => speakWord(currentWord?.en, 0.9)}
-                className="w-10 h-10 flex items-center justify-center bg-yellow-500/20 text-yellow-500 rounded-full hover:bg-yellow-500/30 transition-colors shrink-0"
+                className="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center bg-yellow-500/20 text-yellow-500 rounded-full hover:bg-yellow-500/30 transition-colors shrink-0"
                 title="Ouvir pronúncia"
               >
-                <Volume2 size={20} />
+                <Volume2 className="w-4 h-4 sm:w-5 sm:h-5" />
               </button>
             </div>
 
-            {/* A palavra centralizada perfeitamente no container */}
-            <h3 className="text-4xl sm:text-5xl font-black text-white tracking-wide text-center px-24 w-full break-words">
+            <h3 className="text-[26px] leading-tight sm:text-4xl md:text-5xl font-black text-white tracking-wide text-center w-full break-words px-[76px] sm:px-[100px]">
               {currentWord?.en}
             </h3>
           </div>
@@ -339,27 +361,26 @@ export default function LevelView() {
               type="text" autoFocus disabled={feedback !== null}
               placeholder={t('level.placeholder', 'Sua resposta aqui...')}
               value={inputVal} onChange={(e) => setInputVal(e.target.value)}
-              className="w-full bg-gray-900 text-white p-4 rounded-xl border-2 border-gray-700 focus:border-blue-500 focus:outline-none text-center text-lg transition-colors"
+              className="w-full bg-gray-900 text-white p-3 sm:p-4 rounded-xl border-2 border-gray-700 focus:border-blue-500 focus:outline-none text-center text-base sm:text-lg transition-colors"
             />
             
             <button
               type="submit" disabled={feedback !== null}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold p-4 rounded-xl transition-colors disabled:opacity-50"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold p-3 sm:p-4 rounded-xl transition-colors disabled:opacity-50"
             >
               {t('level.confirm', 'Confirmar')}
             </button>
 
-            {/* BOTÃO (NÃO SEI) PULAR SÓLIDO E EMPILHADO */}
             <button
               type="button" 
               onClick={handleSkip}
               disabled={feedback !== null}
-              className="w-full flex flex-col items-center justify-center bg-yellow-500 hover:bg-yellow-400 text-yellow-950 p-2.5 rounded-xl transition-colors disabled:opacity-50 shadow-md"
+              className="w-full flex flex-col items-center justify-center bg-yellow-500 hover:bg-yellow-400 text-yellow-950 p-2 sm:p-2.5 rounded-xl transition-colors disabled:opacity-50 shadow-md"
             >
-              <span className="text-base font-black uppercase tracking-wider">
+              <span className="text-sm sm:text-base font-black uppercase tracking-wider">
                 {t('level.skipBtnMain', 'Pular')}
               </span>
-              <span className="text-xs font-bold opacity-80">
+              <span className="text-[10px] sm:text-xs font-bold opacity-80">
                 {t('level.skipBtnSub', '(Não sei)')}
               </span>
             </button>
@@ -369,6 +390,12 @@ export default function LevelView() {
         <div className="bg-gray-800 p-8 rounded-2xl border border-green-500 text-center shadow-lg animate-fade-in">
           <CheckCircle2 size={60} className="text-green-500 mx-auto mb-4" />
           <h3 className="text-2xl font-bold text-white mb-2">{t('level.completedTitle', 'Nível Concluído!')}</h3>
+          
+          <div className="flex items-center justify-center gap-2 mb-4 bg-yellow-500/10 border border-yellow-500/20 py-2 px-4 rounded-xl w-max mx-auto">
+            <Flame size={20} className="text-yellow-500" />
+            <span className="text-yellow-400 font-black text-lg">+20 {t('level.xpReward', 'XP de Idiomas')}</span>
+          </div>
+
           <p className="text-gray-400 mb-8">{t('level.masteredAll', 'Você dominou todas as')} {progress.total} {t('level.words', 'palavras!')}</p>
 
           <button 

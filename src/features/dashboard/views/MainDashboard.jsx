@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Globe, Dumbbell, Wallet, Gamepad2, Settings, Flame } from 'lucide-react';
+import { Globe, Dumbbell, Wallet, Calendar, Settings, Flame } from 'lucide-react';
 import { useLanguage } from '../../../contexts/LanguageContext';
 import ModuleCard from '../../../components/ModuleCard';
 import FooterBrand from '../../../components/FooterBrand';
@@ -104,8 +104,8 @@ export default function MainDashboard() {
         />
 
         <ModuleCard 
-          icon={Gamepad2}
-          title={t('home.tasksModule')}
+          icon={Calendar}
+          title={t('home.calendarModule')}
           subtitle={t('inDev')}
           isActive={false}
           customBgClass="bg-gray-800/40 border border-gray-700/40"
