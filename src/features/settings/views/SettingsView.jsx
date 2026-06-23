@@ -55,13 +55,26 @@ export default function SettingsView() {
         setNotifLang(settings.notifLang ?? true);
         setNotifTasks(settings.notifTasks ?? true);
         setNotifFitness(settings.notifFitness ?? false);
+        
+        // CORREÇÃO: Lê do banco de dados local se já foi permitido antes
+        if (settings.micPermissionGranted) {
+           setMicPermission('granted');
+        }
       }
 
+      // Tenta observar mudanças reais no navegador também
       if (navigator.permissions) {
         try {
            const mStatus = await navigator.permissions.query({ name: 'microphone' });
-           setMicPermission(mStatus.state);
-           mStatus.onchange = () => setMicPermission(mStatus.state);
+           if (mStatus.state === 'denied') setMicPermission('denied');
+           if (mStatus.state === 'granted') setMicPermission('granted');
+           
+           mStatus.onchange = () => {
+              setMicPermission(mStatus.state);
+              if (mStatus.state === 'denied') {
+                  db.appSettings.update(1, { micPermissionGranted: false });
+              }
+           };
         } catch(e) {}
       }
     };
@@ -93,14 +106,25 @@ export default function SettingsView() {
     }
   };
 
+  // ==========================================
+  // CORREÇÃO: PERMISSÃO DO MICROFONE 
+  // ==========================================
   const handleMicPermission = async () => {
     if (micPermission === 'granted') {
       alert(t('settings.revokeAlert', "Para remover, vá nas configurações do seu navegador."));
     } else {
       try {
+        // Regra da Web: Precisa chamar o getUserMedia para o aviso aparecer.
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        stream.getTracks().forEach(t => t.stop());
+        stream.getTracks().forEach(t => t.stop()); // Desliga na mesma hora!
+        
         setMicPermission('granted');
+        
+        // CORREÇÃO: Salva no Dexie para não esquecer quando recarregar o app
+        const settings = await db.appSettings.get(1) || { id: 1 };
+        settings.micPermissionGranted = true;
+        await db.appSettings.put(settings);
+
       } catch(e) {
         setMicPermission('denied');
       }
@@ -119,7 +143,6 @@ export default function SettingsView() {
       settings.userEmail = user.email;
       await db.appSettings.put(settings);
       
-      // Sincroniza logo após conectar!
       await pushToCloud(user.uid);
       
       alert(t('settings.connectSuccess', 'Conectado com sucesso! Seus dados agora podem ser sincronizados.'));
@@ -202,7 +225,6 @@ export default function SettingsView() {
           }
         });
         
-        // Se após a importação ele estiver conectado na nuvem, já sobe a versão nova
         if (authUser) {
           await pushToCloud(authUser.uid);
         }
@@ -227,13 +249,11 @@ export default function SettingsView() {
 
     if (window.confirm(warningMsg)) {
       try {
-        // Se estiver conectado, apaga tudo do Firebase primeiro
         if (authUser) { 
           await deleteCloudData(authUser.uid); 
           await signOut(auth);
         }
 
-        // Apaga banco de dados local e localStorage
         await Promise.all(db.tables.map(table => table.clear()));
         localStorage.clear();
         
