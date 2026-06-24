@@ -53,30 +53,35 @@ export default function SettingsView() {
       setNotifFitness(settings.notifFitness ?? false);
 
       // ==========================================
-      // CORREÇÃO: VERIFICAÇÃO HÍBRIDA DO MICROFONE (PC + iPHONE)
+      // VERIFICAÇÃO HÍBRIDA DO MICROFONE (PC + iPHONE)
       // ==========================================
-      let isIosSafari = false;
+      let currentMicState = 'prompt';
 
+      // 1. Pergunta pro navegador o status oficial
       if (navigator.permissions) {
         try {
            const mStatus = await navigator.permissions.query({ name: 'microphone' });
-           setMicPermission(mStatus.state);
-           mStatus.onchange = () => setMicPermission(mStatus.state);
-        } catch(e) {
-           // Se caiu aqui, é o Safari do iPhone bloqueando a API
-           isIosSafari = true; 
-        }
-      } else {
-        isIosSafari = true;
+           currentMicState = mStatus.state;
+           mStatus.onchange = () => {
+              setMicPermission(mStatus.state);
+              if (mStatus.state === 'denied') {
+                  db.appSettings.update(1, { micPermissionGranted: false });
+              }
+           };
+        } catch(e) {}
       }
 
-      // Se for iPhone/Safari, nós usamos a memória do nosso banco local (Dexie)
-      if (isIosSafari && settings.iosMicGranted) {
+      // 2. A MÁGICA PARA O IPHONE:
+      // Se o Safari disser que não tem permissão ('prompt'), mas o nosso Dexie 
+      // lembra que você já clicou em permitir no passado, nós forçamos o botão a ficar 'granted'.
+      if (currentMicState === 'prompt' && settings.micPermissionGranted) {
          setMicPermission('granted');
+      } else {
+         setMicPermission(currentMicState);
       }
     };
-
     loadSettingsAndStats();
+
     return () => unsubscribe();
   }, []);
 
@@ -111,15 +116,14 @@ export default function SettingsView() {
       alert(t('settings.revokeAlert', "Para remover, vá nas configurações do seu navegador."));
     } else {
       try {
-        // Na Web, ligar o microfone é a única forma de mostrar a janela "Permitir"
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        stream.getTracks().forEach(t => t.stop()); // Desliga na mesma hora
+        stream.getTracks().forEach(t => t.stop()); 
         
         setMicPermission('granted');
 
-        // Salva no banco local para o iPhone lembrar que já foi dado!
+        // Salva no banco local para a UI do iPhone lembrar!
         const settings = await db.appSettings.get(1) || { id: 1 };
-        settings.iosMicGranted = true;
+        settings.micPermissionGranted = true;
         await db.appSettings.put(settings);
 
       } catch(e) {
@@ -257,7 +261,6 @@ export default function SettingsView() {
     }
   };
 
-  // Lógica do Level Global
   const totalXP = englishXP + fitnessXP;
   const userLevel = userProfile.currentLevel || 1;
   const currentLevelXP = totalXP % 100;
