@@ -15,7 +15,7 @@ import { pullFromCloud, pushToCloud } from '../../../utils/cloudSync';
 
 export default function SyncChoiceView({ onOffline }) {
   const { t } = useLanguage();
-
+  
   const handleGoogleLogin = async () => {
     try {
       // 1. Abre o popup do Google
@@ -43,7 +43,7 @@ export default function SyncChoiceView({ onOffline }) {
       }
 
       // 3. Redireciona o usuário direto para o app
-      window.location.href = '/'; 
+      window.location.href = '/LifeAccessApp/'; 
       
     } catch (error) {
       console.error("Erro no login com Google:", error);
