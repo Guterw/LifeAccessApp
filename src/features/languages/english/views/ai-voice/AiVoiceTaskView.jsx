@@ -10,6 +10,7 @@ import { VOICE_SCENARIOS } from '../../../../../data/voiceScenarios';
 import FooterBrand from '../../../../../components/FooterBrand';
 import { addXP } from '../../../../../utils/xpManager';
 import PigeonAvatar from '../../../../../components/PigeonAvatar';
+import StreakModal from '../../../../../components/StreakModal';
 
 const CEFR_LEVELS = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
 
@@ -91,7 +92,8 @@ export default function AiVoiceTaskView() {
   const navigate = useNavigate();
   const location = useLocation();
   const { t, uiLang } = useLanguage();
-  
+  const [streakUpdate, setStreakUpdate] = useState(null);
+const [showStreakModal, setShowStreakModal] = useState(false);
   const backRoute = location.state?.fromTrail 
     ? '/english/trail' 
     : '/english/ai-voice/tasks';
@@ -209,6 +211,9 @@ export default function AiVoiceTaskView() {
           localStorage.setItem('completedVoiceTasks', JSON.stringify(savedCompleted));
           
           await addXP(20);
+          const result = await registerLanguageActivity();
+          setStreakUpdate(result);
+          if (result?.increased) setShowStreakModal(true);
         }
       } else {
         setCallState('idle');
@@ -327,7 +332,10 @@ export default function AiVoiceTaskView() {
 
   return (
     <div className="fixed inset-x-0 top-0 bottom-[80px] bg-gray-950 flex flex-col animate-fade-in z-10">
-      
+      <StreakModal
+        streakUpdate={showStreakModal ? streakUpdate : null}
+        onClose={() => setShowStreakModal(false)}
+      />
       {/* HEADER E NÍVEL */}
       <div className="flex flex-col w-full shrink-0">
         <div className="flex items-center justify-between p-4 bg-gray-900 border-b border-gray-800">

@@ -12,6 +12,7 @@ import { TASK_SCENARIOS } from '../../../../../data/taskScenarios';
 import { addXP } from '../../../../../utils/xpManager';
 import PigeonAvatar from '../../../../../components/PigeonAvatar';
 import PigeonAvatarFem from '../../../../../components/PigeonAvatarFem'; 
+import StreakModal from '../../../../../components/StreakModal';
 
 const CEFR_LEVELS = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
 
@@ -97,6 +98,8 @@ export default function AiChatTaskView() {
   const location = useLocation();
   const { t, uiLang } = useLanguage();
   const isKeyboardOpen = useKeyboardOpen();
+  const [streakUpdate, setStreakUpdate] = useState(null);
+  const [showStreakModal, setShowStreakModal] = useState(false);
   
   const backRoute = location.state?.fromTrail 
       ? '/english/trail' 
@@ -219,6 +222,9 @@ export default function AiChatTaskView() {
           localStorage.setItem('completedAiTasks', JSON.stringify(savedCompleted));
           await addXP(20);
         }
+        const result = await registerLanguageActivity();
+        setStreakUpdate(result);
+        if (result?.increased) setShowStreakModal(true);
       }
     } catch (err) {
       setHasError(true);
@@ -252,7 +258,10 @@ export default function AiChatTaskView() {
 
   return (
     <div className={`fixed inset-x-0 top-0 flex flex-col bg-gray-950 z-10 animate-fade-in transition-all duration-200 ${isKeyboardOpen ? 'bottom-0' : 'bottom-[80px]'}`}>
-
+      <StreakModal
+        streakUpdate={showStreakModal ? streakUpdate : null}
+        onClose={() => setShowStreakModal(false)}
+      />
       {/* HEADER PRINCIPAL COM AVATAR DINÂMICO */}
       <div className="shrink-0 h-16 w-full bg-gray-900 border-b border-gray-800 z-20 flex items-center justify-between px-2 sm:px-4 shadow-sm">
         <div className="flex items-center gap-2 sm:gap-3 min-w-0">

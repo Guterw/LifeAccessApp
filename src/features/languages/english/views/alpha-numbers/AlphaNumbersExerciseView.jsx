@@ -12,6 +12,7 @@ import { NUMBER_EXERCISES } from '../../../../../data/numberExercises';
 import { db } from '../../../../../config/dexieDb';
 import BackButton from '../../../../../components/BackButton';
 import SpeechToast from '../../../../../components/SpeechToast';
+import StreakModal from '../../../../../components/StreakModal';
 import { addXP } from '../../../../../utils/xpManager';
 import { useError } from '../../../../../contexts/ErrorContext';
 
@@ -85,7 +86,7 @@ export default function AlphaNumbersExerciseView() {
   const { mode, index } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const { t, uiLang } = useLanguage();
+  const { t, uiLang, registerLanguageActivity } = useLanguage();
   const { showError } = useError();
 
   const backRoute = location.state?.fromTrail
@@ -110,11 +111,11 @@ export default function AlphaNumbersExerciseView() {
   const [totalQuestions, setTotalQuestions] = useState(0);
   const [hasInteracted, setHasInteracted] = useState(false);
   const [turnTranscript, setTurnTranscript] = useState('');
-  const [micLoading, setMicLoading] = useState(false); // aguardando permissão
-
-  // Controla o status exibido no toast (reseta quando muda de questão)
+  const [micLoading, setMicLoading] = useState(false);
   const [toastStatus, setToastStatus] = useState(null);
-
+  const [streakUpdate, setStreakUpdate] = useState(null);
+  const [showStreakModal, setShowStreakModal] = useState(false);
+  
   const {
     transcript,
     isListening,
@@ -275,6 +276,11 @@ export default function AlphaNumbersExerciseView() {
         });
         await db.alphaNumProgress.delete([mode, exerciseIndex]);
         await addXP(20);
+        
+        const result = await registerLanguageActivity();
+        setStreakUpdate(result);
+        if (result?.increased) setShowStreakModal(true);
+        
         playCompletionSound();
       } else {
         await db.alphaNumProgress.put({
@@ -343,6 +349,11 @@ export default function AlphaNumbersExerciseView() {
 
   return (
     <div className="w-full pt-8 animate-fade-in px-4 min-h-screen flex flex-col relative overflow-y-auto">
+
+      <StreakModal
+        streakUpdate={showStreakModal ? streakUpdate : null}
+        onClose={() => setShowStreakModal(false)}
+      />
 
       {/* Toast de status do microfone */}
       <SpeechToast
