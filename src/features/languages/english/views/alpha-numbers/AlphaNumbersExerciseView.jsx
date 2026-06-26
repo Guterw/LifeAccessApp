@@ -9,6 +9,7 @@ import { NUMBER_EXERCISES } from '../../../../../data/numberExercises';
 import { db } from '../../../../../config/dexieDb';
 import BackButton from '../../../../../components/BackButton';
 import { addXP } from '../../../../../utils/xpManager';
+import { useError } from '../../../../../contexts/ErrorContext';
 
 // =========================================
 // FUNÇÕES DE ÁUDIO
@@ -72,7 +73,8 @@ export default function AlphaNumbersExerciseView() {
   const navigate = useNavigate();
   const location = useLocation();
   const { t, uiLang } = useLanguage(); 
-
+  const { showError } = useError();
+  
   const backRoute = location.state?.fromTrail 
     ? '/english/trail' 
     : `/english/alpha-numbers/exercises/${mode}`;
@@ -175,7 +177,23 @@ export default function AlphaNumbersExerciseView() {
     else processAnswer(false);
   };
 
-  const handleMicClick = () => {
+const handleMicClick = async () => {
+    // 1. Verifica se o navegador suporta a API
+    if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+      showError(t('errors.browserNotSupported', 'Seu navegador não suporta reconhecimento de voz. Tente usar o Chrome ou Safari.'));
+      return;
+    }
+
+    // 2. Tenta solicitar acesso ao microfone antes de iniciar
+    try {
+      await navigator.mediaDevices.getUserMedia({ audio: true });
+    } catch (err) {
+      console.error("Erro ao acessar microfone:", err);
+      showError(t('errors.micBlocked', 'Acesso ao microfone negado. Por favor, verifique as permissões do seu navegador/iPhone para este site.'));
+      return;
+    }
+
+    // 3. Lógica de toggle existente
     if (isListening) {
       if (stopListening) stopListening();
     } else {
@@ -202,21 +220,21 @@ export default function AlphaNumbersExerciseView() {
     processAnswer(isCorrect);
   };
 
-  const processAnswer = async (isCorrect) => {
-    setFeedback(isCorrect ? 'correct' : 'wrong');
-    
-    if (isCorrect) playCorrectSound();
-    else playWrongSound();
-
-    let newQueue = [...queue];
-    if (isCorrect) {
-      newQueue.shift();
-    } else {
-      const failedWord = newQueue.shift();
-      newQueue.push(failedWord);
-    }
-
+const processAnswer = async (isCorrect) => {
     try {
+      setFeedback(isCorrect ? 'correct' : 'wrong');
+      
+      if (isCorrect) playCorrectSound();
+      else playWrongSound();
+
+      let newQueue = [...queue];
+      if (isCorrect) {
+        newQueue.shift();
+      } else {
+        const failedWord = newQueue.shift();
+        newQueue.push(failedWord);
+      }
+
       if (newQueue.length === 0) {
         await db.completedAlphaNum.put({
           mode,
@@ -238,7 +256,8 @@ export default function AlphaNumbersExerciseView() {
         });
       }
     } catch (err) {
-      console.error("Falha ao salvar progresso no Dexie:", err);
+      console.error("Erro fatal ao processar resposta:", err);
+      showError(t('errors.saveFailed', 'Não foi possível salvar seu progresso. Tente novamente.'));
     }
   };
 

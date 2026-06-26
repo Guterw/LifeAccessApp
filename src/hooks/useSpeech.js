@@ -1,52 +1,85 @@
 // src/hooks/useSpeech.js
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 
 export function useSpeech(lang = 'en-IE') { // Padrão Irlandês ativado!
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState('');
-  const [recognition, setRecognition] = useState(null);
+  
+  // Usamos useRef em vez de state para guardar o motor do microfone,
+  // pois não queremos causar re-renders desnecessários.
+  const recognitionRef = useRef(null);
 
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (SpeechRecognition) {
-        const rec = new SpeechRecognition();
-        rec.continuous = false; // Queremos que ele pare de gravar quando você fizer uma pausa
-        rec.interimResults = true; 
-        rec.lang = lang; 
-
-        rec.onresult = (event) => {
-          let currentTranscript = '';
-          for (let i = event.resultIndex; i < event.results.length; i++) {
-            currentTranscript += event.results[i][0].transcript;
-          }
-          setTranscript(currentTranscript);
-        };
-
-        rec.onerror = (event) => {
-          console.error('Erro no microfone:', event.error);
-          setIsListening(false);
-        };
-
-        rec.onend = () => {
-          setIsListening(false);
-        };
-
-        setRecognition(rec);
-      }
-    }
-  }, [lang]);
+  // Verificação de suporte em tempo real
+  const hasSupport = typeof window !== 'undefined' && 
+    ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window);
 
   const startListening = useCallback(() => {
-    setTranscript('');
-    setIsListening(true);
-    recognition?.start();
-  }, [recognition]);
+    if (!hasSupport) {
+      console.warn('Reconhecimento de voz não suportado neste navegador.');
+      return;
+    }
+
+    try {
+      // 1. CRIAMOS A INSTÂNCIA NA HORA DO CLIQUE (Obrigatório para iOS)
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      const rec = new SpeechRecognition();
+
+      rec.continuous = false; // Para de gravar nas pausas (ideal para iOS)
+      rec.interimResults = true; 
+      rec.lang = lang; 
+
+      rec.onresult = (event) => {
+        let currentTranscript = '';
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          currentTranscript += event.results[i][0].transcript;
+        }
+        setTranscript(currentTranscript);
+      };
+
+      rec.onerror = (event) => {
+        console.error('Erro no microfone:', event.error);
+        setIsListening(false);
+      };
+
+      rec.onend = () => {
+        setIsListening(false);
+      };
+
+      // 2. Limpamos o estado antigo e atualizamos as referências
+      setTranscript('');
+      setIsListening(true);
+      recognitionRef.current = rec;
+
+      // 3. DISPARAMOS O GRAVADOR (Protegido por try/catch para evitar crashes mudos da Apple)
+      rec.start();
+      
+    } catch (error) {
+      console.error('Falha ao iniciar o reconhecimento de voz:', error);
+      setIsListening(false);
+    }
+  }, [lang, hasSupport]);
 
   const stopListening = useCallback(() => {
     setIsListening(false);
-    recognition?.stop();
-  }, [recognition]);
+    if (recognitionRef.current) {
+      try {
+        recognitionRef.current.stop();
+      } catch (e) {
+        // Ignora erros ao tentar parar uma gravação que já caiu
+      }
+    }
+  }, []);
 
-  return { transcript, isListening, startListening, stopListening, hasSupport: !!recognition };
+  const resetTranscript = useCallback(() => {
+    setTranscript('');
+  }, []);
+
+  return { 
+    transcript, 
+    isListening, 
+    startListening, 
+    stopListening, 
+    resetTranscript, 
+    hasSupport 
+  };
 }

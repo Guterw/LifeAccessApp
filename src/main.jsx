@@ -3,12 +3,16 @@ import { createRoot } from 'react-dom/client';
 import './index.css';
 import App from './App.jsx';
 import { LanguageProvider } from './contexts/LanguageContext';
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import { ErrorProvider } from './contexts/ErrorContext';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    {/* O LanguageProvider agora envolve todo o aplicativo */}
     <LanguageProvider>
-      <App />
+      <ErrorProvider>
+        <App />
+      </ErrorProvider>
     </LanguageProvider>
   </StrictMode>,
 )

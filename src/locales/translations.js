@@ -278,7 +278,12 @@ export const translations = {
       almostThere: "Quase lá!",
       goesToQueue: "A resposta vai para o final da fila.",
       continue: "Continuar",
-      backToMenu: "Voltar para o Menu"
+      backToMenu: "Voltar para o Menu",
+      errorTitle: "Ops! Ocorreu um erro",
+      defaultError: "Algo inesperado aconteceu no sistema.",
+      copyError: "Copiar Log",
+      errorCopied: "Copiado!",
+      close: "Fechar",
     }
   },
   
@@ -557,7 +562,12 @@ export const translations = {
       almostThere: "Almost there!",
       goesToQueue: "The answer goes to the end of the queue.",
       continue: "Continue",
-      backToMenu: "Back to Menu"
+      backToMenu: "Back to Menu",
+      errorTitle: "Oops! An error occurred",
+      defaultError: "Something unexpected happened in the system.",
+      copyError: "Copy Log",
+      errorCopied: "Copied!",
+      close: "Close",
     }
   },
 
@@ -835,7 +845,12 @@ export const translations = {
       almostThere: "¡Casi!",
       goesToQueue: "La respuesta va al final de la cola.",
       continue: "Continuar",
-      backToMenu: "Volver al Menú"
+      backToMenu: "Volver al Menú",
+      errorTitle: "¡Ups! Ocurrió un error",
+      defaultError: "Algo inesperado ocurrió en el sistema.",
+      copyError: "Copiar Log",
+      errorCopied: "¡Copiado!",
+      close: "Cerrar",
     }
   }
 };
