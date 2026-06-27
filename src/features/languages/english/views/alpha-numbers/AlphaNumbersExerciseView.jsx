@@ -261,12 +261,38 @@ export default function AlphaNumbersExerciseView() {
       else playWrongSound();
 
       let newQueue = [...queue];
+      const answeredItem = queue[0]; // Capturamos o item atual ANTES de modificar a fila
+
+      // ── MÁGICA DOS STATS (LEVEL 0) ──
+      const targetStr = Array.isArray(answeredItem.target) ? answeredItem.target[0] : answeredItem.target;
+      const questionStr = getText(answeredItem.question) || targetStr;
+      const categoryName = mode === 'alphabet' ? 'Alfabeto' : 'Números';
+
       if (isCorrect) {
         newQueue.shift();
+        
+        // SALVA NOS STATS (Vocabulário Aprendido)
+        await db.learnedWords.put({
+          en: String(targetStr),
+          translation: String(questionStr),
+          level: 0, // Level 0 indica Fundamentos
+          category: categoryName,
+          learnedAt: new Date().toISOString()
+        });
+
       } else {
         const failed = newQueue.shift();
         newQueue.push(failed);
+        
+        // SALVA NOS STATS (Lista de Erros / Revisão)
+        await db.mistakesLog.put({
+          word: String(targetStr),
+          level: 0, // Level 0 indica Fundamentos
+          category: categoryName,
+          timestamp: new Date().toISOString()
+        });
       }
+      // ────────────────────────────────
 
       if (newQueue.length === 0) {
         await db.completedAlphaNum.put({
