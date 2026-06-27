@@ -16,9 +16,20 @@ export default function EnglishDashboard() {
   const { t, languageStreak } = useLanguage();
 
   const learnedCount = useLiveQuery(() => db.learnedWords?.count() ?? 0, []) || 0;
-  const mistakesCount = useLiveQuery(() => db.mistakesLog?.count() ?? 0, []) || 0;
   const isStreakActive = languageStreak > 0;
   const userProfile = useLiveQuery(() => db.userProfile.get(1)) || { currentLevel: 1, totalXp: 0 };
+
+  // "A Revisar" = palavras que estão no mistakesLog mas NÃO foram aprendidas (não estão em learnedWords)
+  // Ou seja: palavras que o usuário errou e ainda não concluiu o nível delas com acerto
+  const toReviewCount = useLiveQuery(async () => {
+    const mistakes = await db.mistakesLog.toArray();
+    const learnedWords = await db.learnedWords.toArray();
+    const learnedSet = new Set(learnedWords.map(w => w.en));
+    const uniqueNotLearned = new Set(
+      mistakes.map(m => m.word).filter(word => !learnedSet.has(word))
+    );
+    return uniqueNotLearned.size;
+  }, []) ?? 0;
 
   return (
     <div className="w-full pt-8 animate-fade-in px-4 pb-24 -mt-5 -mb-20">
@@ -87,7 +98,7 @@ export default function EnglishDashboard() {
               <div className="w-px h-8 bg-gray-700"></div>
               <div className="flex flex-col items-center flex-1">
                 <AlertTriangle className="text-red-400 mb-1" size={20} />
-                <span className="text-white font-black text-lg">{mistakesCount}</span>
+                <span className="text-white font-black text-lg">{toReviewCount}</span>
                 <span className="text-[8px] text-gray-400 font-bold uppercase tracking-widest mt-0.5">{t('stats.toReview', 'Revisar')}</span>
               </div>
             </div>

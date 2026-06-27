@@ -212,8 +212,16 @@ function WordGroupViewer({ wordsList, onClose, title }) {
 export default function StatsView() {
   const { t, languageStreak } = useLanguage();
 
-  const learnedWords = useLiveQuery(() => db.learnedWords?.toArray() ?? [], []) || [];
-  const wrongWords   = useLiveQuery(() => db.mistakesLog?.toArray()  ?? [], []) || [];
+const learnedWords = useLiveQuery(() => db.learnedWords?.toArray() ?? [], []) || [];
+const wrongWordsRaw = useLiveQuery(() => db.mistakesLog?.toArray() ?? [], []) || [];
+const learnedSet = new Set(learnedWords.map(w => String(w.en || '').toLowerCase().trim()));
+
+const wrongWords = wrongWordsRaw.filter(m => {
+  const key = String(m.word || m.en || m.target || m.id || '').toLowerCase().trim();
+  return !learnedSet.has(key);
+});
+
+const totalRawErrors = wrongWordsRaw.length;
 
   const [modalType, setModalType] = useState(null);
 
@@ -270,15 +278,31 @@ export default function StatsView() {
           onClick={() => setModalType('wrong')}
           className="w-full bg-gray-800 p-5 rounded-2xl border border-red-500/30 flex items-center justify-between hover:bg-gray-750 transition-colors shadow-lg"
         >
-          <div className="flex items-center gap-5">
-            <div className="p-3 bg-red-500/20 text-red-400 rounded-xl"><AlertTriangle size={24} /></div>
-            <div className="text-left">
-              <h4 className="font-bold text-white text-lg">{t('stats.reviewWords', 'Palavras a Revisar')}</h4>
-              <p className="text-sm text-gray-400">{t('stats.reviewDesc', 'Ver erros recentes')}</p>
-            </div>
+        <div className="flex items-center gap-5">
+          <div className="p-3 bg-red-500/20 text-red-400 rounded-xl"><AlertTriangle size={24} /></div>
+          <div className="text-left">
+            <h4 className="font-bold text-white text-lg">{t('stats.reviewWords', 'Palavras a Revisar')}</h4>
+            <p className="text-sm text-gray-400">{t('stats.reviewDesc', 'Ver erros recentes')}</p>
           </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="bg-red-500/20 text-red-400 px-3 py-1 rounded-xl font-bold text-sm">
+            {wrongWords.length}
+          </span>
           <ChevronRight className="text-gray-500" />
-        </button>
+        </div>
+      </button>
+
+      {/* ADICIONE ESTE BLOCO LOGO ABAIXO DO BOTÃO ACIMA: */}
+      <div className="w-full bg-gray-900/40 p-4 rounded-2xl border border-gray-800 flex items-center justify-between text-xs mt-2 px-5">
+        <div className="flex items-center gap-2 text-gray-400">
+          <div className="w-2 h-2 rounded-full bg-red-500/60 animate-pulse"></div>
+          <span>{t('stats.totalMistakesRaw', 'Histórico Total de Erros Gravados')}</span>
+        </div>
+        <span className="font-mono font-bold text-gray-400 bg-gray-800 px-2 py-0.5 rounded-md border border-gray-750">
+          {totalRawErrors}
+        </span>
+      </div>
       </div>
 
       {modalType && (

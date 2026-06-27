@@ -263,7 +263,7 @@ export default function AlphaNumbersExerciseView() {
       let newQueue = [...queue];
       const answeredItem = queue[0]; // Capturamos o item atual ANTES de modificar a fila
 
-      // ── MÁGICA DOS STATS (LEVEL 0) ──
+// ── MÁGICA DOS STATS (LEVEL 0) ──
       const targetStr = Array.isArray(answeredItem.target) ? answeredItem.target[0] : answeredItem.target;
       const questionStr = getText(answeredItem.question) || targetStr;
       const categoryName = mode === 'alphabet' ? 'Alfabeto' : 'Números';
@@ -279,6 +279,9 @@ export default function AlphaNumbersExerciseView() {
           category: categoryName,
           learnedAt: new Date().toISOString()
         });
+        
+        // NOVO: DELETA DO MISTAKES LOG AO ACERTAR!
+        await db.mistakesLog.where('word').equals(String(targetStr)).delete();
 
       } else {
         const failed = newQueue.shift();
