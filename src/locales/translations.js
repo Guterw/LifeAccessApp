@@ -36,7 +36,7 @@ export const translations = {
       langDesc: "Inglês, Espanhol, Francês...",
       fitnessModule: "Fitness",
       financeModule: "Finanças",
-      calendarModule: "Calendario, Lembretes e Tarefas",
+      calendarModule: "Calendario",
       calendarSubtitle: "Calendario, Lembretes(breve), Tarefas(breve) e Contadores."
     },
     languages: {
