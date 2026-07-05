@@ -36,7 +36,8 @@ export const translations = {
       langDesc: "Inglês, Espanhol, Francês...",
       fitnessModule: "Fitness",
       financeModule: "Finanças",
-      calendarModule: "Calendario, Lembretes e Tarefas"
+      calendarModule: "Calendario, Lembretes e Tarefas",
+      calendarSubtitle: "Calendario, Lembretes(breve), Tarefas(breve) e Contadores."
     },
     languages: {
       title: "Central de Idiomas",
@@ -322,7 +323,8 @@ export const translations = {
       langDesc: "English, Spanish, French...",
       fitnessModule: "Fitness",
       financeModule: "Finance",
-      calendarModule: "Calendar, Reminders and Tasks"
+      calendarModule: "Calendar",
+      calendarSubtitle: "Calendar, Reminders(soon), Tasks(soon), and Counter.",
     },
     languages: {
       title: "Language Center",
@@ -606,7 +608,8 @@ export const translations = {
       langDesc: "Inglés, Español, Francés...",
       fitnessModule: "Acondicionamiento",
       financeModule: "Finanzas",
-      calendarModule: "Calendario, Lembretes y Tareas"
+      calendarModule: "Calendario",
+      calendarSubtitle: "Calendario, Lembretes, Tareas y Contadores.",
     },
     languages: {
       title: "Centro de Idiomas",

@@ -156,11 +156,12 @@ export default function MainDashboard() {
             iconBgClass="bg-red-500/10 text-red-400" 
           />
           <ModuleCard 
+            onClick={() => navigate('/calendar')}
             icon={Calendar} 
             title={t('home.calendarModule')} 
-            subtitle={t('inDev')} 
-            isActive={false} 
-            customBgClass="bg-gray-800/40 border border-gray-700/40" 
+            subtitle={t('home.calendarSubtitle')} 
+            isActive={true} 
+            customBgClass="bg-gradient-to-r from-purple-900/40 to-gray-800 border border-purple-500/30 hover:border-purple-400 shadow-lg relative z-10" 
             iconBgClass="bg-purple-500/10 text-purple-400" 
           />
       </div>

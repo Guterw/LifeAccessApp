@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { HashRouter, Routes, Route } from 'react-router-dom';
 import { checkAllNotifications } from './utils/notificationService';
 import { db } from './config/dexieDb';
+import { repairUserProfile } from './utils/xpManager';
 import BottomNav from './components/BottomNav';
 import { useLanguage } from './contexts/LanguageContext';
 import FirstLaunchGuard from './components/FirstLaunchGuard';
@@ -37,11 +38,19 @@ import AiVoiceTaskView from './features/languages/english/views/ai-voice/AiVoice
 import AiVoiceTaskSelectionView from './features/languages/english/views/ai-voice/AiVoiceTaskSelectionView';
 import TrailView from './features/languages/english/views/TrailView';
 
+// Módulo Calendário
+import CalendarView from './features/calendar/views/CalendarView';
+
 function App() {
   const { isFirstAccess } = useLanguage();
   const [onboardingStep, setOnboardingStep] = useState(1);
   
   useEffect(() => {
+    // Repara qualquer perfil com level desalinhado do XP (bug legado).
+    // Roda uma vez a cada abertura do app — barato e idempotente:
+    // não faz nada se o perfil já estiver correto.
+    repairUserProfile();
+
     const interval = setInterval(async () => {
       const settings = await db.appSettings.get(1);
       if (settings) {
@@ -101,7 +110,7 @@ function App() {
 
               <Route path="/fitness" element={<div className="pt-8 text-center text-gray-400">Em breve</div>} />
               <Route path="/finance" element={<div className="pt-8 text-center text-gray-400">Em breve</div>} />
-              <Route path="/tasks" element={<div className="pt-8 text-center text-gray-400">Em breve</div>} />
+              <Route path="/calendar" element={<CalendarView />} />
             </Routes>
           </div>
           <BottomNav />

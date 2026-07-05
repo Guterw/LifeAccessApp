@@ -46,3 +46,22 @@ html, body {
   overscroll-behavior-y: none; 
 
 }
+
+/* Customização Global da Barra de Rolagem (Scrollbar) */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(75, 85, 99, 0.4); /* Cor discreta (gray-600 com opacidade) */
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(107, 114, 128, 0.8); /* Fica mais claro ao passar o mouse */
+}

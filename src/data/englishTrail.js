@@ -69,7 +69,7 @@ export const ENGLISH_TRAIL = [
     id: 'node_11_boss', type: 'task', targetId: 'chat_intro', 
     title: { pt: 'Boss: Apresente-se (Chat)', en: 'Boss: Introduce Yourself', es: 'Jefe: Preséntate' },
     color: 'bg-red-600', shadow: 'shadow-red-600/60', icon: 'Bot',
-    path: '/english/ai-chat/task/chat_intro'
+    path: '/english/ai-chat/tasks/chat_intro'
   },
 
   // ==========================================
@@ -140,6 +140,6 @@ export const ENGLISH_TRAIL = [
     id: 'node_22_boss', type: 'task', targetId: 'voice_coffee', 
     title: { pt: 'Boss: Peça um Café (Voz)', en: 'Boss: Order a Coffee (Voice)', es: 'Jefe: Pide un Café (Voz)' },
     color: 'bg-red-600', shadow: 'shadow-red-600/60', icon: 'Bot',
-    path: '/english/ai-voice/task/voice_coffee'
+    path: '/english/ai-voice/tasks/voice_coffee'
   }
 ];

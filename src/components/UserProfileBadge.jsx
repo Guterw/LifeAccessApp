@@ -4,15 +4,20 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../config/dexieDb';
 import { useLanguage } from '../contexts/LanguageContext';
 import PigeonAvatar from './PigeonAvatar';
+import { calculateLevel } from '../utils/xpManager';
 
 export default function UserProfileBadge({ className = "", customAccessory }) {
   const { t } = useLanguage();
   
   // Puxa as infos do banco de dados em tempo real
-  const userProfile = useLiveQuery(() => db.userProfile.get(1)) || { currentLevel: 1, totalXp: 0 };
+  const userProfile = useLiveQuery(() => db.userProfile.get(1)) || { totalXp: 0 };
   
-  // No futuro, quando tiver a loja de skins, você pode puxar o accessory do db.appSettings.get(1)
-  // Por enquanto, usa o que for passado por prop ou "none" por padrão.
+  // O level NUNCA é lido diretamente do campo salvo — é sempre recalculado
+  // a partir do totalXp. Isso garante que o nível exibido esteja sempre
+  // correto, mesmo que o campo currentLevel salvo esteja desatualizado
+  // (por exemplo, após uma importação de backup antigo).
+  const displayLevel = calculateLevel(userProfile.totalXp || 0);
+
   const accessory = customAccessory || "none";
 
   return (
@@ -23,10 +28,10 @@ export default function UserProfileBadge({ className = "", customAccessory }) {
       </div>
       <div className="flex flex-col items-end">
         <span className="text-[10px] font-black text-yellow-400 uppercase tracking-widest drop-shadow-md">
-          {t('trail.level', 'Nível')} {userProfile.currentLevel}
+          {t('trail.level', 'Nível')} {displayLevel}
         </span>
         <span className="text-[11px] font-bold text-gray-300">
-          {userProfile.totalXp % 100} / 100 {t('settings.xp', 'XP')}
+          {(userProfile.totalXp || 0) % 100} / 100 {t('settings.xp', 'XP')}
         </span>
       </div>
     </div> 

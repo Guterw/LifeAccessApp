@@ -21,7 +21,7 @@ export default function BottomNav() {
 
   const isFitnessActive = currentPath.startsWith('/fitness');
   const isFinanceActive = currentPath.startsWith('/finance');currentPath.includes('/finance');
-  const isTasksActive = currentPath.startsWith('/tasks');
+  const isCalendarActive = currentPath.startsWith('/calendar');
   
   // Home exata
   const isHomeActive = currentPath === '/';
@@ -71,8 +71,8 @@ export default function BottomNav() {
 
       {/* Botão Tarefas */}
       <button 
-        onClick={() => navigate('/tasks')} 
-        className={`flex flex-col items-center justify-center w-16 transition-colors ${isTasksActive ? 'text-purple-500' : 'text-gray-500 hover:text-gray-400'}`}
+        onClick={() => navigate('/calendar')} 
+        className={`flex flex-col items-center justify-center w-16 transition-colors ${isCalendarActive ? 'text-purple-500' : 'text-gray-500 hover:text-gray-400'}`}
       >
         <Calendar size={24} />
         <span className="text-[10px] font-bold mt-1">{t('nav.calendar')}</span>
