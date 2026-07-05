@@ -148,11 +148,13 @@ export default function MainDashboard() {
             customBgClass="bg-gray-800/40 border border-gray-700/40" 
             iconBgClass="bg-green-500/10 text-green-400" 
           />
-          <ModuleCard 
+          <ModuleCard
+            onClick={() => navigate('/finance')}
             icon={Wallet} 
-            title={t('home.financeModule')} 
-            subtitle={t('inDev')} isActive={false} 
-            customBgClass="bg-gray-800/40 border border-gray-700/40" 
+            title={t('home.financeModule')}
+            subtitle={t('home.financeSubtitle')}
+            isActive={true} 
+            customBgClass="bg-gradient-to-r from-red-900/40 to-gray-800 border border-red-500/30 hover:border-red-400 shadow-lg relative z-10" 
             iconBgClass="bg-red-500/10 text-red-400" 
           />
           <ModuleCard 

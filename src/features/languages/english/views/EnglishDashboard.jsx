@@ -108,16 +108,23 @@ export default function EnglishDashboard() {
         {/* TRILHA E BOTÕES */}
         <button
           onClick={() => navigate('/english/trail')}
-          className="w-full text-left p-5 rounded-3xl border bg-gradient-to-br from-indigo-900/40 to-gray-800 flex items-center justify-between border-indigo-500/30 hover:border-indigo-400 shadow-lg group"
+          // O container externo cria a "borda" com padding de 2px
+          // Usamos background-size: 200% para o gradiente ficar maior que o botão
+          className="w-full text-left p-[2px] rounded-[1.0rem] bg-gradient-to-r from-indigo-500 via-amber-300 to-indigo-500 bg-[length:200%_auto] animate-shine shadow-lg group relative"
         >
-          <div className="flex items-center gap-4">
-            <div className="p-3 rounded-2xl bg-indigo-500/20 text-indigo-400 border border-indigo-500/30"><Rocket size={22} /></div>
-            <div>
-              <h3 className="text-base font-black text-white">{t('english.guidedJourney', 'Jornada Guiada')}</h3>
-              <p className="text-[9px] font-bold tracking-widest text-indigo-300 uppercase">{t('english.followTrail', 'Siga a Trilha')}</p>
+          {/* Conteúdo interno mantém a cor de fundo padrão e define o formato */}
+          <div className="w-full bg-gray-800 rounded-[1.1rem] p-5 flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="p-3 rounded-2xl bg-indigo-500/20 text-indigo-400 border from-cyan-400 via-fuchsia-500 to-amber-400 shadow-[0_0_6px_rgba(168,85,247,0.5)]">
+                <Rocket size={22} />
+              </div>
+              <div>
+                <h3 className="text-base font-black text-white">{t('english.guidedJourney', 'Jornada Guiada')}</h3>
+                <p className="text-[9px] font-bold tracking-widest text-indigo-300 uppercase">{t('english.followTrail', 'Siga a Trilha')}</p>
+              </div>
             </div>
+            <ChevronRight className="text-indigo-400" />
           </div>
-          <ChevronRight className="text-indigo-400" />
         </button>
 
         <button 

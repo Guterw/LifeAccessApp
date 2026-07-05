@@ -5,7 +5,11 @@ export default {
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      animation: {
+        'shine': 'shine 3s linear infinite',
+      },
+    },
   },
   plugins: [],
 }

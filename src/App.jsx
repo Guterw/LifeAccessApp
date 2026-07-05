@@ -41,24 +41,37 @@ import TrailView from './features/languages/english/views/TrailView';
 // Módulo Calendário
 import CalendarView from './features/calendar/views/CalendarView';
 
+// Módulo Financias
+import { checkTaskNotifications } from './utils/taskNotifications';
+import FinanceView from './features/finance/views/FinanceView';
+import FinanceTransactionsView from './features/finance/views/FinanceTransactionsView';
+
 function App() {
   const { isFirstAccess } = useLanguage();
   const [onboardingStep, setOnboardingStep] = useState(1);
   
-  useEffect(() => {
-    // Repara qualquer perfil com level desalinhado do XP (bug legado).
-    // Roda uma vez a cada abertura do app — barato e idempotente:
-    // não faz nada se o perfil já estiver correto.
-    repairUserProfile();
+useEffect(() => {
+  repairUserProfile();
 
-    const interval = setInterval(async () => {
-      const settings = await db.appSettings.get(1);
-      if (settings) {
-        checkAllNotifications(settings, [], {});
-      }
-    }, 1000 * 60 * 30);
-    return () => clearInterval(interval);
-  }, []);
+  const interval = setInterval(async () => {
+    const settings = await db.appSettings.get(1);
+    if (settings) {
+      checkAllNotifications(settings, [], {});
+    }
+  }, 1000 * 60 * 30);
+
+  // NOVO: checagem de tarefas/lembretes a cada 1 minuto (mais preciso)
+  checkTaskNotifications();
+  const taskInterval = setInterval(() => {
+    checkTaskNotifications();
+  }, 1000 * 60);
+
+  return () => {
+    clearInterval(interval);
+    clearInterval(taskInterval);
+  };
+}, []);
+
   
   // ==========================================
   // FLUXO DE ONBOARDING ATUALIZADO
@@ -109,7 +122,12 @@ function App() {
               <Route path="/english/trail" element={<TrailView />} />
 
               <Route path="/fitness" element={<div className="pt-8 text-center text-gray-400">Em breve</div>} />
-              <Route path="/finance" element={<div className="pt-8 text-center text-gray-400">Em breve</div>} />
+              
+              {/* Financias */}
+              <Route path="/finance" element={<FinanceView />} />
+              <Route path="/finance/transactions" element={<FinanceTransactionsView />} />
+              
+              {/* Calendario */}
               <Route path="/calendar" element={<CalendarView />} />
             </Routes>
           </div>
