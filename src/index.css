@@ -65,3 +65,92 @@ html, body {
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(107, 114, 128, 0.8); /* Fica mais claro ao passar o mouse */
 }
+
+/* ===================================================== */
+/* BRILHO METÁLICO GIRANDO NA BORDA + ESTRELINHAS DOURADAS */
+/* Usado no card da Trilha (Jornada Guiada)                */
+/* ===================================================== */
+
+.trail-shine-border {
+  position: relative;
+  border-radius: 1.1rem;
+  isolation: isolate;
+}
+
+/* Borda com brilho metálico correndo da esquerda pra direita, em loop */
+.trail-shine-border::before {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: inherit;
+  padding: 50px;
+  background: linear-gradient(
+    100deg,
+    transparent 15%,
+    rgba(255,255,255,0.15) 35%,
+    #fef9c3 45%,
+    #ffffff 50%,
+    #fde68a 55%,
+    rgba(255,255,255,0.15) 65%,
+    transparent 85%
+  );
+  background-size: 260% 100%;
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: trail-shimmer-move 7s linear infinite;
+  pointer-events: none;
+  z-index: 1;
+}
+
+@keyframes trail-shimmer-move {
+  0%   { background-position: 220% 0; }
+  100% { background-position: -220% 0; }
+}
+
+/* Brilho suave pulsando por trás, reforça o "metálico" */
+.trail-shine-border::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: inherit;
+  box-shadow: 0 0 18px 2px rgba(250, 204, 21, 0.25);
+  animation: trail-glow-pulse 2.8s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@keyframes trail-glow-pulse {
+  0%, 100% { opacity: 0.35; }
+  50%      { opacity: 0.9; }
+}
+
+/* Estrelinhas douradas de 4 pontas (losango) saindo ao redor da borda */
+.trail-sparkle {
+  position: absolute;
+  z-index: 2;
+  pointer-events: none;
+  width: 12px;
+  height: 12px;
+  color: #fde68a;
+  filter: drop-shadow(0 0 5px rgba(253, 224, 71, 0.95));
+  animation: trail-sparkle-pop 2.4s ease-in-out infinite;
+}
+
+.trail-sparkle svg { width: 100%; height: 100%; display: block; }
+
+@keyframes trail-sparkle-pop {
+  0%, 100% { opacity: 0; transform: scale(0.2) rotate(0deg); }
+  15%      { opacity: 1; transform: scale(1) rotate(15deg); }
+  30%      { opacity: 0; transform: scale(0.3) rotate(30deg); }
+}
+
+.trail-sparkle-1 { top: -6px;    left: 8%;   animation-delay: 0s;    }
+.trail-sparkle-2 { top: -8px;    left: 42%;  animation-delay: 0.5s;  }
+.trail-sparkle-3 { top: -4px;    right: 10%; animation-delay: 1s;    }
+.trail-sparkle-4 { bottom: -6px; left: 20%;  animation-delay: 1.4s;  }
+.trail-sparkle-5 { bottom: -8px; right: 25%; animation-delay: 0.8s;  }
+.trail-sparkle-6 { top: 40%;     left: -6px; animation-delay: 1.8s;  }
+.trail-sparkle-7 { top: 55%;     right: -6px; animation-delay: 0.3s; }

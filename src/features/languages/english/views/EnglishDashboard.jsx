@@ -108,12 +108,19 @@ export default function EnglishDashboard() {
         {/* TRILHA E BOTÕES */}
         <button
           onClick={() => navigate('/english/trail')}
-          // O container externo cria a "borda" com padding de 2px
-          // Usamos background-size: 200% para o gradiente ficar maior que o botão
-          className="w-full text-left p-[2px] rounded-[1.0rem] bg-gradient-to-r from-indigo-500 via-amber-300 to-indigo-500 bg-[length:200%_auto] animate-shine shadow-lg group relative"
+          className="trail-shine-border w-full text-left shadow-lg group border from-cyan-400 via-fuchsia-500 to-amber-400"
         >
-          {/* Conteúdo interno mantém a cor de fundo padrão e define o formato */}
-          <div className="w-full bg-gray-800 rounded-[1.1rem] p-5 flex items-center justify-between">
+          {/* Estrelinhas douradas de 4 pontas ao redor da borda */}
+          {[1, 2, 3, 4, 5, 6, 7].map((n) => (
+            <span key={n} className={`trail-sparkle trail-sparkle-${n}`}>
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 0 L14.5 9.5 L24 12 L14.5 14.5 L12 24 L9.5 14.5 L0 12 L9.5 9.5 Z" />
+              </svg>
+            </span>
+          ))}
+
+          {/* Conteúdo interno */}
+          <div className="relative w-full bg-gray-800 rounded-[1.1rem] p-5 flex items-center justify-between z-[1]">
             <div className="flex items-center gap-4">
               <div className="p-3 rounded-2xl bg-indigo-500/20 text-indigo-400 border from-cyan-400 via-fuchsia-500 to-amber-400 shadow-[0_0_6px_rgba(168,85,247,0.5)]">
                 <Rocket size={22} />
