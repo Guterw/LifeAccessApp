@@ -35,9 +35,11 @@ export const translations = {
       langModule: "Idiomas",
       langDesc: "Inglês, Espanhol, Francês...",
       fitnessModule: "Fitness",
+      fitnessSubtitle: "Treinos, exercícios e IA Personal Trainer",
       financeModule: "Finanças",
+      financeSubtitle: "Gastos, Saldo, Ganhos, Controle seu dinheiro aqui!",
       calendarModule: "Calendario",
-      calendarSubtitle: "Calendario, Lembretes(breve), Tarefas(breve) e Contadores."
+      calendarSubtitle: "Calendario, Lembretes, Tarefas e Contadores."
     },
     languages: {
       title: "Central de Idiomas",
@@ -322,9 +324,11 @@ export const translations = {
       langModule: "Languages",
       langDesc: "English, Spanish, French...",
       fitnessModule: "Fitness",
+      fitnessSubtitle: "Workouts, exercises, and AI Personal Trainer",
       financeModule: "Finance",
+      financeSubtitle: "Expenses, Balance, Earnings, manage your money here!",
       calendarModule: "Calendar",
-      calendarSubtitle: "Calendar, Reminders(soon), Tasks(soon), and Counter.",
+      calendarSubtitle: "Calendar, Reminders, Tasks, and Counter.",
     },
     languages: {
       title: "Language Center",
@@ -607,7 +611,9 @@ export const translations = {
       langModule: "Idiomas",
       langDesc: "Inglés, Español, Francés...",
       fitnessModule: "Acondicionamiento",
+      fitnessSubtitle: "Entrenamientos, ejercicios y entrenador personal con IA",
       financeModule: "Finanzas",
+      financeSubtitle: "Gastos, saldo, ingresos: ¡controla tu dinero aquí!",
       calendarModule: "Calendario",
       calendarSubtitle: "Calendario, Lembretes, Tareas y Contadores.",
     },

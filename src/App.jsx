@@ -46,6 +46,14 @@ import { checkTaskNotifications } from './utils/taskNotifications';
 import FinanceView from './features/finance/views/FinanceView';
 import FinanceTransactionsView from './features/finance/views/FinanceTransactionsView';
 
+// Módulo Fitness
+import FitnessDashboard from './features/fitness/views/FitnessDashboard';
+import FitnessGroupView from './features/fitness/views/FitnessGroupView';
+import FitnessExerciseView from './features/fitness/views/FitnessExerciseView';
+import FitnessProfileView from './features/fitness/views/FitnessProfileView';
+import FitnessStatsView from './features/fitness/views/FitnessStatsView';
+import FastingView from './features/fitness/views/FastingView';
+
 function App() {
   const { isFirstAccess } = useLanguage();
   const [onboardingStep, setOnboardingStep] = useState(1);
@@ -121,8 +129,14 @@ useEffect(() => {
               
               <Route path="/english/trail" element={<TrailView />} />
 
-              <Route path="/fitness" element={<div className="pt-8 text-center text-gray-400">Em breve</div>} />
-              
+              {/* Fitness */}
+              <Route path="/fitness" element={<FitnessDashboard />} />
+              <Route path="/fitness/profile" element={<FitnessProfileView />} />
+              <Route path="/fitness/stats" element={<FitnessStatsView />} />
+              <Route path="/fitness/fasting" element={<FastingView />} />
+              <Route path="/fitness/group/:groupId" element={<FitnessGroupView />} />
+              <Route path="/fitness/group/:groupId/exercise/:exerciseId" element={<FitnessExerciseView />} />
+                            
               {/* Financias */}
               <Route path="/finance" element={<FinanceView />} />
               <Route path="/finance/transactions" element={<FinanceTransactionsView />} />

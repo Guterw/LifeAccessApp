@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { db } from '../config/dexieDb';
 import { translations } from '../locales/translations';
+import { toDateKey, diffInDays } from '../utils/calendarUtils';
 
 const LanguageContext = createContext();
 
@@ -45,43 +46,42 @@ export const LanguageProvider = ({ children }) => {
 
   // LÓGICA DE OFENSIVA (STREAK)
   const registerLanguageActivity = async () => {
-    const settings = await db.appSettings.get(1);
-    
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+  const settings = await db.appSettings.get(1);
 
-    let oldStreak = settings.languageStreak || 0;
-    let newStreak = oldStreak;
-    let lastDate = settings.lastLanguageActivity ? new Date(settings.lastLanguageActivity) : null;
-    let increased = false;
+  const todayStr = toDateKey(new Date());
+  const oldStreak = settings.languageStreak || 0;
+  const lastActivityStr = settings.lastLanguageActivity
+    ? toDateKey(new Date(settings.lastLanguageActivity))
+    : null;
 
-    if (lastDate) {
-      lastDate.setHours(0, 0, 0, 0);
-      const diffTime = today.getTime() - lastDate.getTime();
-      const diffDays = Math.round(diffTime / (1000 * 3600 * 24));
+  let newStreak = oldStreak;
 
-      if (diffDays === 0) {
-        return { increased: false, oldStreak, newStreak }; // Já estudou hoje
-      } else if (diffDays === 1) {
-        newStreak = oldStreak + 1;
-        increased = true;
-      } else {
-        newStreak = 1; // Perdeu a ofensiva, recomeça do 1
-        increased = true; 
-      }
+  if (lastActivityStr === todayStr) {
+    // Já estudou hoje — nada muda, nenhuma animação.
+    return { increased: false, oldStreak, newStreak: oldStreak };
+  }
+
+  if (lastActivityStr) {
+    const diffDays = diffInDays(lastActivityStr, todayStr);
+    if (diffDays === 1) {
+      newStreak = oldStreak + 1; // Manteve a ofensiva
     } else {
-      newStreak = 1; // Primeiro dia de estudo
-      increased = true;
+      newStreak = 1; // Quebrou a ofensiva, recomeça do 1
     }
+  } else {
+    newStreak = 1; // Primeiro dia de estudo
+  }
 
-    await db.appSettings.update(1, { 
-      languageStreak: newStreak, 
-      lastLanguageActivity: today.toISOString() 
-    });
-    setLanguageStreak(newStreak);
+  await db.appSettings.update(1, {
+    languageStreak: newStreak,
+    lastLanguageActivity: new Date().toISOString()
+  });
+  setLanguageStreak(newStreak);
 
-    // Agora a função retorna o que aconteceu para a tela poder animar!
-    return { increased, oldStreak, newStreak }; 
+  // Só é "aumento" de verdade se o número realmente mudou
+  const increased = newStreak !== oldStreak;
+
+  return { increased, oldStreak, newStreak };
   };
 
   // A função T() é quem vai traduzir os textos nas telas. 

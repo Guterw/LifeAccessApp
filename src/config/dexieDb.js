@@ -3,19 +3,10 @@ import Dexie from 'dexie';
 
 export const db = new Dexie('LifeAccessDB');
 
-db.version(8).stores({
-  appSettings: 'id, uiLanguage, isFirstAccess, userName',
-  learnedWords: 'en, translation, level, category, learnedAt',
-  mistakesLog: '++id, word, level, category, timestamp',
-  levelProgress: 'level, correctCount, total, pendingQueue',
-  completedLevels: 'level, completedAt',
-  chatHistory: '++id, timestamp, role, content',
-  alphaNumProgress: '[mode+exerciseIndex], mode, exerciseIndex, pendingQueue, correctCount, total, updatedAt',
-  completedAlphaNum: '[mode+exerciseIndex], mode, exerciseIndex, completedAt, xp',
-  userProfile: 'id, currentLevel, totalXp, bodyRanks',
-});
-
-db.version(9).stores({
+// ==========================================
+// 🔼 VERSÃO 12: JEJUM INTERMITENTE
+// ==========================================
+db.version(12).stores({
   appSettings: 'id, uiLanguage, isFirstAccess, userName',
   learnedWords: 'en, translation, level, category, learnedAt',
   mistakesLog: '++id, word, level, category, timestamp',
@@ -26,28 +17,14 @@ db.version(9).stores({
   completedAlphaNum: '[mode+exerciseIndex], mode, exerciseIndex, completedAt, xp',
   userProfile: 'id, currentLevel, totalXp, bodyRanks',
   counters: '++id, title, type, anchorDate, color, icon, createdAt',
-});
-
-// ==========================================
-// 🔼 VERSÃO 10: TAREFAS/LEMBRETES + FINANÇAS
-// ==========================================
-db.version(10).stores({
-  appSettings: 'id, uiLanguage, isFirstAccess, userName',
-  learnedWords: 'en, translation, level, category, learnedAt',
-  mistakesLog: '++id, word, level, category, timestamp',
-  levelProgress: 'level, correctCount, total, pendingQueue',
-  completedLevels: 'level, completedAt',
-  chatHistory: '++id, timestamp, role, content',
-  alphaNumProgress: '[mode+exerciseIndex], mode, exerciseIndex, pendingQueue, correctCount, total, updatedAt',
-  completedAlphaNum: '[mode+exerciseIndex], mode, exerciseIndex, completedAt, xp',
-  userProfile: 'id, currentLevel, totalXp, bodyRanks',
-  counters: '++id, title, type, anchorDate, color, icon, createdAt',
-
-  // NOVA TABELA: Tarefas / Lembretes / (no futuro) Treinos
-  // type: 'task' | 'reminder' | 'workout'
   tasks: '++id, title, date, time, type, done, notify, notified, color, createdAt',
-
-  // NOVA TABELA: Transações Financeiras
-  // type: 'income' | 'expense'
   financeTransactions: '++id, type, amount, category, description, date, createdAt',
+  fitnessProfile: 'id, weightKg, heightCm, age, gender, goal, activityLevel, bmi, caloriesBurnedTotal, isOnboarded, aiPlanSummary',
+  fitnessStreak: 'id, streak, lastWorkoutActivity',
+  fitnessExerciseProgress: '[groupId+exerciseId], groupId, exerciseId, pendingQueue, correctCount, total, updatedAt',
+  completedFitnessExercises: '[groupId+exerciseId], groupId, exerciseId, completedAt, caloriesBurned, xp',
+  fitnessWeeklyPlan: 'id, generatedAt, days',
+
+  // NOVA TABELA: Sessões de Jejum Intermitente
+  fastingSessions: '++id, startTime, endTime, targetHours, protocol, completed, caloriesBurnedEstimate',
 });

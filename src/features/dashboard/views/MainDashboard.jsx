@@ -141,11 +141,13 @@ export default function MainDashboard() {
           />
         </div>
 
-          <ModuleCard 
+          <ModuleCard
+            onClick={() => navigate('/fitness')}
             icon={Dumbbell} 
-            title={t('home.fitnessModule')} 
-            subtitle={t('inDev')} isActive={false} 
-            customBgClass="bg-gray-800/40 border border-gray-700/40" 
+            title={t('home.fitnessModule')}
+            subtitle={t('home.fitnessSubtitle')} 
+            isActive={true} 
+            customBgClass="bg-gradient-to-r from-green-900/40 to-gray-800 border border-green-500/30 hover:border-green-400 shadow-lg relative z-10" 
             iconBgClass="bg-green-500/10 text-green-400" 
           />
           <ModuleCard

@@ -363,7 +363,7 @@ function CounterCard({ counter, onClick, t }) {
           </p>
         </div>
       </div>
-      <div className="text-right shrink-0 pl-2">
+      <div className="text-right shrink-0 pl-3 pr-1">
         <span className={`text-2xl font-black ${colorCfg.text}`}>
           {counter.type === 'until' && !isPast && value === 0 ? <PartyPopper size={22} className="inline" /> : value}
         </span>
@@ -398,7 +398,7 @@ function TaskRow({ task, onToggle, onEdit }) {
           )}
         </div>
       </div>
-      <button onClick={() => onEdit(task)} className="p-1.5 text-gray-400 hover:text-white shrink-0">
+      <button onClick={() => onEdit(task)} className="p-1.5 mr-1 text-gray-400 hover:text-white shrink-0">
         <Pencil size={14} />
       </button>
     </div>
@@ -708,8 +708,7 @@ export default function CalendarView() {
                             {tsk.type === 'reminder' ? <Bell size={14} className="text-yellow-400 shrink-0" /> : tsk.type === 'workout' ? <Dumbbell size={14} className="text-green-400 shrink-0" /> : <ListChecks size={14} className="text-blue-400 shrink-0" />}
                             <span className="text-sm text-white truncate">{tsk.title}</span>
                           </div>
-                          <span className="text-[10px] text-gray-500 font-bold shrink-0">{tsk.date.slice(5)}</span>
-                        </button>
+                            <span className="text-[10px] text-gray-500 font-bold shrink-0 ml-3 pr-1">{tsk.date.slice(5)}</span>                        </button>
                       ))
                   )}
                 </div>

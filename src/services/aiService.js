@@ -35,3 +35,32 @@ export const generateCloudResponse = async (userMessage, history = [], systemPro
   const data = await response.json();
   return data.choices[0].message.content;
 };
+
+  export const generateFitnessPlan = async (profileAnswers) => {
+    const systemPrompt = `You are an encouraging AI personal trainer creating a weekly workout plan.
+  The user's data: goal="${profileAnswers.goal}", weightKg=${profileAnswers.weightKg}, heightCm=${profileAnswers.heightCm}, age=${profileAnswers.age}, activityLevel="${profileAnswers.activityLevel}".
+  Available muscle groups: legs, core, back, arms, cardio.
+
+  Respond ONLY with valid JSON:
+  {
+    "summary": "2-3 sentence friendly summary of the plan and why, in Portuguese",
+    "days": [
+      { "weekday": "Monday", "groupIds": ["legs","core"] },
+      { "weekday": "Wednesday", "groupIds": ["back","arms"] },
+      { "weekday": "Friday", "groupIds": ["cardio","core"] }
+    ]
+  }`;
+
+    const raw = await generateCloudResponse(
+      "Generate my weekly plan.",
+      [],
+      systemPrompt
+    );
+
+    const cleaned = raw.trim().replace(/^```json\s*/i, '').replace(/^```\s*/, '').replace(/```$/, '').trim();
+    try {
+      return JSON.parse(cleaned);
+    } catch {
+      return { summary: raw, days: [] };
+    }
+  };
