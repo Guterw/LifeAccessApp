@@ -7,6 +7,7 @@ import { repairUserProfile } from './utils/xpManager';
 import BottomNav from './components/BottomNav';
 import { useLanguage } from './contexts/LanguageContext';
 import FirstLaunchGuard from './components/FirstLaunchGuard';
+import SyncPreferenceGuard from './components/SyncPreferenceGuard';
 
 import WelcomeView from './features/onboarding/views/WelcomeView';
 import SyncChoiceView from './features/onboarding/views/SyncChoiceView'; // <-- NOVA TELA IMPORTADA AQUI
@@ -98,6 +99,7 @@ useEffect(() => {
     <HashRouter>
       {/* Guardião de Permissões: Aparece só DEPOIS do Onboarding e ANTES de liberar o app principal */}
       <FirstLaunchGuard>
+        <SyncPreferenceGuard>
         <div className="min-h-screen bg-gray-900 text-white font-sans selection:bg-blue-500/30">
           <div className="max-w-md mx-auto w-full px-4 pb-28">
             <Routes>
@@ -149,6 +151,7 @@ useEffect(() => {
           </div>
           <BottomNav />
         </div>
+        </SyncPreferenceGuard>
       </FirstLaunchGuard>
     </HashRouter>
   );

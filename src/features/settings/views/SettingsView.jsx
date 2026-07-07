@@ -1,6 +1,11 @@
 // src/features/settings/views/SettingsView.jsx
 import React, { useState, useEffect, useRef } from 'react';
-import { User, Flame, Dumbbell, Receipt, CalendarCheck, Globe, Bell, Moon, Mic, Zap, HardDrive, Download, Upload, Cloud, CloudDownload, LogOut, RefreshCw, Trash2, AlertTriangle, X } from 'lucide-react';
+import {
+  User, Flame, Dumbbell, Receipt, CalendarCheck, Globe, Bell, Moon, Mic, Zap,
+  HardDrive, Download, Upload, Cloud, CloudDownload, LogOut, RefreshCw, Trash2,
+  AlertTriangle, X, Wallet, ListChecks, Hourglass, Footprints, HeartPulse,
+  ArrowDownToLine, ArrowUpFromLine as ArrowUpFromLineIcon, ToggleLeft
+} from 'lucide-react';
 import { useLanguage } from '../../../contexts/LanguageContext';
 import BackButton from '../../../components/BackButton';
 import { db } from '../../../config/dexieDb';
@@ -8,52 +13,91 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import FooterBrand from '../../../components/FooterBrand';
 import PigeonAvatar from '../../../components/PigeonAvatar';
 
-// Importações do Firebase
 import { auth, googleProvider } from '../../../config/firebaseConfig';
 import { signInWithPopup, signOut, onAuthStateChanged } from 'firebase/auth';
 
-// Importação do Motor de Nuvem
 import { pushToCloud, pullFromCloud, deleteCloudData, hasCloudBackup, getCloudLastSync } from '../../../utils/cloudSync';
 import { calculateLevel, repairUserProfile } from '../../../utils/xpManager';
+import { todayKey } from '../../../utils/calendarUtils';
+import { pullHealthData, pushHealthData, isHealthBridgeNative } from '../../../utils/healthSync';
 
 export default function SettingsView() {
   const { t, userName, uiLang, changeLanguage, languageStreak } = useLanguage();
   const today = new Intl.DateTimeFormat(uiLang, { dateStyle: 'full' }).format(new Date());
-  
+
   const [permission, setPermission] = useState(typeof Notification !== 'undefined' ? Notification.permission : 'default');
   const [micPermission, setMicPermission] = useState('prompt');
-  
-  // Estado de Autenticação na Nuvem
+
   const [authUser, setAuthUser] = useState(null);
   const [cloudLastSync, setCloudLastSync] = useState(null);
   const [isSyncing, setIsSyncing] = useState(false);
   const fileInputRef = useRef(null);
 
-  // Preferências
   const [notifLang, setNotifLang] = useState(true);
   const [notifTasks, setNotifTasks] = useState(true);
   const [notifFitness, setNotifFitness] = useState(false);
+  const [notifFitnessReminders, setNotifFitnessReminders] = useState(false);
 
-  // Modal de escolha ao conectar uma conta que já possui backup remoto
+  const [autoSyncEnabled, setAutoSyncEnabled] = useState(true);
+  const [lastAutoSync, setLastAutoSync] = useState(null);
+
+  const [isHealthSyncing, setIsHealthSyncing] = useState(false);
+  const [healthLastSync, setHealthLastSync] = useState(null);
+  const [healthResultMsg, setHealthResultMsg] = useState(null);
+
   const [cloudChoiceModal, setCloudChoiceModal] = useState({ open: false, user: null, remoteDate: null });
-  // Modal de confirmação de importação (mostra a data do backup antes de sobrescrever)
   const [importConfirmModal, setImportConfirmModal] = useState({ open: false, data: null, exportedAt: null });
 
-  // PUXANDO O PERFIL COMPLETO
-  const userProfile = useLiveQuery(() => db.userProfile.get(1)) || { 
+  // ==========================================
+  // PERFIL / XP (já existente)
+  // ==========================================
+  const userProfile = useLiveQuery(() => db.userProfile.get(1)) || {
     totalXp: 0,
     equippedSkin: 'none'
   };
   const englishXP = userProfile.totalXp || 0;
-  // O nível NUNCA é lido do campo salvo isoladamente — é sempre recalculado
-  // a partir do totalXp, para nunca mais ficar desalinhado (o bug relatado
-  // de "level 4 virar level 1" era exatamente essa desincronização).
   const userLevel = calculateLevel(englishXP);
   const fitnessXP = parseInt(localStorage.getItem('fitnessXP') || '0', 10);
-  const fitnessStreak = parseInt(localStorage.getItem('fitnessStreak') || '0', 10);
+
+  // ==========================================
+  // NOVO: FITNESS — ofensiva/streak direto do Dexie (fonte real, não localStorage)
+  // ==========================================
+  const fitnessStreakRecord = useLiveQuery(() => db.fitnessStreak.get(1)) || { streak: 0 };
+  const fitnessProfile = useLiveQuery(() => db.fitnessProfile.get(1)) || { caloriesBurnedTotal: 0 };
+  const fitnessStreak = fitnessStreakRecord.streak || 0;
+
+  // ==========================================
+  // NOVO: FINANÇAS — resumo (receitas, gastos, saldo)
+  // ==========================================
+  const financeTransactions = useLiveQuery(() => db.financeTransactions.toArray()) || [];
+  const financeSummary = React.useMemo(() => {
+    let income = 0, expense = 0;
+    financeTransactions.forEach((tx) => {
+      if (tx.type === 'income') income += tx.amount;
+      else expense += tx.amount;
+    });
+    return { income, expense, balance: income - expense };
+  }, [financeTransactions]);
+  const formatCurrency = (val) => `R$ ${Number(val || 0).toFixed(2).replace('.', ',')}`;
+
+  // ==========================================
+  // NOVO: CALENDÁRIO — tarefas pendentes, lembretes ativos, contadores ativos
+  // ==========================================
+  const allTasks = useLiveQuery(() => db.tasks.toArray()) || [];
+  const counters = useLiveQuery(() => db.counters.toArray()) || [];
+  const calendarSummary = React.useMemo(() => {
+    const pendingTasks = allTasks.filter(tk => tk.type !== 'reminder' && !tk.done).length;
+    const activeReminders = allTasks.filter(tk => tk.type === 'reminder' && !tk.done).length;
+    const activeCounters = counters.length;
+    // Próximo evento (tarefa/lembrete não concluído mais próximo de hoje, incluindo hoje em diante)
+    const tKey = todayKey();
+    const upcoming = allTasks
+      .filter(tk => !tk.done && tk.date >= tKey)
+      .sort((a, b) => (a.date + (a.time || '')).localeCompare(b.date + (b.time || '')))[0];
+    return { pendingTasks, activeReminders, activeCounters, upcoming };
+  }, [allTasks, counters]);
 
   useEffect(() => {
-    // Repara qualquer inconsistência de level assim que a tela abre
     repairUserProfile();
 
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -71,12 +115,12 @@ export default function SettingsView() {
       setNotifLang(settings.notifLang ?? true);
       setNotifTasks(settings.notifTasks ?? true);
       setNotifFitness(settings.notifFitness ?? false);
+      setNotifFitnessReminders(settings.notifFitnessReminders ?? false);
+      setAutoSyncEnabled(settings.autoSyncEnabled ?? true);
+      setLastAutoSync(settings.lastAutoSync || null);
+      setHealthLastSync(settings.healthLastSync || null);
 
-      // ==========================================
-      // VERIFICAÇÃO HÍBRIDA DO MICROFONE (PC + iPHONE)
-      // ==========================================
       let currentMicState = 'prompt';
-
       if (navigator.permissions) {
         try {
            const mStatus = await navigator.permissions.query({ name: 'microphone' });
@@ -107,7 +151,7 @@ export default function SettingsView() {
   };
 
   const Toggle = ({ checked, onChange }) => (
-    <button 
+    <button
       onClick={() => onChange(!checked)}
       className={`w-11 h-6 rounded-full p-1 transition-all duration-300 ${checked ? 'bg-blue-600' : 'bg-gray-700'}`}
     >
@@ -130,14 +174,11 @@ export default function SettingsView() {
     } else {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        stream.getTracks().forEach(t => t.stop()); 
-        
+        stream.getTracks().forEach(t => t.stop());
         setMicPermission('granted');
-
         const settings = await db.appSettings.get(1) || { id: 1 };
         settings.micPermissionGranted = true;
         await db.appSettings.put(settings);
-
       } catch(e) {
         setMicPermission('denied');
       }
@@ -145,14 +186,65 @@ export default function SettingsView() {
   };
 
   // ==========================================
-  // LÓGICA DE FIREBASE (LOGIN / LOGOUT / SYNC)
+  // NOVO: TOGGLE DE SINCRONIZAÇÃO AUTOMÁTICA
   // ==========================================
+  const handleToggleAutoSync = async (value) => {
+    setAutoSyncEnabled(value);
+    const settings = await db.appSettings.get(1) || { id: 1 };
+    settings.autoSyncEnabled = value;
+    await db.appSettings.put(settings);
+  };
 
-  // CORRIGIDO: antes, conectar aqui SEMPRE fazia push (sobrescrevendo
-  // qualquer backup remoto real com os dados locais, possivelmente vazios,
-  // do dispositivo atual). Agora, primeiro verificamos se já existe um
-  // backup remoto para essa conta — se existir, perguntamos ao usuário
-  // o que fazer, em vez de destruir os dados da nuvem silenciosamente.
+  // ==========================================
+  // NOVO: SINCRONIZAÇÃO COM APPLE HEALTH / GOOGLE FIT
+  // ==========================================
+  const handlePullHealthData = async () => {
+    if (isHealthSyncing) return;
+    setIsHealthSyncing(true);
+    setHealthResultMsg(null);
+    try {
+      const result = await pullHealthData();
+      const settings = await db.appSettings.get(1) || { id: 1 };
+      settings.healthLastSync = new Date().toISOString();
+      await db.appSettings.put(settings);
+      setHealthLastSync(settings.healthLastSync);
+      setHealthResultMsg(
+        result.simulated
+          ? t('settings.healthPullSimulated', `Trazido (estimativa): ${result.steps} passos, ${result.caloriesBurned} kcal. Conecte um app nativo para dados reais.`)
+          : t('settings.healthPullSuccess', `Dados trazidos: ${result.steps} passos, ${result.caloriesBurned} kcal.`)
+      );
+    } catch (err) {
+      setHealthResultMsg(t('settings.healthError', 'Erro ao sincronizar com o app de saúde.'));
+    } finally {
+      setIsHealthSyncing(false);
+    }
+  };
+
+  const handlePushHealthData = async () => {
+    if (isHealthSyncing) return;
+    setIsHealthSyncing(true);
+    setHealthResultMsg(null);
+    try {
+      const result = await pushHealthData();
+      const settings = await db.appSettings.get(1) || { id: 1 };
+      settings.healthLastSync = new Date().toISOString();
+      await db.appSettings.put(settings);
+      setHealthLastSync(settings.healthLastSync);
+      setHealthResultMsg(
+        result.simulated
+          ? t('settings.healthPushSimulated', 'Simulado: em um app nativo, isso enviaria suas calorias para o Health/Fit.')
+          : t('settings.healthPushSuccess', 'Dados enviados para o app de saúde com sucesso!')
+      );
+    } catch (err) {
+      setHealthResultMsg(t('settings.healthError', 'Erro ao sincronizar com o app de saúde.'));
+    } finally {
+      setIsHealthSyncing(false);
+    }
+  };
+
+  // ==========================================
+  // FIREBASE (mantido igual ao original)
+  // ==========================================
   const handleConnectGoogle = async () => {
     if (isSyncing) return;
     setIsSyncing(true);
@@ -185,7 +277,6 @@ export default function SettingsView() {
     }
   };
 
-  // Usuário escolheu: "usar os dados da nuvem" (baixa e sobrescreve este dispositivo)
   const confirmUseCloudData = async () => {
     const user = cloudChoiceModal.user;
     setCloudChoiceModal({ open: false, user: null, remoteDate: null });
@@ -202,7 +293,6 @@ export default function SettingsView() {
     }
   };
 
-  // Usuário escolheu: "usar os dados deste dispositivo" (sobrescreve a nuvem)
   const confirmUseLocalData = async () => {
     const user = cloudChoiceModal.user;
     setCloudChoiceModal({ open: false, user: null, remoteDate: null });
@@ -230,8 +320,6 @@ export default function SettingsView() {
     }
   };
 
-  // Botão "Enviar para Nuvem" (push manual) — mantém o comportamento existente,
-  // mas agora com nome mais claro na UI para não confundir com "Baixar da Nuvem".
   const handleCloudSync = async () => {
     if (!authUser || isSyncing) return;
     setIsSyncing(true);
@@ -247,9 +335,6 @@ export default function SettingsView() {
     }
   };
 
-  // NOVO: Botão explícito "Baixar da Nuvem" (pull manual). Antes, não existia
-  // nenhuma forma de forçar um pull manualmente fora do onboarding — esse era
-  // um dos motivos do usuário sentir que "sincronizar não trazia nada de volta".
   const handleCloudRestore = async () => {
     if (!authUser || isSyncing) return;
     if (!window.confirm(t('settings.restoreConfirm', 'Isso substituirá todos os dados deste dispositivo pelos dados salvos na nuvem. Deseja continuar?'))) {
@@ -272,27 +357,20 @@ export default function SettingsView() {
   };
 
   // ==========================================
-  // FUNÇÕES DE EXPORTAÇÃO E IMPORTAÇÃO (MANUAL)
+  // EXPORTAÇÃO / IMPORTAÇÃO MANUAL (mantido igual)
   // ==========================================
   const handleExportData = async () => {
     try {
-      // Garante que o level exportado está sempre consistente com o XP
       await repairUserProfile();
-
       const data = {};
       for (const table of db.tables) {
         data[table.name] = await table.toArray();
       }
-
-      // Metadados do backup: permitem mostrar ao usuário QUANDO aquele
-      // arquivo foi gerado antes de ele importar por engano um backup antigo.
       const exportedAt = new Date().toISOString();
       const payload = { _meta: { exportedAt, app: 'LifeAccessApp' }, ...data };
-
       const jsonStr = JSON.stringify(payload);
       const blob = new Blob([jsonStr], { type: "application/json" });
       const url = URL.createObjectURL(blob);
-      
       const a = document.createElement('a');
       a.href = url;
       a.download = `lifeaccess_backup_${exportedAt.split('T')[0]}.json`;
@@ -300,7 +378,6 @@ export default function SettingsView() {
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-      
       alert(t('settings.exportSuccess', 'Backup exportado com sucesso!'));
     } catch (error) {
       console.error(error);
@@ -313,15 +390,12 @@ export default function SettingsView() {
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-
     const reader = new FileReader();
     reader.onload = async (event) => {
       try {
         const parsed = JSON.parse(event.target.result);
-        // Suporta tanto o novo formato (com _meta) quanto backups antigos sem _meta
         const exportedAt = parsed._meta?.exportedAt || null;
         const { _meta, ...tableData } = parsed;
-
         setImportConfirmModal({ open: true, data: tableData, exportedAt });
       } catch (error) {
         alert(t('settings.importError', 'Arquivo de backup inválido ou corrompido.'));
@@ -343,13 +417,8 @@ export default function SettingsView() {
           }
         }
       });
-
-      // Repara o level a partir do XP importado — corrige o bug de
-      // "importar level 4 e virar level 1" definitivamente.
       await repairUserProfile();
-
       if (authUser) await pushToCloud(authUser.uid);
-      
       alert(t('settings.importSuccess', 'Backup restaurado com sucesso!'));
       window.location.reload();
     } catch (error) {
@@ -358,24 +427,19 @@ export default function SettingsView() {
     }
   };
 
-  // ==========================================
-  // ZONA DE PERIGO: APAGAR DADOS
-  // ==========================================
   const handleDeleteAllData = async () => {
-    const warningMsg = authUser 
+    const warningMsg = authUser
       ? t('settings.deleteCloudWarn', 'ATENÇÃO: Como você está conectado, isso apagará todos os seus dados deste dispositivo E DA NUVEM permanentemente. Tem certeza absoluta?')
       : t('settings.deleteLocalWarn', 'ATENÇÃO: Isso apagará todos os seus dados deste dispositivo permanentemente. Tem certeza absoluta?');
 
     if (window.confirm(warningMsg)) {
       try {
-        if (authUser) { 
-          await deleteCloudData(authUser.uid); 
+        if (authUser) {
+          await deleteCloudData(authUser.uid);
           await signOut(auth);
         }
-
         await Promise.all(db.tables.map(table => table.clear()));
         localStorage.clear();
-        
         alert(t('settings.deleteSuccess', 'Todos os dados foram apagados.'));
         window.location.reload();
       } catch (error) {
@@ -386,7 +450,7 @@ export default function SettingsView() {
 
   const totalXP = englishXP + fitnessXP;
   const currentLevelXP = totalXP % 100;
-  const nextLevelXP = 100; 
+  const nextLevelXP = 100;
   const progressPercentage = (currentLevelXP / nextLevelXP) * 100;
 
   const formatDate = (isoStr) => {
@@ -427,8 +491,8 @@ export default function SettingsView() {
               </span>
             </div>
             <div className="h-1.5 w-full bg-gray-900 rounded-full overflow-hidden border border-gray-700">
-              <div 
-                className="h-full bg-gradient-to-r from-blue-500 to-cyan-400 rounded-full transition-all duration-700 ease-out" 
+              <div
+                className="h-full bg-gradient-to-r from-blue-500 to-cyan-400 rounded-full transition-all duration-700 ease-out"
                 style={{ width: `${progressPercentage}%` }}
               ></div>
             </div>
@@ -436,9 +500,11 @@ export default function SettingsView() {
         </div>
       </div>
 
-      {/* VISÃO GERAL */}
+      {/* VISÃO GERAL — AGORA COM DADOS REAIS DE TODOS OS MÓDULOS */}
       <h3 className="font-bold text-gray-400 mb-4 uppercase tracking-wider text-sm">{t('settings.statsSection', 'Visão Geral')}</h3>
       <div className="grid grid-cols-2 gap-4 mb-8">
+
+        {/* IDIOMAS */}
         <div className="bg-gray-800 p-4 rounded-2xl border border-gray-700 shadow-md flex flex-col justify-between">
           <div className="flex items-center gap-2 mb-3">
             <Globe className="text-blue-400" size={20} />
@@ -456,6 +522,7 @@ export default function SettingsView() {
           </div>
         </div>
 
+        {/* FITNESS — agora com ofensiva REAL vinda do db.fitnessStreak */}
         <div className="bg-gray-800 p-4 rounded-2xl border border-gray-700 shadow-md flex flex-col justify-between">
           <div className="flex items-center gap-2 mb-3">
             <Dumbbell className="text-green-400" size={20} />
@@ -467,22 +534,58 @@ export default function SettingsView() {
               <span className={`text-sm font-bold ${fitnessStreak > 0 ? 'text-orange-400' : 'text-gray-500'}`}>{fitnessStreak}</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-xs text-gray-400 flex items-center gap-1"><Zap size={14} className={fitnessXP > 0 ? "text-yellow-400" : "text-gray-500"}/> {t('settings.xp', 'XP')}</span>
-              <span className={`text-sm font-bold ${fitnessXP > 0 ? 'text-yellow-400' : 'text-gray-500'}`}>{fitnessXP}</span>
+              <span className="text-xs text-gray-400 flex items-center gap-1"><Flame size={14} className="text-green-400"/> {t('settings.caloriesShort', 'Kcal')}</span>
+              <span className="text-sm font-bold text-green-400">{Math.round(fitnessProfile.caloriesBurnedTotal || 0)}</span>
             </div>
           </div>
         </div>
 
-        <div className="bg-gray-800/50 p-4 rounded-2xl border border-gray-700 shadow-sm opacity-60">
-          <Receipt className="text-red-400 mb-2" size={24} />
-          <h4 className="text-white font-bold">{t('settings.financeStat', 'Finanças')}</h4>
-          <p className="text-[10px] text-gray-400 mt-1 uppercase tracking-wider">{t('inDev', 'Em Breve')}</p>
+        {/* FINANÇAS — agora com dados reais: receitas, gastos, saldo */}
+        <div className="bg-gray-800 p-4 rounded-2xl border border-gray-700 shadow-md flex flex-col justify-between">
+          <div className="flex items-center gap-2 mb-3">
+            <Wallet className="text-red-400" size={20} />
+            <h4 className="text-white font-bold">{t('settings.financeStat', 'Finanças')}</h4>
+          </div>
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] text-gray-400">{t('finance.income', 'Receitas')}</span>
+              <span className="text-xs font-bold text-green-400">{formatCurrency(financeSummary.income)}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] text-gray-400">{t('finance.expense', 'Gastos')}</span>
+              <span className="text-xs font-bold text-red-400">{formatCurrency(financeSummary.expense)}</span>
+            </div>
+            <div className="flex items-center justify-between pt-1 border-t border-gray-700/70">
+              <span className="text-[11px] text-gray-400 font-bold">{t('finance.balance', 'Saldo')}</span>
+              <span className={`text-xs font-black ${financeSummary.balance >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                {formatCurrency(financeSummary.balance)}
+              </span>
+            </div>
+          </div>
         </div>
-        <div className="bg-gray-800/50 p-4 rounded-2xl border border-gray-700 shadow-sm opacity-60">
-          <CalendarCheck className="text-purple-500 mb-2" size={24} />
-          <h4 className="text-white font-bold">{t('settings.tasksStat', 'Tarefas')}</h4>
-          <p className="text-[10px] text-gray-400 mt-1 uppercase tracking-wider">{t('inDev', 'Em Breve')}</p>
+
+        {/* CALENDÁRIO — tarefas pendentes, lembretes ativos, contadores ativos (espremido para caber) */}
+        <div className="bg-gray-800 p-4 rounded-2xl border border-gray-700 shadow-md flex flex-col justify-between">
+          <div className="flex items-center gap-2 mb-3">
+            <CalendarCheck className="text-purple-500" size={20} />
+            <h4 className="text-white font-bold">{t('settings.tasksStat', 'Tarefas')}</h4>
+          </div>
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] text-gray-400 flex items-center gap-1"><ListChecks size={11} /> {t('calendar.pendingTasks', 'Pendentes')}</span>
+              <span className="text-xs font-bold text-purple-300">{calendarSummary.pendingTasks}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] text-gray-400 flex items-center gap-1"><Bell size={11} /> {t('calendar.typeReminder', 'Lembretes')}</span>
+              <span className="text-xs font-bold text-yellow-300">{calendarSummary.activeReminders}</span>
+            </div>
+            <div className="flex items-center justify-between pt-1 border-t border-gray-700/70">
+              <span className="text-[11px] text-gray-400 flex items-center gap-1"><Hourglass size={11} /> {t('calendar.myCounters', 'Contadores')}</span>
+              <span className="text-xs font-bold text-blue-300">{calendarSummary.activeCounters}</span>
+            </div>
+          </div>
         </div>
+
         <div className="col-span-2 text-center text-xs text-gray-500 italic mt-[-4px]">
           {today.charAt(0).toUpperCase() + today.slice(1)}
         </div>
@@ -491,14 +594,14 @@ export default function SettingsView() {
       {/* PREFERÊNCIAS */}
       <h3 className="font-bold text-gray-400 mb-4 uppercase tracking-wider text-sm">{t('settings.prefsSection')}</h3>
       <div className="bg-gray-800 rounded-3xl border border-gray-700 divide-y divide-gray-700 overflow-hidden shadow-lg mb-8">
-        
+
         <div className="p-5 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="p-2 bg-blue-500/20 rounded-lg text-blue-400"><Globe size={20} /></div>
             <span className="font-bold text-white">{t('settings.language')}</span>
           </div>
-          <select 
-            value={uiLang} 
+          <select
+            value={uiLang}
             onChange={(e) => changeLanguage(e.target.value)}
             className="bg-gray-900 text-white p-2 rounded-lg border border-gray-600 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
           >
@@ -513,11 +616,11 @@ export default function SettingsView() {
             <div className="p-2 bg-blue-500/20 rounded-lg text-blue-400"><Mic size={20} /></div>
             <span className="font-bold text-white">{t('settings.microphone', 'Microfone')}</span>
           </div>
-          <button 
+          <button
             onClick={handleMicPermission}
             className={`px-4 py-1.5 rounded-lg text-xs font-bold uppercase transition-all ${
-              micPermission === 'granted' 
-              ? 'bg-red-500/20 text-red-400 hover:bg-red-500/30' 
+              micPermission === 'granted'
+              ? 'bg-red-500/20 text-red-400 hover:bg-red-500/30'
               : 'bg-blue-600 text-white hover:bg-blue-500'
             }`}
           >
@@ -531,18 +634,18 @@ export default function SettingsView() {
               <div className="p-2 bg-yellow-500/20 rounded-lg text-yellow-400"><Bell size={20} /></div>
               <span className="font-bold text-white">{t('settings.notifications')}</span>
             </div>
-            <button 
+            <button
               onClick={handlePermission}
               className={`px-4 py-1.5 rounded-lg text-xs font-bold uppercase transition-all ${
-                permission === 'granted' 
-                ? 'bg-red-500/20 text-red-400 hover:bg-red-500/30' 
+                permission === 'granted'
+                ? 'bg-red-500/20 text-red-400 hover:bg-red-500/30'
                 : 'bg-blue-600 text-white hover:bg-blue-500'
               }`}
             >
               {permission === 'granted' ? t('notifications.remove', 'Remover') : t('notifications.allow', 'Permitir')}
             </button>
           </div>
-          
+
           <div className="space-y-3 pl-12">
             <label className="flex justify-between items-center text-sm text-gray-300">
               {t('notifications.language')}
@@ -552,9 +655,15 @@ export default function SettingsView() {
               {t('notifications.tasks')}
               <Toggle checked={notifTasks} onChange={(val) => handleToggleChange('notifTasks', setNotifTasks, val)} />
             </label>
+            {/* NOVO: Notificação de treino (lembrete diário para treinar) */}
             <label className="flex justify-between items-center text-sm text-gray-300">
               {t('notifications.fitness')}
               <Toggle checked={notifFitness} onChange={(val) => handleToggleChange('notifFitness', setNotifFitness, val)} />
+            </label>
+            {/* NOVO: Notificação de lembretes específicos do fitness (ex: jejum terminando, meta de calorias) */}
+            <label className="flex justify-between items-center text-sm text-gray-300">
+              {t('notifications.fitnessReminders', 'Lembretes de Metas Fitness')}
+              <Toggle checked={notifFitnessReminders} onChange={(val) => handleToggleChange('notifFitnessReminders', setNotifFitnessReminders, val)} />
             </label>
           </div>
         </div>
@@ -568,17 +677,92 @@ export default function SettingsView() {
         </div>
       </div>
 
+      {/* NOVO: SINCRONIZAÇÃO COM APPLE HEALTH / GOOGLE FIT */}
+      <h3 className="font-bold text-gray-400 mb-4 uppercase tracking-wider text-sm">
+        {t('settings.healthSection', 'Saúde e Atividade (Apple Health / Google Fit)')}
+      </h3>
+      <div className="bg-gray-800 rounded-3xl border border-gray-700 p-5 shadow-lg mb-8">
+        <div className="flex items-center gap-3 mb-3">
+          <div className="p-2 bg-pink-500/20 rounded-lg text-pink-400"><HeartPulse size={20} /></div>
+          <div className="min-w-0">
+            <h4 className="font-bold text-white text-sm">{t('settings.healthTitle', 'Sincronizar Passos e Calorias')}</h4>
+            <p className="text-[11px] text-gray-400 mt-0.5">
+              {isHealthBridgeNative()
+                ? t('settings.healthNativeDesc', 'Conectado ao app de saúde do seu dispositivo.')
+                : t('settings.healthWebDesc', 'No navegador, esta função funciona em modo estimado. Em um app instalado, conecta de verdade ao Health/Fit.')}
+            </p>
+          </div>
+        </div>
+
+        {healthLastSync && (
+          <p className="text-[10px] text-gray-500 mb-3">
+            {t('settings.lastSync', 'Último backup')}: {formatDate(healthLastSync)}
+          </p>
+        )}
+
+        {healthResultMsg && (
+          <div className="bg-pink-500/10 border border-pink-500/20 rounded-xl p-3 mb-3 text-xs text-pink-200">
+            {healthResultMsg}
+          </div>
+        )}
+
+        <div className="flex gap-2">
+          <button
+            onClick={handlePullHealthData}
+            disabled={isHealthSyncing}
+            className="flex-1 bg-pink-600 hover:bg-pink-500 disabled:opacity-50 text-white text-xs font-bold py-2.5 rounded-xl flex items-center justify-center gap-2 transition-colors"
+          >
+            <ArrowDownToLine size={14} />
+            {t('settings.healthPull', 'Trazer do Health/Fit')}
+          </button>
+          <button
+            onClick={handlePushHealthData}
+            disabled={isHealthSyncing}
+            className="flex-1 bg-gray-700 hover:bg-gray-600 disabled:opacity-50 text-white text-xs font-bold py-2.5 rounded-xl flex items-center justify-center gap-2 transition-colors"
+          >
+            <ArrowUpFromLineIcon size={14} />
+            {t('settings.healthPush', 'Enviar para Health/Fit')}
+          </button>
+        </div>
+
+        {fitnessProfile.lastHealthSteps !== undefined && (
+          <div className="mt-3 flex items-center gap-2 text-xs text-gray-400">
+            <Footprints size={14} className="text-pink-400" />
+            {t('settings.lastKnownSteps', 'Últimos passos importados')}: <span className="font-bold text-white">{fitnessProfile.lastHealthSteps || 0}</span>
+          </div>
+        )}
+      </div>
+
       {/* BACKUP, DADOS E NUVEM */}
       <h3 className="font-bold text-gray-400 mb-4 uppercase tracking-wider text-sm">{t('settings.backupSection', 'Backup e Dados')}</h3>
       <div className="bg-gray-800 rounded-3xl border border-gray-700 divide-y divide-gray-700 overflow-hidden shadow-lg mb-8">
-        
-        <input 
-          type="file" 
-          accept=".json" 
-          ref={fileInputRef} 
-          style={{ display: 'none' }} 
+
+        <input
+          type="file"
+          accept=".json"
+          ref={fileInputRef}
+          style={{ display: 'none' }}
           onChange={handleFileChange}
         />
+
+        {/* NOVO: TOGGLE DE SINCRONIZAÇÃO AUTOMÁTICA */}
+        <div className="p-5 flex items-center justify-between bg-blue-900/10">
+          <div className="flex items-center gap-4">
+            <div className="p-2 bg-blue-500/20 rounded-lg text-blue-400"><RefreshCw size={20} /></div>
+            <div>
+              <h4 className="font-bold text-white text-sm">{t('settings.autoSync', 'Sincronização Automática')}</h4>
+              <p className="text-[11px] text-gray-400 mt-0.5">
+                {t('settings.autoSyncDesc', 'Envia para a nuvem a cada ~5 min quando algo é concluído/alterado')}
+              </p>
+              {lastAutoSync && (
+                <p className="text-[10px] text-gray-500 mt-0.5">
+                  {t('settings.lastAutoSync', 'Última sinc. automática')}: {formatDate(lastAutoSync)}
+                </p>
+              )}
+            </div>
+          </div>
+          <Toggle checked={autoSyncEnabled} onChange={handleToggleAutoSync} />
+        </div>
 
         {authUser ? (
           <>
@@ -596,7 +780,7 @@ export default function SettingsView() {
                 </div>
               </div>
               <div className="flex gap-2 mt-2">
-                <button 
+                <button
                   onClick={handleCloudSync}
                   disabled={isSyncing}
                   className="flex-1 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white text-xs font-bold py-2.5 rounded-xl flex items-center justify-center gap-2 transition-colors"
@@ -605,7 +789,7 @@ export default function SettingsView() {
                   <Upload size={14} />
                   {t('settings.syncNow', 'Enviar')}
                 </button>
-                <button 
+                <button
                   onClick={handleCloudRestore}
                   disabled={isSyncing}
                   className="flex-1 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white text-xs font-bold py-2.5 rounded-xl flex items-center justify-center gap-2 transition-colors"
@@ -614,7 +798,7 @@ export default function SettingsView() {
                   <CloudDownload size={14} />
                   {t('settings.restoreBtn', 'Baixar')}
                 </button>
-                <button 
+                <button
                   onClick={handleDisconnectGoogle}
                   disabled={isSyncing}
                   className="bg-gray-700 hover:bg-gray-600 disabled:opacity-50 text-white text-xs font-bold px-4 py-2.5 rounded-xl flex items-center justify-center transition-colors"
@@ -626,7 +810,7 @@ export default function SettingsView() {
             </div>
           </>
         ) : (
-          <button 
+          <button
             onClick={handleConnectGoogle}
             disabled={isSyncing}
             className="w-full p-5 flex items-center justify-between hover:bg-gray-700/50 transition-colors text-left border-b border-gray-700 disabled:opacity-60"
@@ -643,7 +827,7 @@ export default function SettingsView() {
           </button>
         )}
 
-        <button 
+        <button
           onClick={handleExportData}
           className="w-full p-5 flex items-center justify-between hover:bg-gray-700/50 transition-colors text-left"
         >
@@ -656,7 +840,7 @@ export default function SettingsView() {
           </div>
         </button>
 
-        <button 
+        <button
           onClick={handleImportClick}
           className="w-full p-5 flex items-center justify-between hover:bg-gray-700/50 transition-colors text-left border-b border-gray-700"
         >
@@ -669,7 +853,7 @@ export default function SettingsView() {
           </div>
         </button>
 
-        <button 
+        <button
           onClick={handleDeleteAllData}
           className="w-full p-5 flex items-center justify-between hover:bg-red-900/20 transition-colors text-left group"
         >
@@ -683,15 +867,13 @@ export default function SettingsView() {
         </button>
 
       </div>
-      
+
       <div className="shrink-0 mt-4">
           <FooterBrand direction="flex-col" textSize="text-xs" textColor="text-gray-500" />
       </div>
       <div className="-mb-3"></div>
 
-      {/* ========================================== */}
-      {/* MODAL: Conta já possui backup remoto        */}
-      {/* ========================================== */}
+      {/* MODAL: Conta já possui backup remoto */}
       {cloudChoiceModal.open && (
         <div className="fixed inset-0 z-[100] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
           <div className="bg-gray-900 border border-gray-700 rounded-3xl p-6 w-full max-w-sm shadow-2xl">
@@ -735,9 +917,7 @@ export default function SettingsView() {
         </div>
       )}
 
-      {/* ========================================== */}
-      {/* MODAL: Confirmar Importação (mostra a data) */}
-      {/* ========================================== */}
+      {/* MODAL: Confirmar Importação */}
       {importConfirmModal.open && (
         <div className="fixed inset-0 z-[100] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
           <div className="bg-gray-900 border border-gray-700 rounded-3xl p-6 w-full max-w-sm shadow-2xl flex flex-col items-center text-center">
