@@ -18,6 +18,17 @@ function formatDuration(ms) {
   return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
 }
 
+// Formata a duração de uma sessão já finalizada (start->end) de forma legível: "16h 12m"
+function formatSessionDuration(startTime, endTime) {
+  if (!startTime || !endTime) return '--';
+  const ms = new Date(endTime).getTime() - new Date(startTime).getTime();
+  if (ms <= 0) return '--';
+  const totalMinutes = Math.floor(ms / (1000 * 60));
+  const h = Math.floor(totalMinutes / 60);
+  const m = totalMinutes % 60;
+  return `${h}h ${m}m`;
+}
+
 export default function FastingView() {
   const { t } = useLanguage();
   const profile = useLiveQuery(() => db.fitnessProfile.get(1), [], null);
@@ -131,13 +142,20 @@ export default function FastingView() {
           history.map((h) => (
             <div key={h.id} className="bg-gray-800/60 rounded-xl p-3 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                {h.completed ? <CheckCircle2 size={16} className="text-green-500" /> : <XCircle size={16} className="text-gray-500" />}
+                {h.completed ? <CheckCircle2 size={16} className="text-green-500 shrink-0" /> : <XCircle size={16} className="text-gray-500 shrink-0" />}
                 <div>
                   <p className="text-sm font-bold text-white">{h.protocol}</p>
-                  <p className="text-[10px] text-gray-500">{new Date(h.startTime).toLocaleDateString()}</p>
+                  <p className="text-[10px] text-gray-500">
+                    {new Date(h.startTime).toLocaleDateString()}
+                    {h.endTime && (
+                      <span className="ml-1.5 text-indigo-400 font-bold">
+                        • {formatSessionDuration(h.startTime, h.endTime)}
+                      </span>
+                    )}
+                  </p>
                 </div>
               </div>
-              <span className="text-xs font-bold text-green-400">{h.caloriesBurnedEstimate || 0} kcal</span>
+              <span className="text-xs font-bold text-green-400 shrink-0 ml-2">{h.caloriesBurnedEstimate || 0} kcal</span>
             </div>
           ))
         )}

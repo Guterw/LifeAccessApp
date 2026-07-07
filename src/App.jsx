@@ -53,6 +53,7 @@ import FitnessExerciseView from './features/fitness/views/FitnessExerciseView';
 import FitnessProfileView from './features/fitness/views/FitnessProfileView';
 import FitnessStatsView from './features/fitness/views/FitnessStatsView';
 import FastingView from './features/fitness/views/FastingView';
+import FitnessWorkoutsView from './features/fitness/views/FitnessWorkoutsView';
 
 function App() {
   const { isFirstAccess } = useLanguage();
@@ -134,9 +135,10 @@ useEffect(() => {
               <Route path="/fitness/profile" element={<FitnessProfileView />} />
               <Route path="/fitness/stats" element={<FitnessStatsView />} />
               <Route path="/fitness/fasting" element={<FastingView />} />
+              <Route path="/fitness/workouts" element={<FitnessWorkoutsView />} />
               <Route path="/fitness/group/:groupId" element={<FitnessGroupView />} />
               <Route path="/fitness/group/:groupId/exercise/:exerciseId" element={<FitnessExerciseView />} />
-                            
+
               {/* Financias */}
               <Route path="/finance" element={<FinanceView />} />
               <Route path="/finance/transactions" element={<FinanceTransactionsView />} />

@@ -154,3 +154,44 @@ html, body {
 .trail-sparkle-5 { bottom: -8px; right: 25%; animation-delay: 0.8s;  }
 .trail-sparkle-6 { top: 40%;     left: -6px; animation-delay: 1.8s;  }
 .trail-sparkle-7 { top: 55%;     right: -6px; animation-delay: 0.3s; }
+
+/* ===================================================== */
+/* BORDA METÁLICA FINA E BRILHANTE (uso geral em cards)   */
+/* Mais sutil/fina que o trail-shine-border, para uso     */
+/* recorrente em cards de dashboard (Fitness, etc.)       */
+/* ===================================================== */
+.metal-border-card {
+  position: relative;
+  border-radius: 1.5rem;
+  isolation: isolate;
+}
+
+.metal-border-card::before {
+  content: '';
+  position: absolute;
+  inset: -1.5px;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: linear-gradient(
+    115deg,
+    rgba(148,163,184,0.25) 10%,
+    rgba(226,232,240,0.9) 35%,
+    #ffffff 45%,
+    rgba(226,232,240,0.9) 55%,
+    rgba(148,163,184,0.25) 80%
+  );
+  background-size: 250% 100%;
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: metal-shimmer-move 6s linear infinite;
+  pointer-events: none;
+  z-index: 1;
+}
+
+@keyframes metal-shimmer-move {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}

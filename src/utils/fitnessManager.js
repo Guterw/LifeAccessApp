@@ -40,6 +40,64 @@ export const calculateDailyCalorieNeed = (profile) => {
 };
 
 // ==========================================
+// META DE PESO (Perda/Ganho) + PRAZO REALISTA
+// ==========================================
+// Regra de segurança: no máximo ~1kg de variação de peso por semana.
+// Isso evita que o usuário defina prazos irreais (ex: perder 10kg em 1 semana).
+const MAX_SAFE_KG_PER_WEEK = 1;
+const MIN_SAFE_KG_PER_WEEK = 0.25; // abaixo disso, o prazo fica longo demais / pouco eficaz
+const KCAL_PER_KG = 7700; // aproximação padrão: 1kg de gordura ≈ 7700 kcal
+
+// Retorna { minWeeks, maxWeeks, diffKg } — o prazo (em semanas) considerado
+// realista para atingir a diferença de peso informada.
+export const getRealisticWeekRange = (currentWeightKg, targetWeightKg) => {
+  const diff = Math.abs(Number(targetWeightKg) - Number(currentWeightKg));
+  if (!diff || diff <= 0) return { minWeeks: 1, maxWeeks: 1, diffKg: 0 };
+
+  const minWeeks = Math.ceil(diff / MAX_SAFE_KG_PER_WEEK);
+  const maxWeeks = Math.ceil(diff / MIN_SAFE_KG_PER_WEEK);
+  return { minWeeks, maxWeeks, diffKg: Number(diff.toFixed(1)) };
+};
+
+// Valida se o número de semanas informado pelo usuário está dentro da faixa segura
+export const isRealisticTimeframe = (currentWeightKg, targetWeightKg, weeks) => {
+  const { minWeeks, maxWeeks } = getRealisticWeekRange(currentWeightKg, targetWeightKg);
+  const w = Number(weeks);
+  if (!w || w <= 0) return false;
+  return w >= minWeeks && w <= maxWeeks;
+};
+
+// Calcula a meta diária de calorias (consumo recomendado) considerando o
+// gasto diário total (TDEE) e o déficit/superávit necessário para atingir
+// o peso alvo dentro do prazo escolhido pelo usuário.
+export const calculateGoalCalorieTarget = (profile) => {
+  const tdee = calculateDailyCalorieNeed(profile);
+
+  if (!profile?.targetWeightKg || !profile?.targetWeeks || !profile?.weightKg) {
+    return { dailyTarget: tdee, dailyAdjustment: 0, direction: 'maintain', tdee };
+  }
+
+  const diffKg = Number(profile.targetWeightKg) - Number(profile.weightKg);
+  if (Math.abs(diffKg) < 0.1) {
+    return { dailyTarget: tdee, dailyAdjustment: 0, direction: 'maintain', tdee };
+  }
+
+  const totalKcalNeeded = Math.abs(diffKg) * KCAL_PER_KG;
+  const totalDays = Number(profile.targetWeeks) * 7;
+  const dailyAdjustment = Math.round(totalKcalNeeded / totalDays);
+
+  const isLoss = diffKg < 0;
+  const dailyTarget = isLoss ? tdee - dailyAdjustment : tdee + dailyAdjustment;
+
+  return {
+    dailyTarget: Math.max(1200, dailyTarget), // nunca sugere abaixo de 1200 kcal (segurança)
+    dailyAdjustment,
+    direction: isLoss ? 'loss' : 'gain',
+    tdee,
+  };
+};
+
+// ==========================================
 // OFENSIVA DE TREINO
 // ==========================================
 export const registerWorkoutActivity = async () => {

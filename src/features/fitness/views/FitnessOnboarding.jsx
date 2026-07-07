@@ -1,9 +1,9 @@
 // src/features/fitness/views/FitnessOnboarding.jsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Dumbbell, Target, Scale, Ruler, Calendar, Sparkles, Loader2, ArrowRight } from 'lucide-react';
+import { Dumbbell, Target, Scale, Ruler, Calendar, Sparkles, Loader2, ArrowRight, TrendingDown, TrendingUp, AlertTriangle, Flame } from 'lucide-react';
 import { useLanguage } from '../../../contexts/LanguageContext';
-import { saveFitnessProfile } from '../../../utils/fitnessManager';
+import { saveFitnessProfile, getRealisticWeekRange, isRealisticTimeframe, calculateGoalCalorieTarget } from '../../../utils/fitnessManager';
 import { generateFitnessPlan } from '../../../services/aiService';
 import { db } from '../../../config/dexieDb';
 import FooterBrand from '../../../components/FooterBrand';
@@ -28,12 +28,41 @@ export default function FitnessOnboarding() {
   const [step, setStep] = useState(0);
   const [isGenerating, setIsGenerating] = useState(false);
   const [answers, setAnswers] = useState({
-    goal: '', weightKg: '', heightCm: '', age: '', gender: 'other', activityLevel: ''
-  });~
-  console.log('[FitnessOnboarding] Renderizando onboarding, step atual:', step);
+    goal: '', weightKg: '', heightCm: '', age: '', gender: 'other', activityLevel: '',
+    targetWeightKg: '', targetWeeks: ''
+  });
 
   const getLabel = (obj) => obj[uiLang] || obj.pt;
 
+  // A etapa de meta de peso só existe quando o objetivo é perder peso ou ganhar músculo
+  const needsWeightGoalStep = answers.goal === 'lose_weight' || answers.goal === 'gain_muscle';
+  const isLossGoal = answers.goal === 'lose_weight';
+
+  const currentWeight = Number(answers.weightKg) || 0;
+  const targetWeight = Number(answers.targetWeightKg) || 0;
+  const targetWeeks = Number(answers.targetWeeks) || 0;
+
+  const weekRange = targetWeight && currentWeight
+    ? getRealisticWeekRange(currentWeight, targetWeight)
+    : null;
+
+  const timeframeIsValid = !targetWeight || !targetWeeks
+    ? false
+    : isRealisticTimeframe(currentWeight, targetWeight, targetWeeks);
+
+  const goalCalorieInfo = (targetWeight && targetWeeks && currentWeight && answers.age && answers.heightCm)
+    ? calculateGoalCalorieTarget({
+        weightKg: currentWeight,
+        heightCm: Number(answers.heightCm),
+        age: Number(answers.age),
+        gender: answers.gender,
+        activityLevel: answers.activityLevel,
+        targetWeightKg: targetWeight,
+        targetWeeks: targetWeeks,
+      })
+    : null;
+
+  // Monta dinamicamente a lista de etapas (a de meta de peso só entra se fizer sentido)
   const steps = [
     {
       key: 'intro',
@@ -94,6 +123,77 @@ export default function FitnessOnboarding() {
         </div>
       )
     },
+    // ==========================================
+    // NOVA ETAPA: Meta de Peso + Prazo Realista
+    // Só é incluída no array de steps se needsWeightGoalStep for true
+    // (ver montagem final da lista logo abaixo)
+    // ==========================================
+    {
+      key: 'weightGoal',
+      render: () => (
+        <div className="flex flex-col gap-4 w-full">
+          <h3 className="text-xl font-bold text-white text-center flex items-center justify-center gap-2">
+            {isLossGoal
+              ? <TrendingDown className="text-red-400" size={22} />
+              : <TrendingUp className="text-green-400" size={22} />}
+            {isLossGoal
+              ? t('fitness.targetWeightLoss', 'Meta de peso (perda)')
+              : t('fitness.targetWeightGain', 'Meta de peso (ganho)')}
+          </h3>
+          <p className="text-gray-400 text-xs text-center -mt-2">
+            {t('fitness.weightGoalStepDesc', 'Isso nos ajuda a calcular quantas calorias você deve consumir por dia.')}
+          </p>
+
+          <input
+            type="number"
+            placeholder={t('fitness.targetWeightPlaceholder', 'Peso alvo (kg)')}
+            value={answers.targetWeightKg}
+            onChange={e => setAnswers(a => ({ ...a, targetWeightKg: e.target.value }))}
+            className="w-full bg-gray-800 text-white p-4 rounded-xl border-2 border-gray-700 focus:border-green-500 focus:outline-none text-center"
+          />
+
+          <input
+            type="number"
+            placeholder={t('fitness.targetWeeksPlaceholder', 'Em quantas semanas? (Ex: 12)')}
+            value={answers.targetWeeks}
+            onChange={e => setAnswers(a => ({ ...a, targetWeeks: e.target.value }))}
+            className="w-full bg-gray-800 text-white p-4 rounded-xl border-2 border-gray-700 focus:border-green-500 focus:outline-none text-center"
+          />
+
+          {weekRange && (
+            <p className="text-[11px] text-gray-500 text-center">
+              {t('fitness.realisticRangeHint', 'Prazo realista e seguro para essa meta')}: {weekRange.minWeeks} {t('fitness.toWeeks', 'a')} {weekRange.maxWeeks} {t('fitness.weeksLabel', 'semanas')} ({weekRange.diffKg}kg)
+            </p>
+          )}
+
+          {answers.targetWeightKg && answers.targetWeeks && !timeframeIsValid && (
+            <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-3 flex items-start gap-2">
+              <AlertTriangle size={16} className="text-red-400 shrink-0 mt-0.5" />
+              <p className="text-xs text-red-300 leading-relaxed">
+                {t('fitness.unrealisticTimeframe', 'Esse prazo não é seguro/realista para essa quantidade de peso. Ajuste o número de semanas dentro da faixa sugerida acima.')}
+              </p>
+            </div>
+          )}
+
+          {goalCalorieInfo && timeframeIsValid && (
+            <div className="bg-orange-500/10 border border-orange-500/20 rounded-xl p-4">
+              <div className="flex items-center gap-2 mb-1">
+                <Flame size={16} className="text-orange-400" />
+                <span className="text-xs font-bold text-orange-300 uppercase tracking-wide">
+                  {t('fitness.recommendedIntake', 'Consumo médio recomendado')}
+                </span>
+              </div>
+              <p className="text-2xl font-black text-white">{goalCalorieInfo.dailyTarget} <span className="text-sm font-bold text-gray-400">kcal/dia</span></p>
+              <p className="text-[11px] text-gray-500 mt-1">
+                {goalCalorieInfo.direction === 'loss'
+                  ? t('fitness.deficitHint', 'Déficit diário de ~{n} kcal em relação ao seu gasto.').replace('{n}', goalCalorieInfo.dailyAdjustment)
+                  : t('fitness.surplusHint', 'Superávit diário de ~{n} kcal em relação ao seu gasto.').replace('{n}', goalCalorieInfo.dailyAdjustment)}
+              </p>
+            </div>
+          )}
+        </div>
+      )
+    },
     {
       key: 'activity',
       render: () => (
@@ -117,65 +217,69 @@ export default function FitnessOnboarding() {
     },
   ];
 
+  // Filtra a etapa "weightGoal" fora do fluxo quando o objetivo não é perda/ganho de peso
+  const activeSteps = steps.filter(s => s.key !== 'weightGoal' || needsWeightGoalStep);
+
   const isStepValid = () => {
-    const key = steps[step].key;
+    const key = activeSteps[step].key;
     if (key === 'goal') return !!answers.goal;
     if (key === 'body') return answers.weightKg && answers.heightCm && answers.age;
+    if (key === 'weightGoal') return !!answers.targetWeightKg && !!answers.targetWeeks && timeframeIsValid;
     if (key === 'activity') return !!answers.activityLevel;
     return true;
   };
 
-const handleFinish = async () => {
-  console.log('[FitnessOnboarding] Finalizando onboarding com respostas:', answers);
-  setIsGenerating(true);
-  try {
-    const savedProfile = await saveFitnessProfile({
-      weightKg: Number(answers.weightKg),
-      heightCm: Number(answers.heightCm),
-      age: Number(answers.age),
-      gender: answers.gender,
-      goal: answers.goal,
-      activityLevel: answers.activityLevel,
-      isOnboarded: true,
-    });
-    console.log('[FitnessOnboarding] Perfil salvo:', savedProfile);
+  const handleFinish = async () => {
+    setIsGenerating(true);
+    try {
+      const savedProfile = await saveFitnessProfile({
+        weightKg: Number(answers.weightKg),
+        heightCm: Number(answers.heightCm),
+        age: Number(answers.age),
+        gender: answers.gender,
+        goal: answers.goal,
+        activityLevel: answers.activityLevel,
+        targetWeightKg: needsWeightGoalStep ? Number(answers.targetWeightKg) : null,
+        targetWeeks: needsWeightGoalStep ? Number(answers.targetWeeks) : null,
+        isOnboarded: true,
+      });
+      console.log('[FitnessOnboarding] Perfil salvo:', savedProfile);
 
-    const plan = await generateFitnessPlan(answers);
-    console.log('[FitnessOnboarding] Plano gerado pela IA:', plan);
+      const plan = await generateFitnessPlan(answers);
 
-    await db.fitnessWeeklyPlan.put({
-      id: 1,
-      generatedAt: new Date().toISOString(),
-      days: plan.days || [],
-    });
+      await db.fitnessWeeklyPlan.put({
+        id: 1,
+        generatedAt: new Date().toISOString(),
+        days: plan.days || [],
+      });
 
-    await db.fitnessProfile.update(1, { aiPlanSummary: plan.summary || '' });
+      await db.fitnessProfile.update(1, { aiPlanSummary: plan.summary || '' });
 
-    navigate('/fitness');
-  } catch (err) {
-    console.error('[FitnessOnboarding] Erro ao finalizar (seguindo mesmo assim):', err);
-    navigate('/fitness');
-  }
-};
+      navigate('/fitness');
+    } catch (err) {
+      console.error('[FitnessOnboarding] Erro ao finalizar (seguindo mesmo assim):', err);
+      navigate('/fitness');
+    }
+  };
 
   const handleNext = () => {
-    if (step < steps.length - 1) setStep(step + 1);
+    if (step < activeSteps.length - 1) setStep(step + 1);
     else handleFinish();
   };
 
   return (
-    <div className="fixed inset-0 bg-gray-900 z-50 flex flex-col items-center justify-between p-6 animate-fade-in">
-      <div className="w-full max-w-sm flex gap-1.5 mt-4">
-        {steps.map((_, i) => (
+    <div className="fixed inset-0 bg-gray-900 z-50 flex flex-col items-center justify-between p-6 animate-fade-in overflow-y-auto">
+      <div className="w-full max-w-sm flex gap-1.5 mt-4 shrink-0">
+        {activeSteps.map((_, i) => (
           <div key={i} className={`h-1.5 flex-1 rounded-full transition-colors ${i <= step ? 'bg-green-500' : 'bg-gray-700'}`} />
         ))}
       </div>
 
-      <div className="flex-1 flex items-center justify-center w-full max-w-sm">
-        {steps[step].render()}
+      <div className="flex-1 flex items-center justify-center w-full max-w-sm py-6">
+        {activeSteps[step].render()}
       </div>
 
-      <div className="w-full max-w-sm">
+      <div className="w-full max-w-sm shrink-0">
         <button
           onClick={handleNext}
           disabled={!isStepValid() || isGenerating}
@@ -183,7 +287,7 @@ const handleFinish = async () => {
         >
           {isGenerating ? (
             <><Loader2 className="animate-spin" size={20} /> {t('fitness.generatingPlan', 'Montando seu plano com IA...')}</>
-          ) : step === steps.length - 1 ? (
+          ) : step === activeSteps.length - 1 ? (
             <><Sparkles size={20} /> {t('fitness.generatePlan', 'Gerar meu plano')}</>
           ) : (
             <>{t('general.continue', 'Continuar')} <ArrowRight size={20} /></>
