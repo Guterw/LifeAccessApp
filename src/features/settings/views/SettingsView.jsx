@@ -168,7 +168,7 @@ export default function SettingsView() {
       <button
         onClick={() => !disabled && onChange && onChange(!checked)}
         disabled={disabled}
-        className={`w-11 h-6 rounded-full p-1 transition-all duration-300 ${
+        className={`w-11 h-6 rounded-full p-1 transition-all duration-300 shrink-0 ${
           disabled ? 'bg-gray-800 cursor-not-allowed opacity-50' : checked ? 'bg-blue-600' : 'bg-gray-700'
         }`}
       >
@@ -206,10 +206,31 @@ export default function SettingsView() {
   // NOVO: TOGGLE DE SINCRONIZAÇÃO AUTOMÁTICA
   // ==========================================
   const handleToggleAutoSync = async (value) => {
-    setAutoSyncEnabled(value);
-    const settings = await db.appSettings.get(1) || { id: 1 };
-    settings.autoSyncEnabled = value;
-    await db.appSettings.put(settings);
+    if (!authUser) return; // sem conta conectada, o toggle não deve fazer nada
+    try {
+      const settings = await db.appSettings.get(1) || { id: 1 };
+      const updated = { ...settings, id: 1, autoSyncEnabled: value };
+      await db.appSettings.put(updated);
+      setAutoSyncEnabled(value);
+
+      // Força uma sincronização imediata ao ativar, em vez de esperar até
+      // 5 minutos pelo próximo ciclo automático — isso corrige a sensação
+      // de "não fez nada" ao apertar o botão.
+      if (value) {
+        setIsSyncing(true);
+        try {
+          await pushToCloud(authUser.uid);
+          const lastSync = await getCloudLastSync(authUser.uid);
+          setCloudLastSync(lastSync);
+        } finally {
+          setIsSyncing(false);
+        }
+      }
+    } catch (err) {
+      console.error('Erro ao alternar sincronização automática:', err);
+      // Reverte visualmente se falhou ao salvar
+      setAutoSyncEnabled(!value);
+    }
   };
 
   // ==========================================
@@ -785,10 +806,10 @@ export default function SettingsView() {
         />
 
         {/* SINCRONIZAÇÃO AUTOMÁTICA — só pode ser ativada com conta Google conectada */}
-        <div className="p-5 flex items-center justify-between bg-blue-900/10">
-          <div className="flex items-center gap-4">
-            <div className="p-2 bg-blue-500/20 rounded-lg text-blue-400"><RefreshCw size={20} /></div>
-            <div>
+        <div className="p-5 flex items-center justify-between gap-3 bg-blue-900/10">
+          <div className="flex items-center gap-4 min-w-0">
+            <div className="p-2 bg-blue-500/20 rounded-lg text-blue-400 shrink-0"><RefreshCw size={20} /></div>
+            <div className="min-w-0">
               <h4 className="font-bold text-white text-sm">{t('settings.autoSync', 'Sincronização Automática')}</h4>
               <p className="text-[11px] text-gray-400 mt-0.5">
                 {authUser

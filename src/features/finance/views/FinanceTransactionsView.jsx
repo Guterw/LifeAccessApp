@@ -6,7 +6,7 @@ import { db } from '../../../config/dexieDb';
 import { useLanguage } from '../../../contexts/LanguageContext';
 import BackButton from '../../../components/BackButton';
 import FooterBrand from '../../../components/FooterBrand';
-import { getExchangeRateBRLtoEUR, convertCurrency, formatCurrencyValue } from '../../../utils/currencyManager';
+import { getExchangeRates, convertCurrency, formatCurrencyValue } from '../../../utils/currencyManager';
 
 export default function FinanceTransactionsView() {
   const { t } = useLanguage();
@@ -20,7 +20,7 @@ export default function FinanceTransactionsView() {
   const transactions = useLiveQuery(() => db.financeTransactions.toArray(), []) || [];
 
   useEffect(() => {
-    getExchangeRateBRLtoEUR().then(setExchangeRate);
+    getExchangeRates().then((r) => setExchangeRate(r.brlToEur));
   }, []);
 
   const convertToPrimary = (tx) => convertCurrency(tx.amount, tx.currency || 'BRL', primaryCurrency, exchangeRate);

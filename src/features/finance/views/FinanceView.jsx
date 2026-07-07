@@ -12,7 +12,7 @@ import BackButton from '../../../components/BackButton';
 import FooterBrand from '../../../components/FooterBrand';
 import { todayKey } from '../../../utils/calendarUtils';
 import {
-  getExchangeRateBRLtoEUR, convertCurrency, setPrimaryCurrency, CURRENCY_SYMBOLS, formatCurrencyValue
+  getExchangeRates, convertCurrency, setPrimaryCurrency, CURRENCY_SYMBOLS, formatCurrencyValue
 } from '../../../utils/currencyManager';
 
 const EXPENSE_CATEGORIES = ['Moradia', 'Alimentação', 'Transporte', 'Lazer', 'Contas', 'Saúde', 'Outros'];
@@ -60,58 +60,67 @@ function AddTransactionModal({ defaultType = 'expense', primaryCurrency, onClose
           </button>
         </div>
 
+        {/* TUDO EMPILHADO VERTICALMENTE — sem nada lado a lado */}
         <form onSubmit={handleSubmit} className="space-y-5">
-          <div className="grid grid-cols-2 gap-3">
+
+          {/* Tipo: Gasto / Receita, um embaixo do outro */}
+          <div className="flex flex-col gap-3">
             <button
               type="button"
               onClick={() => handleTypeChange('expense')}
-              className={`p-3 rounded-xl border-2 flex flex-col items-center gap-1.5 transition-all ${
+              className={`w-full p-3 rounded-xl border-2 flex items-center justify-center gap-2 transition-all ${
                 type === 'expense' ? 'bg-red-500/10 border-red-500 text-red-400' : 'bg-gray-800 border-gray-700 text-gray-400'
               }`}
             >
-              <ArrowDownCircle size={22} />
-              <span className="text-xs font-bold">{t('finance.expense', 'Gasto')}</span>
+              <ArrowDownCircle size={20} />
+              <span className="text-sm font-bold">{t('finance.expense', 'Gasto')}</span>
             </button>
             <button
               type="button"
               onClick={() => handleTypeChange('income')}
-              className={`p-3 rounded-xl border-2 flex flex-col items-center gap-1.5 transition-all ${
+              className={`w-full p-3 rounded-xl border-2 flex items-center justify-center gap-2 transition-all ${
                 type === 'income' ? 'bg-green-500/10 border-green-500 text-green-400' : 'bg-gray-800 border-gray-700 text-gray-400'
               }`}
             >
-              <ArrowUpCircle size={22} />
-              <span className="text-xs font-bold">{t('finance.income', 'Receita')}</span>
+              <ArrowUpCircle size={20} />
+              <span className="text-sm font-bold">{t('finance.income', 'Receita')}</span>
             </button>
           </div>
 
+          {/* Valor */}
           <div>
             <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2">
               {t('finance.amount', 'Valor')}
             </label>
-            <div className="flex gap-2">
-              <input
-                type="text"
-                inputMode="decimal"
-                autoFocus
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                placeholder="0,00"
-                className="flex-1 bg-gray-800 text-white p-4 rounded-xl border-2 border-gray-700 focus:border-blue-500 focus:outline-none text-2xl font-black text-center"
-              />
-              <div className="flex bg-gray-800 rounded-xl border-2 border-gray-700 overflow-hidden shrink-0">
-                {['BRL', 'EUR'].map((cur) => (
-                  <button
-                    key={cur}
-                    type="button"
-                    onClick={() => setCurrency(cur)}
-                    className={`px-3 font-black text-sm transition-colors ${
-                      currency === cur ? 'bg-blue-600 text-white' : 'text-gray-400'
-                    }`}
-                  >
-                    {CURRENCY_SYMBOLS[cur]}
-                  </button>
-                ))}
-              </div>
+            <input
+              type="text"
+              inputMode="decimal"
+              autoFocus
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              placeholder="0,00"
+              className="w-full bg-gray-800 text-white p-4 rounded-xl border-2 border-gray-700 focus:border-blue-500 focus:outline-none text-2xl font-black text-center"
+            />
+          </div>
+
+          {/* Moeda do valor — agora EMBAIXO do input, não ao lado */}
+          <div>
+            <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2">
+              {t('finance.transactionCurrency', 'Moeda deste valor')}
+            </label>
+            <div className="flex bg-gray-800 rounded-xl border-2 border-gray-700 overflow-hidden w-full">
+              {['BRL', 'EUR'].map((cur) => (
+                <button
+                  key={cur}
+                  type="button"
+                  onClick={() => setCurrency(cur)}
+                  className={`flex-1 py-3 font-black text-sm transition-colors ${
+                    currency === cur ? 'bg-blue-600 text-white' : 'text-gray-400'
+                  }`}
+                >
+                  {CURRENCY_SYMBOLS[cur]} {cur}
+                </button>
+              ))}
             </div>
           </div>
 
@@ -172,7 +181,7 @@ export default function FinanceView() {
   const navigate = useNavigate();
   const [modalOpen, setModalOpen] = useState(false);
   const [modalDefaultType, setModalDefaultType] = useState('expense');
-  const [exchangeRate, setExchangeRate] = useState(0.17);
+  const [rates, setRates] = useState({ brlToEur: 0.17, eurToBrl: 5.9, updatedAt: null });
   const [isRefreshingRate, setIsRefreshingRate] = useState(false);
 
   const appSettings = useLiveQuery(() => db.appSettings.get(1)) || {};
@@ -182,16 +191,16 @@ export default function FinanceView() {
 
   useEffect(() => {
     const loadRate = async () => {
-      const rate = await getExchangeRateBRLtoEUR();
-      setExchangeRate(rate);
+      const r = await getExchangeRates();
+      setRates(r);
     };
     loadRate();
   }, []);
 
   const handleRefreshRate = async () => {
     setIsRefreshingRate(true);
-    const rate = await getExchangeRateBRLtoEUR(true);
-    setExchangeRate(rate);
+    const r = await getExchangeRates(true);
+    setRates(r);
     setIsRefreshingRate(false);
   };
 
@@ -205,13 +214,13 @@ export default function FinanceView() {
     let income = 0, expense = 0;
     transactions.forEach((tx) => {
       const txCurrency = tx.currency || 'BRL';
-      const converted = convertCurrency(tx.amount, txCurrency, primaryCurrency, exchangeRate);
+      const converted = convertCurrency(tx.amount, txCurrency, primaryCurrency, rates.brlToEur);
       if (tx.type === 'income') income += converted;
       else expense += converted;
     });
     const sorted = [...transactions].sort((a, b) => new Date(b.date + 'T' + (b.createdAt?.split('T')[1] || '00:00')) - new Date(a.date + 'T' + (a.createdAt?.split('T')[1] || '00:00')));
     return { totalIncome: income, totalExpense: expense, balance: income - expense, recent: sorted.slice(0, 5) };
-  }, [transactions, primaryCurrency, exchangeRate]);
+  }, [transactions, primaryCurrency, rates]);
 
   const openModal = (type) => {
     setModalDefaultType(type);
@@ -221,6 +230,15 @@ export default function FinanceView() {
   const handleSaveTransaction = async (data) => {
     await db.financeTransactions.add(data);
     setModalOpen(false);
+  };
+
+  const formatDate = (isoStr) => {
+    if (!isoStr) return null;
+    try {
+      return new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short', timeStyle: 'short' }).format(new Date(isoStr));
+    } catch {
+      return isoStr;
+    }
   };
 
   return (
@@ -237,19 +255,20 @@ export default function FinanceView() {
         </div>
       </div>
 
-      {/* SELETOR DE MOEDA PRINCIPAL + COTAÇÃO */}
-      <div className="bg-gray-800/60 rounded-2xl border border-gray-700 p-3 mb-4 flex items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
+      {/* SELETOR DE MOEDA PRINCIPAL + COTAÇÃO NAS DUAS DIREÇÕES */}
+      <div className="bg-gray-800/60 rounded-2xl border border-gray-700 p-4 mb-4">
+        <div className="flex items-center justify-between gap-3 mb-3">
           <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">
             {t('finance.primaryCurrency', 'Moeda Principal')}
           </span>
-          <div className="flex bg-gray-900 rounded-lg border border-gray-700 overflow-hidden">
+          {/* Espaçamento corrigido: gap entre os dois botões + padding melhor */}
+          <div className="flex bg-gray-900 rounded-lg border border-gray-700 overflow-hidden gap-0.5 p-0.5">
             {['BRL', 'EUR'].map((cur) => (
               <button
                 key={cur}
                 onClick={() => handleChangePrimaryCurrency(cur)}
-                className={`px-3 py-1 text-xs font-black transition-colors ${
-                  primaryCurrency === cur ? 'bg-emerald-600 text-white' : 'text-gray-400'
+                className={`px-4 py-1.5 rounded-md text-xs font-black transition-colors ${
+                  primaryCurrency === cur ? 'bg-emerald-600 text-white' : 'text-gray-400 hover:text-gray-200'
                 }`}
               >
                 {cur}
@@ -257,14 +276,29 @@ export default function FinanceView() {
             ))}
           </div>
         </div>
+
+        {/* Cotações reais, uma embaixo da outra */}
+        <div className="space-y-1.5 bg-gray-900/50 rounded-xl p-3">
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-gray-400 font-medium">1 R$ (BRL) =</span>
+            <span className="text-sm font-black text-white">€ {rates.brlToEur.toFixed(4)}</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-gray-400 font-medium">1 € (EUR) =</span>
+            <span className="text-sm font-black text-white">R$ {rates.eurToBrl.toFixed(4)}</span>
+          </div>
+        </div>
+
         <button
           onClick={handleRefreshRate}
           disabled={isRefreshingRate}
-          className="flex items-center gap-1.5 text-[10px] font-bold text-gray-400 hover:text-white transition-colors shrink-0"
-          title={t('finance.refreshRate', 'Atualizar cotação')}
+          className="flex items-center gap-1.5 text-[10px] font-bold text-gray-400 hover:text-white transition-colors mt-2"
         >
           <RefreshCw size={12} className={isRefreshingRate ? 'animate-spin' : ''} />
-          1 R$ = {exchangeRate.toFixed(4)} €
+          {t('finance.refreshRate', 'Atualizar cotação')}
+          {rates.updatedAt && (
+            <span className="text-gray-600 font-normal">• {formatDate(rates.updatedAt)}</span>
+          )}
         </button>
       </div>
 
