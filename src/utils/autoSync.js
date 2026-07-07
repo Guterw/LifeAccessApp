@@ -1,16 +1,22 @@
 // src/utils/autoSync.js
 import { db } from '../config/dexieDb';
 import { auth } from '../config/firebaseConfig';
-import { pushToCloud } from './cloudSync';
+import { pushToCloud, pullFromCloud, getCloudLastSync } from './cloudSync';
 
 // Tabelas que, quando alteradas (criadas/editadas/apagadas), marcam o app
 // como "sujo" e elegível para o próximo ciclo de sincronização automática.
-// Cobre: exercícios de idioma concluídos, exercícios fitness concluídos,
-// perfil/configurações, finanças, tarefas/lembretes/contadores do calendário.
+// Cobre: idiomas, fitness, jejum, finanças, calendário e configurações/perfil.
 const DIRTY_TABLES = [
   'completedLevels',
   'completedAlphaNum',
+  'alphaNumProgress',
+  'levelProgress',
+  'learnedWords',
+  'mistakesLog',
   'completedFitnessExercises',
+  'fitnessExerciseProgress',
+  'fitnessWeeklyPlan',
+  'fastingSessions',
   'financeTransactions',
   'tasks',
   'counters',
@@ -18,7 +24,6 @@ const DIRTY_TABLES = [
   'fitnessStreak',
   'appSettings',
   'userProfile',
-  'fastingSessions',
 ];
 
 const SYNC_INTERVAL_MS = 5 * 60 * 1000; // a cada 5 minutos
@@ -67,12 +72,46 @@ const runSyncIfNeeded = async () => {
   }
 };
 
+// Ao iniciar o app, se houver algo mais novo salvo na nuvem (feito em outro
+// dispositivo) e não houver mudanças locais pendentes de envio, traz
+// automaticamente esses dados para este dispositivo.
+const runInitialPullIfNeeded = async () => {
+  try {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const settings = await db.appSettings.get(1);
+    if (!settings?.autoSyncEnabled) return;
+    if (dirty) return; // se há mudanças locais não enviadas, prioriza push antes de puxar
+
+    const remoteLastSync = await getCloudLastSync(user.uid);
+    if (!remoteLastSync) return;
+
+    const localKnownRemote = settings.lastKnownRemoteSync || null;
+    const remoteIsNewer = !localKnownRemote || new Date(remoteLastSync) > new Date(localKnownRemote);
+
+    if (remoteIsNewer) {
+      await pullFromCloud(user.uid);
+      await db.appSettings.update(1, { lastKnownRemoteSync: remoteLastSync });
+    }
+  } catch (err) {
+    console.error('[autoSync] Falha no pull automático inicial:', err);
+  }
+};
+
 export const startAutoSync = () => {
   attachDirtyHooks();
   if (intervalId) return;
-  intervalId = setInterval(runSyncIfNeeded, SYNC_INTERVAL_MS);
-  // Tenta uma vez ao iniciar o app, caso haja algo pendente de uma sessão anterior.
-  runSyncIfNeeded();
+
+  // Primeiro tenta trazer o que houver de mais novo na nuvem, depois liga
+  // o ciclo periódico de envio automático quando algo mudar localmente.
+  runInitialPullIfNeeded().then(() => {
+    runSyncIfNeeded();
+  });
+
+  intervalId = setInterval(() => {
+    runSyncIfNeeded();
+  }, SYNC_INTERVAL_MS);
 };
 
 export const stopAutoSync = () => {

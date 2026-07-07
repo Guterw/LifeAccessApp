@@ -20,6 +20,7 @@ import { pushToCloud, pullFromCloud, deleteCloudData, hasCloudBackup, getCloudLa
 import { calculateLevel, repairUserProfile } from '../../../utils/xpManager';
 import { todayKey } from '../../../utils/calendarUtils';
 import { pullHealthData, pushHealthData, isHealthBridgeNative } from '../../../utils/healthSync';
+import { getExchangeRateBRLtoEUR, convertCurrency, formatCurrencyValue } from '../../../utils/currencyManager';
 
 export default function SettingsView() {
   const { t, userName, uiLang, changeLanguage, languageStreak } = useLanguage();
@@ -70,15 +71,28 @@ export default function SettingsView() {
   // NOVO: FINANÇAS — resumo (receitas, gastos, saldo)
   // ==========================================
   const financeTransactions = useLiveQuery(() => db.financeTransactions.toArray()) || [];
+    const primaryCurrency = useLiveQuery(async () => {
+      const settings = await db.appSettings.get(1);
+      return settings?.primaryCurrency || 'BRL';
+    }) || 'BRL';
+    const [exchangeRateSettings, setExchangeRateSettings] = useState(0.17);
+
+    useEffect(() => {
+      getExchangeRateBRLtoEUR().then(setExchangeRateSettings);
+    }, []);
+
   const financeSummary = React.useMemo(() => {
-    let income = 0, expense = 0;
-    financeTransactions.forEach((tx) => {
-      if (tx.type === 'income') income += tx.amount;
-      else expense += tx.amount;
-    });
-    return { income, expense, balance: income - expense };
-  }, [financeTransactions]);
-  const formatCurrency = (val) => `R$ ${Number(val || 0).toFixed(2).replace('.', ',')}`;
+      let income = 0, expense = 0;
+      financeTransactions.forEach((tx) => {
+        const txCurrency = tx.currency || 'BRL';
+        const converted = convertCurrency(tx.amount, txCurrency, primaryCurrency, exchangeRateSettings);
+        if (tx.type === 'income') income += converted;
+        else expense += converted;
+      });
+      return { income, expense, balance: income - expense };
+    }, [financeTransactions, primaryCurrency, exchangeRateSettings]);
+
+  const formatCurrency = (val) => formatCurrencyValue(val, primaryCurrency);
 
   // ==========================================
   // NOVO: CALENDÁRIO — tarefas pendentes, lembretes ativos, contadores ativos
@@ -150,14 +164,17 @@ export default function SettingsView() {
     await db.appSettings.update(1, { [key]: value });
   };
 
-  const Toggle = ({ checked, onChange }) => (
-    <button
-      onClick={() => onChange(!checked)}
-      className={`w-11 h-6 rounded-full p-1 transition-all duration-300 ${checked ? 'bg-blue-600' : 'bg-gray-700'}`}
-    >
-      <div className={`w-4 h-4 bg-white rounded-full transition-transform duration-300 ${checked ? 'translate-x-5' : 'translate-x-0'}`} />
-    </button>
-  );
+  const Toggle = ({ checked, onChange, disabled = false }) => (
+      <button
+        onClick={() => !disabled && onChange && onChange(!checked)}
+        disabled={disabled}
+        className={`w-11 h-6 rounded-full p-1 transition-all duration-300 ${
+          disabled ? 'bg-gray-800 cursor-not-allowed opacity-50' : checked ? 'bg-blue-600' : 'bg-gray-700'
+        }`}
+      >
+        <div className={`w-4 h-4 bg-white rounded-full transition-transform duration-300 ${checked ? 'translate-x-5' : 'translate-x-0'}`} />
+      </button>
+    );
 
   const handlePermission = async () => {
     if (permission === 'granted') {
@@ -208,11 +225,16 @@ export default function SettingsView() {
       settings.healthLastSync = new Date().toISOString();
       await db.appSettings.put(settings);
       setHealthLastSync(settings.healthLastSync);
-      setHealthResultMsg(
-        result.simulated
-          ? t('settings.healthPullSimulated', `Trazido (estimativa): ${result.steps} passos, ${result.caloriesBurned} kcal. Conecte um app nativo para dados reais.`)
-          : t('settings.healthPullSuccess', `Dados trazidos: ${result.steps} passos, ${result.caloriesBurned} kcal.`)
-      );
+
+      if (result.simulated) {
+        setHealthResultMsg(
+          result.alreadyCountedToday
+            ? t('settings.healthPullSimulatedNoDup', `Estimativa de hoje: ${result.steps} passos, ${result.caloriesBurned} kcal (já contabilizado hoje). Conecte um app nativo para dados reais.`)
+            : t('settings.healthPullSimulatedNew', `Trazido (estimativa): ${result.steps} passos, ${result.caloriesBurned} kcal. Conecte um app nativo para dados reais.`)
+        );
+      } else {
+        setHealthResultMsg(t('settings.healthPullSuccessNew', `Dados trazidos: ${result.steps} passos, ${result.caloriesBurned} kcal.`));
+      }
     } catch (err) {
       setHealthResultMsg(t('settings.healthError', 'Erro ao sincronizar com o app de saúde.'));
     } finally {
@@ -232,8 +254,8 @@ export default function SettingsView() {
       setHealthLastSync(settings.healthLastSync);
       setHealthResultMsg(
         result.simulated
-          ? t('settings.healthPushSimulated', 'Simulado: em um app nativo, isso enviaria suas calorias para o Health/Fit.')
-          : t('settings.healthPushSuccess', 'Dados enviados para o app de saúde com sucesso!')
+          ? t('settings.healthPushSimulatedNew', 'Simulado: em um app nativo, isso enviaria suas calorias para o Health/Fit.')
+          : t('settings.healthPushSuccessNew', 'Dados enviados para o app de saúde com sucesso!')
       );
     } catch (err) {
       setHealthResultMsg(t('settings.healthError', 'Erro ao sincronizar com o app de saúde.'));
@@ -310,15 +332,17 @@ export default function SettingsView() {
   };
 
   const handleDisconnectGoogle = async () => {
-    if (window.confirm(t('settings.disconnectConfirm', 'Tem certeza que deseja desconectar sua conta? Seus dados não serão mais sincronizados na nuvem.'))) {
-      await signOut(auth);
-      const settings = await db.appSettings.get(1);
-      if (settings) {
-        settings.userEmail = null;
-        await db.appSettings.put(settings);
+      if (window.confirm(t('settings.disconnectConfirm', 'Tem certeza que deseja desconectar sua conta? Seus dados não serão mais sincronizados na nuvem.'))) {
+        await signOut(auth);
+        const settings = await db.appSettings.get(1);
+        if (settings) {
+          settings.userEmail = null;
+          settings.autoSyncEnabled = false; // sem conta conectada, não faz sentido manter ativo
+          await db.appSettings.put(settings);
+          setAutoSyncEnabled(false);
+        }
       }
-    }
-  };
+    };
 
   const handleCloudSync = async () => {
     if (!authUser || isSyncing) return;
@@ -725,6 +749,21 @@ export default function SettingsView() {
           </button>
         </div>
 
+        <div className="mt-4 flex items-center justify-between bg-gray-900/40 rounded-xl p-3">
+          <div className="min-w-0 pr-3">
+            <p className="text-xs font-bold text-white">{t('settings.healthAutoSync', 'Sincronização automática de Saúde')}</p>
+            <p className="text-[10px] text-gray-500 mt-0.5">{t('settings.healthAutoSyncDesc', 'Roda em segundo plano, é local e leve')}</p>
+          </div>
+          <Toggle
+            checked={!!fitnessProfile.autoHealthSyncEnabled}
+            onChange={async (val) => {
+              const profile = await db.fitnessProfile.get(1) || { id: 1 };
+              profile.autoHealthSyncEnabled = val;
+              await db.fitnessProfile.put(profile);
+            }}
+          />
+        </div>
+
         {fitnessProfile.lastHealthSteps !== undefined && (
           <div className="mt-3 flex items-center gap-2 text-xs text-gray-400">
             <Footprints size={14} className="text-pink-400" />
@@ -745,23 +784,29 @@ export default function SettingsView() {
           onChange={handleFileChange}
         />
 
-        {/* NOVO: TOGGLE DE SINCRONIZAÇÃO AUTOMÁTICA */}
+        {/* SINCRONIZAÇÃO AUTOMÁTICA — só pode ser ativada com conta Google conectada */}
         <div className="p-5 flex items-center justify-between bg-blue-900/10">
           <div className="flex items-center gap-4">
             <div className="p-2 bg-blue-500/20 rounded-lg text-blue-400"><RefreshCw size={20} /></div>
             <div>
               <h4 className="font-bold text-white text-sm">{t('settings.autoSync', 'Sincronização Automática')}</h4>
               <p className="text-[11px] text-gray-400 mt-0.5">
-                {t('settings.autoSyncDesc', 'Envia para a nuvem a cada ~5 min quando algo é concluído/alterado')}
+                {authUser
+                  ? t('settings.autoSyncDesc', 'Envia para a nuvem a cada ~5 min quando algo é concluído/alterado')
+                  : t('settings.autoSyncNeedsAccount', 'Conecte-se ao Google abaixo para poder ativar a sincronização automática.')}
               </p>
-              {lastAutoSync && (
+              {authUser && lastAutoSync && (
                 <p className="text-[10px] text-gray-500 mt-0.5">
                   {t('settings.lastAutoSync', 'Última sinc. automática')}: {formatDate(lastAutoSync)}
                 </p>
               )}
             </div>
           </div>
-          <Toggle checked={autoSyncEnabled} onChange={handleToggleAutoSync} />
+          <Toggle
+            checked={authUser ? autoSyncEnabled : false}
+            onChange={handleToggleAutoSync}
+            disabled={!authUser}
+          />
         </div>
 
         {authUser ? (

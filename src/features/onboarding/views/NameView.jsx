@@ -2,14 +2,25 @@ import React, { useState } from 'react';
 import { useLanguage } from '../../../contexts/LanguageContext';
 import { User, ArrowRight } from 'lucide-react';
 import FooterBrand from '../../../components/FooterBrand';
+import { db } from '../../../config/dexieDb';
 
 export default function NameView() {
   const { finishOnboarding, t } = useLanguage();
   const [nameVal, setNameVal] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (nameVal.trim().length > 1) {
+      // Fluxo OFFLINE: não há conta Google/nuvem conectada, então a
+      // sincronização automática não faz sentido aqui — já deixamos
+      // desativada e marcamos a preferência como "já definida" para que
+      // o SyncPreferenceGuard não pergunte de novo (o usuário pode
+      // ativar manualmente depois em Configurações, se conectar ao Google).
+      const settings = await db.appSettings.get(1) || { id: 1 };
+      settings.autoSyncEnabled = false;
+      await db.appSettings.put(settings);
+      localStorage.setItem('lifeaccess_syncpref_set', 'true');
+
       finishOnboarding(nameVal.trim());
     }
   };

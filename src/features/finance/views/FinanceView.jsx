@@ -1,23 +1,27 @@
 // src/features/finance/views/FinanceView.jsx
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
 import {
   TrendingUp, TrendingDown, Wallet, Receipt, X, Plus, Minus,
-  ArrowUpCircle, ArrowDownCircle, ChevronRight, PiggyBank
+  ArrowUpCircle, ArrowDownCircle, ChevronRight, PiggyBank, RefreshCw
 } from 'lucide-react';
 import { db } from '../../../config/dexieDb';
 import { useLanguage } from '../../../contexts/LanguageContext';
 import BackButton from '../../../components/BackButton';
 import FooterBrand from '../../../components/FooterBrand';
 import { todayKey } from '../../../utils/calendarUtils';
+import {
+  getExchangeRateBRLtoEUR, convertCurrency, setPrimaryCurrency, CURRENCY_SYMBOLS, formatCurrencyValue
+} from '../../../utils/currencyManager';
 
 const EXPENSE_CATEGORIES = ['Moradia', 'Alimentação', 'Transporte', 'Lazer', 'Contas', 'Saúde', 'Outros'];
 const INCOME_CATEGORIES = ['Salário', 'Freelance', 'Investimentos', 'Presente', 'Outros'];
 
-function AddTransactionModal({ defaultType = 'expense', onClose, onSave, t }) {
+function AddTransactionModal({ defaultType = 'expense', primaryCurrency, onClose, onSave, t }) {
   const [type, setType] = useState(defaultType);
   const [amount, setAmount] = useState('');
+  const [currency, setCurrency] = useState(primaryCurrency);
   const [category, setCategory] = useState(defaultType === 'expense' ? EXPENSE_CATEGORIES[0] : INCOME_CATEGORIES[0]);
   const [description, setDescription] = useState('');
   const [date, setDate] = useState(todayKey());
@@ -36,6 +40,7 @@ function AddTransactionModal({ defaultType = 'expense', onClose, onSave, t }) {
     onSave({
       type,
       amount: parsedAmount,
+      currency,
       category,
       description: description.trim(),
       date,
@@ -81,17 +86,33 @@ function AddTransactionModal({ defaultType = 'expense', onClose, onSave, t }) {
 
           <div>
             <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2">
-              {t('finance.amount', 'Valor (R$)')}
+              {t('finance.amount', 'Valor')}
             </label>
-            <input
-              type="text"
-              inputMode="decimal"
-              autoFocus
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              placeholder="0,00"
-              className="w-full bg-gray-800 text-white p-4 rounded-xl border-2 border-gray-700 focus:border-blue-500 focus:outline-none text-2xl font-black text-center"
-            />
+            <div className="flex gap-2">
+              <input
+                type="text"
+                inputMode="decimal"
+                autoFocus
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                placeholder="0,00"
+                className="flex-1 bg-gray-800 text-white p-4 rounded-xl border-2 border-gray-700 focus:border-blue-500 focus:outline-none text-2xl font-black text-center"
+              />
+              <div className="flex bg-gray-800 rounded-xl border-2 border-gray-700 overflow-hidden shrink-0">
+                {['BRL', 'EUR'].map((cur) => (
+                  <button
+                    key={cur}
+                    type="button"
+                    onClick={() => setCurrency(cur)}
+                    className={`px-3 font-black text-sm transition-colors ${
+                      currency === cur ? 'bg-blue-600 text-white' : 'text-gray-400'
+                    }`}
+                  >
+                    {CURRENCY_SYMBOLS[cur]}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
 
           <div>
@@ -151,20 +172,46 @@ export default function FinanceView() {
   const navigate = useNavigate();
   const [modalOpen, setModalOpen] = useState(false);
   const [modalDefaultType, setModalDefaultType] = useState('expense');
+  const [exchangeRate, setExchangeRate] = useState(0.17);
+  const [isRefreshingRate, setIsRefreshingRate] = useState(false);
+
+  const appSettings = useLiveQuery(() => db.appSettings.get(1)) || {};
+  const primaryCurrency = appSettings.primaryCurrency || 'BRL';
 
   const transactions = useLiveQuery(() => db.financeTransactions.toArray(), []) || [];
 
+  useEffect(() => {
+    const loadRate = async () => {
+      const rate = await getExchangeRateBRLtoEUR();
+      setExchangeRate(rate);
+    };
+    loadRate();
+  }, []);
+
+  const handleRefreshRate = async () => {
+    setIsRefreshingRate(true);
+    const rate = await getExchangeRateBRLtoEUR(true);
+    setExchangeRate(rate);
+    setIsRefreshingRate(false);
+  };
+
+  const handleChangePrimaryCurrency = async (cur) => {
+    await setPrimaryCurrency(cur);
+  };
+
+  // Converte cada transação (que pode estar em BRL ou EUR) para a moeda
+  // principal escolhida, usando a cotação real, antes de somar os totais.
   const { totalIncome, totalExpense, balance, recent } = useMemo(() => {
     let income = 0, expense = 0;
     transactions.forEach((tx) => {
-      if (tx.type === 'income') income += tx.amount;
-      else expense += tx.amount;
+      const txCurrency = tx.currency || 'BRL';
+      const converted = convertCurrency(tx.amount, txCurrency, primaryCurrency, exchangeRate);
+      if (tx.type === 'income') income += converted;
+      else expense += converted;
     });
     const sorted = [...transactions].sort((a, b) => new Date(b.date + 'T' + (b.createdAt?.split('T')[1] || '00:00')) - new Date(a.date + 'T' + (a.createdAt?.split('T')[1] || '00:00')));
     return { totalIncome: income, totalExpense: expense, balance: income - expense, recent: sorted.slice(0, 5) };
-  }, [transactions]);
-
-  const formatCurrency = (val) => `R$ ${val.toFixed(2).replace('.', ',')}`;
+  }, [transactions, primaryCurrency, exchangeRate]);
 
   const openModal = (type) => {
     setModalDefaultType(type);
@@ -180,14 +227,45 @@ export default function FinanceView() {
     <div className="w-full pt-8 animate-fade-in pb-24 px-4 -mt-5 -mb-20 min-h-screen">
       <BackButton to="/" label={t('backToHome', 'Voltar')} />
 
-      <div className="flex items-center gap-3 mb-6 -mt-3">
+      <div className="flex items-center gap-3 mb-4 -mt-3">
         <div className="p-3 bg-emerald-500/20 text-emerald-400 rounded-2xl">
           <Wallet size={28} />
         </div>
-        <div>
+        <div className="flex-1">
           <h2 className="text-2xl font-black text-white">{t('finance.title', 'Finanças')}</h2>
           <p className="text-xs text-gray-500 font-bold uppercase tracking-wide">{t('finance.subtitle', 'Controle de Gastos e Receitas')}</p>
         </div>
+      </div>
+
+      {/* SELETOR DE MOEDA PRINCIPAL + COTAÇÃO */}
+      <div className="bg-gray-800/60 rounded-2xl border border-gray-700 p-3 mb-4 flex items-center justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">
+            {t('finance.primaryCurrency', 'Moeda Principal')}
+          </span>
+          <div className="flex bg-gray-900 rounded-lg border border-gray-700 overflow-hidden">
+            {['BRL', 'EUR'].map((cur) => (
+              <button
+                key={cur}
+                onClick={() => handleChangePrimaryCurrency(cur)}
+                className={`px-3 py-1 text-xs font-black transition-colors ${
+                  primaryCurrency === cur ? 'bg-emerald-600 text-white' : 'text-gray-400'
+                }`}
+              >
+                {cur}
+              </button>
+            ))}
+          </div>
+        </div>
+        <button
+          onClick={handleRefreshRate}
+          disabled={isRefreshingRate}
+          className="flex items-center gap-1.5 text-[10px] font-bold text-gray-400 hover:text-white transition-colors shrink-0"
+          title={t('finance.refreshRate', 'Atualizar cotação')}
+        >
+          <RefreshCw size={12} className={isRefreshingRate ? 'animate-spin' : ''} />
+          1 R$ = {exchangeRate.toFixed(4)} €
+        </button>
       </div>
 
       {/* CARD DE SALDO */}
@@ -201,21 +279,21 @@ export default function FinanceView() {
           {t('finance.currentBalance', 'Saldo Atual')}
         </p>
         <h3 className={`text-4xl font-black relative z-10 ${balance >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
-          {formatCurrency(balance)}
+          {formatCurrencyValue(balance, primaryCurrency)}
         </h3>
         <div className="flex gap-6 mt-5 relative z-10">
           <div className="flex items-center gap-2">
             <TrendingUp size={16} className="text-green-400" />
             <div>
               <p className="text-[9px] text-gray-400 uppercase font-bold">{t('finance.income', 'Receitas')}</p>
-              <p className="text-sm font-bold text-green-400">{formatCurrency(totalIncome)}</p>
+              <p className="text-sm font-bold text-green-400">{formatCurrencyValue(totalIncome, primaryCurrency)}</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
             <TrendingDown size={16} className="text-red-400" />
             <div>
               <p className="text-[9px] text-gray-400 uppercase font-bold">{t('finance.expense', 'Gastos')}</p>
-              <p className="text-sm font-bold text-red-400">{formatCurrency(totalExpense)}</p>
+              <p className="text-sm font-bold text-red-400">{formatCurrencyValue(totalExpense, primaryCurrency)}</p>
             </div>
           </div>
         </div>
@@ -262,22 +340,25 @@ export default function FinanceView() {
             {t('finance.noTransactions', 'Nenhuma transação registrada ainda.')}
           </div>
         ) : (
-          recent.map((tx) => (
-            <div key={tx.id} className="bg-gray-800 rounded-2xl border border-gray-700 p-4 flex items-center justify-between shadow-sm">
-              <div className="flex items-center gap-3 min-w-0">
-                <div className={`p-2 rounded-lg shrink-0 ${tx.type === 'income' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
-                  {tx.type === 'income' ? <ArrowUpCircle size={18} /> : <ArrowDownCircle size={18} />}
+          recent.map((tx) => {
+            const txCurrency = tx.currency || 'BRL';
+            return (
+              <div key={tx.id} className="bg-gray-800 rounded-2xl border border-gray-700 p-4 flex items-center justify-between shadow-sm">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className={`p-2 rounded-lg shrink-0 ${tx.type === 'income' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
+                    {tx.type === 'income' ? <ArrowUpCircle size={18} /> : <ArrowDownCircle size={18} />}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-sm font-bold text-white truncate">{tx.description || tx.category}</p>
+                    <p className="text-[10px] text-gray-500 font-bold uppercase">{tx.category} • {tx.date.slice(5).split('-').reverse().join('/')} • {txCurrency}</p>
+                  </div>
                 </div>
-                <div className="min-w-0">
-                  <p className="text-sm font-bold text-white truncate">{tx.description || tx.category}</p>
-                  <p className="text-[10px] text-gray-500 font-bold uppercase">{tx.category} • {tx.date.slice(5).split('-').reverse().join('/')}</p>
-                </div>
+                <span className={`text-sm font-black shrink-0 ${tx.type === 'income' ? 'text-green-400' : 'text-red-400'}`}>
+                  {tx.type === 'income' ? '+' : '-'}{formatCurrencyValue(tx.amount, txCurrency)}
+                </span>
               </div>
-              <span className={`text-sm font-black shrink-0 ${tx.type === 'income' ? 'text-green-400' : 'text-red-400'}`}>
-                {tx.type === 'income' ? '+' : '-'}{formatCurrency(tx.amount)}
-              </span>
-            </div>
-          ))
+            );
+          })
         )}
       </div>
 
@@ -288,6 +369,7 @@ export default function FinanceView() {
       {modalOpen && (
         <AddTransactionModal
           defaultType={modalDefaultType}
+          primaryCurrency={primaryCurrency}
           onClose={() => setModalOpen(false)}
           onSave={handleSaveTransaction}
           t={t}

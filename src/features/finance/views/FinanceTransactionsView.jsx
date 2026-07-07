@@ -1,32 +1,43 @@
 // src/features/finance/views/FinanceTransactionsView.jsx
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { Trash2, ArrowUpCircle, ArrowDownCircle, AlertTriangle, X, FileSpreadsheet } from 'lucide-react';
 import { db } from '../../../config/dexieDb';
 import { useLanguage } from '../../../contexts/LanguageContext';
 import BackButton from '../../../components/BackButton';
 import FooterBrand from '../../../components/FooterBrand';
+import { getExchangeRateBRLtoEUR, convertCurrency, formatCurrencyValue } from '../../../utils/currencyManager';
 
 export default function FinanceTransactionsView() {
   const { t } = useLanguage();
   const [filter, setFilter] = useState('all'); // all | income | expense
   const [deleteModal, setDeleteModal] = useState({ open: false, id: null });
+  const [exchangeRate, setExchangeRate] = useState(0.17);
+
+  const appSettings = useLiveQuery(() => db.appSettings.get(1)) || {};
+  const primaryCurrency = appSettings.primaryCurrency || 'BRL';
 
   const transactions = useLiveQuery(() => db.financeTransactions.toArray(), []) || [];
 
-  const formatCurrency = (val) => `R$ ${val.toFixed(2).replace('.', ',')}`;
+  useEffect(() => {
+    getExchangeRateBRLtoEUR().then(setExchangeRate);
+  }, []);
 
-  // Ordena do mais antigo para o mais recente para calcular o saldo acumulado corretamente,
-  // depois inverte para exibir do mais recente para o mais antigo (com saldo já calculado).
+  const convertToPrimary = (tx) => convertCurrency(tx.amount, tx.currency || 'BRL', primaryCurrency, exchangeRate);
+
+  // Ordena do mais antigo para o mais recente para calcular o saldo acumulado
+  // (já convertido para a moeda principal), depois inverte para exibir do mais
+  // recente para o mais antigo.
   const rowsWithRunningBalance = useMemo(() => {
     const sortedAsc = [...transactions].sort((a, b) => new Date(a.date) - new Date(b.date) || new Date(a.createdAt) - new Date(b.createdAt));
     let running = 0;
     const withBalance = sortedAsc.map((tx) => {
-      running += tx.type === 'income' ? tx.amount : -tx.amount;
+      const convertedAmount = convertToPrimary(tx);
+      running += tx.type === 'income' ? convertedAmount : -convertedAmount;
       return { ...tx, runningBalance: running };
     });
     return withBalance.reverse();
-  }, [transactions]);
+  }, [transactions, primaryCurrency, exchangeRate]);
 
   const filteredRows = useMemo(() => {
     if (filter === 'all') return rowsWithRunningBalance;
@@ -36,11 +47,12 @@ export default function FinanceTransactionsView() {
   const totals = useMemo(() => {
     let income = 0, expense = 0;
     transactions.forEach((tx) => {
-      if (tx.type === 'income') income += tx.amount;
-      else expense += tx.amount;
+      const converted = convertToPrimary(tx);
+      if (tx.type === 'income') income += converted;
+      else expense += converted;
     });
     return { income, expense, balance: income - expense };
-  }, [transactions]);
+  }, [transactions, primaryCurrency, exchangeRate]);
 
   const handleDelete = async () => {
     if (deleteModal.id) await db.financeTransactions.delete(deleteModal.id);
@@ -57,7 +69,9 @@ export default function FinanceTransactionsView() {
         </div>
         <div>
           <h2 className="text-2xl font-black text-white">{t('finance.statementTitle', 'Planilha / Extrato')}</h2>
-          <p className="text-xs text-gray-500 font-bold uppercase tracking-wide">{t('finance.statementSubtitle', 'Todos os lançamentos')}</p>
+          <p className="text-xs text-gray-500 font-bold uppercase tracking-wide">
+            {t('finance.statementSubtitle', 'Todos os lançamentos')} • {t('finance.convertedTo', 'convertido para')} {primaryCurrency}
+          </p>
         </div>
       </div>
 
@@ -65,15 +79,15 @@ export default function FinanceTransactionsView() {
       <div className="grid grid-cols-3 gap-3 mb-5">
         <div className="bg-gray-800 rounded-2xl border border-gray-700 p-3 text-center">
           <p className="text-[9px] text-gray-500 font-bold uppercase mb-1">{t('finance.income', 'Receitas')}</p>
-          <p className="text-sm font-black text-green-400">{formatCurrency(totals.income)}</p>
+          <p className="text-sm font-black text-green-400">{formatCurrencyValue(totals.income, primaryCurrency)}</p>
         </div>
         <div className="bg-gray-800 rounded-2xl border border-gray-700 p-3 text-center">
           <p className="text-[9px] text-gray-500 font-bold uppercase mb-1">{t('finance.expense', 'Gastos')}</p>
-          <p className="text-sm font-black text-red-400">{formatCurrency(totals.expense)}</p>
+          <p className="text-sm font-black text-red-400">{formatCurrencyValue(totals.expense, primaryCurrency)}</p>
         </div>
         <div className={`rounded-2xl border p-3 text-center ${totals.balance >= 0 ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-red-500/10 border-red-500/30'}`}>
           <p className="text-[9px] text-gray-400 font-bold uppercase mb-1">{t('finance.balance', 'Saldo')}</p>
-          <p className={`text-sm font-black ${totals.balance >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>{formatCurrency(totals.balance)}</p>
+          <p className={`text-sm font-black ${totals.balance >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>{formatCurrencyValue(totals.balance, primaryCurrency)}</p>
         </div>
       </div>
 
@@ -103,34 +117,43 @@ export default function FinanceTransactionsView() {
             {t('finance.noTransactions', 'Nenhuma transação registrada ainda.')}
           </div>
         ) : (
-          filteredRows.map((tx) => (
-            <div key={tx.id} className="bg-gray-800 rounded-2xl border border-gray-700 p-4 shadow-sm">
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-2 min-w-0">
-                  {tx.type === 'income'
-                    ? <ArrowUpCircle size={16} className="text-green-400 shrink-0" />
-                    : <ArrowDownCircle size={16} className="text-red-400 shrink-0" />
-                  }
-                  <span className="text-sm font-bold text-white truncate">{tx.description || tx.category}</span>
+          filteredRows.map((tx) => {
+            const txCurrency = tx.currency || 'BRL';
+            const showsConverted = txCurrency !== primaryCurrency;
+            return (
+              <div key={tx.id} className="bg-gray-800 rounded-2xl border border-gray-700 p-4 shadow-sm">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2 min-w-0">
+                    {tx.type === 'income'
+                      ? <ArrowUpCircle size={16} className="text-green-400 shrink-0" />
+                      : <ArrowDownCircle size={16} className="text-red-400 shrink-0" />
+                    }
+                    <span className="text-sm font-bold text-white truncate">{tx.description || tx.category}</span>
+                  </div>
+                  <button onClick={() => setDeleteModal({ open: true, id: tx.id })} className="p-1.5 text-gray-500 hover:text-red-400 shrink-0">
+                    <Trash2 size={15} />
+                  </button>
                 </div>
-                <button onClick={() => setDeleteModal({ open: true, id: tx.id })} className="p-1.5 text-gray-500 hover:text-red-400 shrink-0">
-                  <Trash2 size={15} />
-                </button>
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-gray-500 font-bold">{tx.category} • {tx.date.split('-').reverse().join('/')} • {txCurrency}</span>
+                  <span className={`font-black ${tx.type === 'income' ? 'text-green-400' : 'text-red-400'}`}>
+                    {tx.type === 'income' ? '+' : '-'}{formatCurrencyValue(tx.amount, txCurrency)}
+                    {showsConverted && (
+                      <span className="text-[10px] text-gray-500 font-normal ml-1">
+                        (~{formatCurrencyValue(convertToPrimary(tx), primaryCurrency)})
+                      </span>
+                    )}
+                  </span>
+                </div>
+                <div className="mt-2 pt-2 border-t border-gray-700/60 flex justify-between items-center">
+                  <span className="text-[9px] text-gray-500 uppercase font-bold tracking-widest">{t('finance.balanceAfter', 'Saldo acumulado')} ({primaryCurrency})</span>
+                  <span className={`text-xs font-black ${tx.runningBalance >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                    {formatCurrencyValue(tx.runningBalance, primaryCurrency)}
+                  </span>
+                </div>
               </div>
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-gray-500 font-bold">{tx.category} • {tx.date.split('-').reverse().join('/')}</span>
-                <span className={`font-black ${tx.type === 'income' ? 'text-green-400' : 'text-red-400'}`}>
-                  {tx.type === 'income' ? '+' : '-'}{formatCurrency(tx.amount)}
-                </span>
-              </div>
-              <div className="mt-2 pt-2 border-t border-gray-700/60 flex justify-between items-center">
-                <span className="text-[9px] text-gray-500 uppercase font-bold tracking-widest">{t('finance.balanceAfter', 'Saldo acumulado')}</span>
-                <span className={`text-xs font-black ${tx.runningBalance >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
-                  {formatCurrency(tx.runningBalance)}
-                </span>
-              </div>
-            </div>
-          ))
+            );
+          })
         )}
       </div>
 

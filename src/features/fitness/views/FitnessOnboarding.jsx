@@ -28,9 +28,9 @@ export default function FitnessOnboarding() {
   const [step, setStep] = useState(0);
   const [isGenerating, setIsGenerating] = useState(false);
   const [answers, setAnswers] = useState({
-    goal: '', weightKg: '', heightCm: '', age: '', gender: 'other', activityLevel: '',
-    targetWeightKg: '', targetWeeks: ''
-  });
+      goal: '', weightKg: '', heightCm: '', age: '', gender: 'other', activityLevel: '',
+      targetWeightKg: '', targetWeeks: '', healthAutoSync: null
+    });
 
   const getLabel = (obj) => obj[uiLang] || obj.pt;
 
@@ -77,6 +77,40 @@ export default function FitnessOnboarding() {
           <p className="text-gray-400 text-sm leading-relaxed">
             {t('fitness.introDesc', 'Vou fazer algumas perguntas rápidas para montar um plano de treino sob medida para você, usando o mesmo motor de IA que te ajuda com inglês.')}
           </p>
+        </div>
+      )
+    },
+    {
+      key: 'healthAutoSync',
+      render: () => (
+        <div className="flex flex-col gap-4 w-full text-center">
+          <div className="w-20 h-20 bg-pink-500/20 rounded-full flex items-center justify-center mx-auto">
+            <span className="text-3xl">❤️‍🔥</span>
+          </div>
+          <h3 className="text-xl font-bold text-white flex items-center justify-center gap-2">
+            {t('fitness.healthAutoSyncQuestion', 'Sincronizar Saúde automaticamente?')}
+          </h3>
+          <p className="text-gray-400 text-sm leading-relaxed">
+            {t('fitness.healthAutoSyncDesc', 'Podemos sincronizar seus passos e calorias com o Apple Health / Google Fit automaticamente em segundo plano, sem precisar clicar em nada. Por ser uma sincronização local no seu dispositivo, é bem leve.')}
+          </p>
+          <div className="grid grid-cols-1 gap-3 mt-2">
+            <button
+              onClick={() => setAnswers(a => ({ ...a, healthAutoSync: true }))}
+              className={`p-4 rounded-2xl border-2 font-bold transition-all ${
+                answers.healthAutoSync === true ? 'bg-pink-500/20 border-pink-500 text-white' : 'bg-gray-800 border-gray-700 text-gray-300'
+              }`}
+            >
+              {t('fitness.healthAutoSyncEnable', 'Sim, sincronizar automaticamente')}
+            </button>
+            <button
+              onClick={() => setAnswers(a => ({ ...a, healthAutoSync: false }))}
+              className={`p-4 rounded-2xl border-2 font-bold transition-all ${
+                answers.healthAutoSync === false ? 'bg-gray-700/60 border-gray-500 text-white' : 'bg-gray-800 border-gray-700 text-gray-300'
+              }`}
+            >
+              {t('fitness.healthAutoSyncDisable', 'Não, prefiro sincronizar manualmente')}
+            </button>
+          </div>
         </div>
       )
     },
@@ -221,13 +255,14 @@ export default function FitnessOnboarding() {
   const activeSteps = steps.filter(s => s.key !== 'weightGoal' || needsWeightGoalStep);
 
   const isStepValid = () => {
-    const key = activeSteps[step].key;
-    if (key === 'goal') return !!answers.goal;
-    if (key === 'body') return answers.weightKg && answers.heightCm && answers.age;
-    if (key === 'weightGoal') return !!answers.targetWeightKg && !!answers.targetWeeks && timeframeIsValid;
-    if (key === 'activity') return !!answers.activityLevel;
-    return true;
-  };
+      const key = activeSteps[step].key;
+      if (key === 'goal') return !!answers.goal;
+      if (key === 'body') return answers.weightKg && answers.heightCm && answers.age;
+      if (key === 'weightGoal') return !!answers.targetWeightKg && !!answers.targetWeeks && timeframeIsValid;
+      if (key === 'activity') return !!answers.activityLevel;
+      if (key === 'healthAutoSync') return answers.healthAutoSync !== null;
+      return true;
+    };
 
   const handleFinish = async () => {
     setIsGenerating(true);
@@ -241,6 +276,7 @@ export default function FitnessOnboarding() {
         activityLevel: answers.activityLevel,
         targetWeightKg: needsWeightGoalStep ? Number(answers.targetWeightKg) : null,
         targetWeeks: needsWeightGoalStep ? Number(answers.targetWeeks) : null,
+        autoHealthSyncEnabled: !!answers.healthAutoSync,
         isOnboarded: true,
       });
       console.log('[FitnessOnboarding] Perfil salvo:', savedProfile);

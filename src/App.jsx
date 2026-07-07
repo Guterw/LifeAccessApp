@@ -8,10 +8,15 @@ import BottomNav from './components/BottomNav';
 import { useLanguage } from './contexts/LanguageContext';
 import FirstLaunchGuard from './components/FirstLaunchGuard';
 import SyncPreferenceGuard from './components/SyncPreferenceGuard';
+import { startAutoSync } from './utils/autoSync';
+import { startAutoHealthSync } from './utils/autoHealthSync';
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth } from './config/firebaseConfig';
 
 import WelcomeView from './features/onboarding/views/WelcomeView';
-import SyncChoiceView from './features/onboarding/views/SyncChoiceView'; // <-- NOVA TELA IMPORTADA AQUI
+import SyncChoiceView from './features/onboarding/views/SyncChoiceView';
 import NameView from './features/onboarding/views/NameView';
+import SyncPrefStepView from './features/onboarding/views/SyncPrefStepView'; // <-- NOVA ETAPA
 
 import MainDashboard from './features/dashboard/views/MainDashboard';
 import LanguagesDashboard from './features/languages/views/LanguagesDashboard';
@@ -59,42 +64,67 @@ import FitnessWorkoutsView from './features/fitness/views/FitnessWorkoutsView';
 function App() {
   const { isFirstAccess } = useLanguage();
   const [onboardingStep, setOnboardingStep] = useState(1);
-  
-useEffect(() => {
-  repairUserProfile();
 
-  const interval = setInterval(async () => {
-    const settings = await db.appSettings.get(1);
-    if (settings) {
-      checkAllNotifications(settings, [], {});
-    }
-  }, 1000 * 60 * 30);
+  useEffect(() => {
+    repairUserProfile();
 
-  // NOVO: checagem de tarefas/lembretes a cada 1 minuto (mais preciso)
-  checkTaskNotifications();
-  const taskInterval = setInterval(() => {
+    // Sincronização automática de saúde (Health/Fit) — roda independente de login,
+    // pois é uma sincronização local/estimada no próprio dispositivo.
+    startAutoHealthSync();
+
+    // Sincronização automática com a nuvem — só ativa de fato quando há uma
+    // conta Google conectada (checado dentro de autoSync.js a cada ciclo).
+    // Reagimos ao login/logout para (re)iniciar o pull inicial imediatamente.
+    const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
+      if (user) startAutoSync();
+    });
+    startAutoSync();
+
+    const interval = setInterval(async () => {
+      const settings = await db.appSettings.get(1);
+      if (settings) {
+        checkAllNotifications(settings, [], {});
+      }
+    }, 1000 * 60 * 30);
+
+    // NOVO: checagem de tarefas/lembretes a cada 1 minuto (mais preciso)
     checkTaskNotifications();
-  }, 1000 * 60);
+    const taskInterval = setInterval(() => {
+      checkTaskNotifications();
+    }, 1000 * 60);
 
-  return () => {
-    clearInterval(interval);
-    clearInterval(taskInterval);
-  };
-}, []);
+    return () => {
+      clearInterval(interval);
+      clearInterval(taskInterval);
+      unsubscribeAuth();
+    };
+  }, []);
 
-  
   // ==========================================
   // FLUXO DE ONBOARDING ATUALIZADO
   // Passo 1: Idioma
-  // Passo 2: Google vs Offline (NOVO)
-  // Passo 3: Digitar Nome (Apenas se escolheu offline)
+  // Passo 2: Google vs Offline
+  //   -> Se escolher Google: login + pull/push da nuvem, depois vai para o Passo 4
+  //      (escolha de sincronização automática), SEM recarregar a página no meio do caminho.
+  //   -> Se escolher Offline: vai para o Passo 3 (digitar nome) e finaliza direto,
+  //      já com autoSyncEnabled = false (não tem nuvem pra sincronizar).
+  // Passo 3: Digitar Nome (apenas fluxo offline)
+  // Passo 4: Escolha de Sincronização Automática (apenas fluxo Google)
   // ==========================================
   if (isFirstAccess) {
     if (onboardingStep === 1) return <WelcomeView onNext={() => setOnboardingStep(2)} />;
-    if (onboardingStep === 2) return <SyncChoiceView onOffline={() => setOnboardingStep(3)} />;
+    if (onboardingStep === 2) {
+      return (
+        <SyncChoiceView
+          onOffline={() => setOnboardingStep(3)}
+          onGoogleSuccess={() => setOnboardingStep(4)}
+        />
+      );
+    }
     if (onboardingStep === 3) return <NameView />;
+    if (onboardingStep === 4) return <SyncPrefStepView />;
   }
-  
+
   return (
     <HashRouter>
       {/* Guardião de Permissões: Aparece só DEPOIS do Onboarding e ANTES de liberar o app principal */}

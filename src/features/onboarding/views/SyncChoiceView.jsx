@@ -14,7 +14,7 @@ import { db } from '../../../config/dexieDb';
 import { pullFromCloud, pushToCloud } from '../../../utils/cloudSync';
 import { repairUserProfile } from '../../../utils/xpManager';
 
-export default function SyncChoiceView({ onOffline }) {
+export default function SyncChoiceView({ onOffline, onGoogleSuccess }) {
   const { t } = useLanguage();
   const [isLoading, setIsLoading] = useState(false);
   
@@ -27,6 +27,7 @@ export default function SyncChoiceView({ onOffline }) {
       const user = result.user;
       
       // 2. Tenta puxar o backup da nuvem (Celular novo ou reinstalação)
+      // Isso já é o "Baixar" automático dos dados assim que loga com Google.
       const hasBackup = await pullFromCloud(user.uid);
       
       if (!hasBackup) {
@@ -34,22 +35,25 @@ export default function SyncChoiceView({ onOffline }) {
         const settings = await db.appSettings.get(1) || { id: 1 };
         settings.userName = user.displayName.split(' ')[0]; // Pega só o primeiro nome
         settings.userEmail = user.email;
-        settings.isFirstAccess = false; 
         await db.appSettings.put(settings);
         
         await pushToCloud(user.uid); // Cria a primeira versão na nuvem
       } else {
         // Se já tinha backup, ele puxou com sucesso para o Dexie.
-        // Garante que a flag de primeiro acesso seja desativada e que
-        // o level/xp puxados estejam matematicamente consistentes.
+        // Garante que o email/nome fiquem registrados e que o level/xp
+        // puxados estejam matematicamente consistentes.
         const settings = await db.appSettings.get(1) || { id: 1 };
-        settings.isFirstAccess = false;
+        settings.userEmail = user.email;
+        if (!settings.userName) settings.userName = user.displayName.split(' ')[0];
         await db.appSettings.put(settings);
         await repairUserProfile();
       }
 
-      // 3. Redireciona o usuário direto para o app
-      window.location.href = '/LifeAccessApp/'; 
+      // 3. NÃO recarrega a página aqui. Avança para a etapa de escolha de
+      // sincronização automática dentro do próprio fluxo de onboarding.
+      // O isFirstAccess só será marcado como concluído ao final dessa etapa.
+      setIsLoading(false);
+      onGoogleSuccess();
       
     } catch (error) {
       console.error("Erro no login com Google:", error);
