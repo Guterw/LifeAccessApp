@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { db } from '../config/dexieDb';
 import { translations } from '../locales/translations';
-import { toDateKey, diffInDays } from '../utils/calendarUtils';
+import { registerLanguageActivity as registerLanguageActivityDb } from '../utils/languageManager';
 
 const LanguageContext = createContext();
 
@@ -20,12 +20,24 @@ export const LanguageProvider = ({ children }) => {
         setUiLang(settings.uiLanguage);
         setIsFirstAccess(settings.isFirstAccess);
         setUserName(settings.userName || '');
-        setLanguageStreak(settings.languageStreak || 0); // Puxa do DB
       } else {
         await db.appSettings.put({ 
-          id: 1, uiLanguage: 'pt', isFirstAccess: true, userName: '', languageStreak: 0 
+          id: 1, uiLanguage: 'pt', isFirstAccess: true, userName: '' 
         });
       }
+
+      // OFENSIVA DE IDIOMAS: agora vive em tabela dedicada (languageStreak),
+      // no mesmo padrão do Fitness (fitnessStreak). Isso é mais resistente
+      // a corridas de escrita e a sobrescritas parciais do que um campo
+      // solto dentro de appSettings.
+      const streakRecord = await db.languageStreak.get(1);
+      if (streakRecord) {
+        setLanguageStreak(streakRecord.streak || 0);
+      } else {
+        await db.languageStreak.put({ id: 1, streak: 0, lastLanguageActivity: null });
+        setLanguageStreak(0);
+      }
+
       setIsLoading(false);
     };
     loadSettings();
@@ -44,44 +56,11 @@ export const LanguageProvider = ({ children }) => {
     await db.appSettings.update(1, { isFirstAccess: false, userName: name });
   };
 
-  // LÓGICA DE OFENSIVA (STREAK)
+  // LÓGICA DE OFENSIVA (STREAK) — delega para a tabela dedicada languageStreak
   const registerLanguageActivity = async () => {
-  const settings = await db.appSettings.get(1);
-
-  const todayStr = toDateKey(new Date());
-  const oldStreak = settings.languageStreak || 0;
-  const lastActivityStr = settings.lastLanguageActivity
-    ? toDateKey(new Date(settings.lastLanguageActivity))
-    : null;
-
-  let newStreak = oldStreak;
-
-  if (lastActivityStr === todayStr) {
-    // Já estudou hoje — nada muda, nenhuma animação.
-    return { increased: false, oldStreak, newStreak: oldStreak };
-  }
-
-  if (lastActivityStr) {
-    const diffDays = diffInDays(lastActivityStr, todayStr);
-    if (diffDays === 1) {
-      newStreak = oldStreak + 1; // Manteve a ofensiva
-    } else {
-      newStreak = 1; // Quebrou a ofensiva, recomeça do 1
-    }
-  } else {
-    newStreak = 1; // Primeiro dia de estudo
-  }
-
-  await db.appSettings.update(1, {
-    languageStreak: newStreak,
-    lastLanguageActivity: new Date().toISOString()
-  });
-  setLanguageStreak(newStreak);
-
-  // Só é "aumento" de verdade se o número realmente mudou
-  const increased = newStreak !== oldStreak;
-
-  return { increased, oldStreak, newStreak };
+    const result = await registerLanguageActivityDb();
+    setLanguageStreak(result.newStreak);
+    return result;
   };
 
   // A função T() é quem vai traduzir os textos nas telas. 
@@ -103,7 +82,7 @@ export const LanguageProvider = ({ children }) => {
   return (
     <LanguageContext.Provider value={{ 
       uiLang, changeLanguage, isFirstAccess, finishOnboarding, t, userName, 
-      languageStreak, registerLanguageActivity // NOVOS AQUI
+      languageStreak, registerLanguageActivity
     }}>
       {children}
     </LanguageContext.Provider>

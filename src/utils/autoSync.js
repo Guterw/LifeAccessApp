@@ -5,7 +5,6 @@ import { pushToCloud, pullFromCloud, getCloudLastSync } from './cloudSync';
 
 // Tabelas que, quando alteradas (criadas/editadas/apagadas), marcam o app
 // como "sujo" e elegível para o próximo ciclo de sincronização automática.
-// Cobre: idiomas, fitness, jejum, finanças, calendário e configurações/perfil.
 const DIRTY_TABLES = [
   'completedLevels',
   'completedAlphaNum',
@@ -26,14 +25,54 @@ const DIRTY_TABLES = [
   'userProfile',
 ];
 
-const SYNC_INTERVAL_MS = 5 * 60 * 1000; // a cada 5 minutos
+const SYNC_INTERVAL_MS = 5 * 60 * 1000; // ciclo periódico de segurança (5 min)
+const QUICK_PUSH_DEBOUNCE_MS = 4000; // tenta subir ~4s após qualquer mudança relevante
 
-let dirty = false;
+// ==========================================
+// CORREÇÃO CRÍTICA: persistência do "dirty"
+// ==========================================
+// Antes, a flag "dirty" só existia em memória (let dirty = false). Se o app
+// fosse fechado (ou o Android matasse o processo) antes do ciclo periódico
+// de 5 minutos enviar os dados para a nuvem, essa informação se perdia.
+// Na próxima abertura, o app achava que não havia nada pendente e fazia um
+// PULL da nuvem — sobrescrevendo progresso local recém-feito (ex: ofensiva,
+// XP, exercícios concluídos) com a versão antiga salva na nuvem.
+//
+// Agora a flag também é persistida no localStorage, que sobrevive a
+// fechamentos/reaberturas do app, e o pull inicial NUNCA roda enquanto
+// houver algo pendente de envio — nesse caso, primeiro tentamos enviar.
+const DIRTY_STORAGE_KEY = 'lifeaccess_sync_dirty';
+
+const readDirtyFromStorage = () => {
+  try {
+    return localStorage.getItem(DIRTY_STORAGE_KEY) === '1';
+  } catch (_) {
+    return false;
+  }
+};
+
+let dirty = readDirtyFromStorage();
 let intervalId = null;
 let hooksAttached = false;
+let quickPushTimer = null;
+let visibilityHandlerAttached = false;
 
 export const markSyncDirty = () => {
   dirty = true;
+  try { localStorage.setItem(DIRTY_STORAGE_KEY, '1'); } catch (_) {}
+
+  // Agenda um envio rápido (debounced) em vez de esperar até 5 minutos.
+  // Isso reduz drasticamente a janela em que o app pode ser fechado com
+  // dados ainda não enviados para a nuvem.
+  if (quickPushTimer) clearTimeout(quickPushTimer);
+  quickPushTimer = setTimeout(() => {
+    runSyncIfNeeded();
+  }, QUICK_PUSH_DEBOUNCE_MS);
+};
+
+const clearDirty = () => {
+  dirty = false;
+  try { localStorage.removeItem(DIRTY_STORAGE_KEY); } catch (_) {}
 };
 
 const attachDirtyHooks = () => {
@@ -62,19 +101,25 @@ const runSyncIfNeeded = async () => {
     if (!settings?.autoSyncEnabled) return;
     if (!dirty) return;
 
+    const nowIso = new Date().toISOString();
     await pushToCloud(user.uid);
-    dirty = false;
-    await db.appSettings.update(1, { lastAutoSync: new Date().toISOString() });
+    clearDirty();
+    // Ao subir com sucesso, também atualizamos "lastKnownRemoteSync" para o
+    // horário atual, já que agora a nuvem reflete exatamente este estado
+    // local — evita um pull desnecessário logo em seguida.
+    await db.appSettings.update(1, { lastAutoSync: nowIso, lastKnownRemoteSync: nowIso });
   } catch (err) {
-    // Falha silenciosa: não queremos interromper o uso do app por causa
-    // de um erro de sincronização em background.
+    // Falha silenciosa: não interrompe o uso do app por causa de um erro
+    // de sincronização em segundo plano. A flag "dirty" permanece true
+    // (não foi limpa), então a próxima tentativa vai tentar de novo.
     console.error('[autoSync] Falha na sincronização automática:', err);
   }
 };
 
-// Ao iniciar o app, se houver algo mais novo salvo na nuvem (feito em outro
-// dispositivo) e não houver mudanças locais pendentes de envio, traz
-// automaticamente esses dados para este dispositivo.
+// Ao iniciar o app: se há mudanças locais pendentes de envio (inclusive de
+// uma sessão anterior que foi fechada antes do envio terminar), a
+// prioridade é subir essas mudanças primeiro. Puxar da nuvem agora
+// apagaria esse progresso local ainda não sincronizado.
 const runInitialPullIfNeeded = async () => {
   try {
     const user = auth.currentUser;
@@ -82,7 +127,11 @@ const runInitialPullIfNeeded = async () => {
 
     const settings = await db.appSettings.get(1);
     if (!settings?.autoSyncEnabled) return;
-    if (dirty) return; // se há mudanças locais não enviadas, prioriza push antes de puxar
+
+    if (dirty) {
+      await runSyncIfNeeded();
+      return;
+    }
 
     const remoteLastSync = await getCloudLastSync(user.uid);
     if (!remoteLastSync) return;
@@ -99,12 +148,32 @@ const runInitialPullIfNeeded = async () => {
   }
 };
 
+// Melhor esforço: quando o app vai para segundo plano/é minimizado ou a aba
+// é fechada, tenta subir imediatamente qualquer alteração pendente, em vez
+// de depender só do timer de 5 minutos ou do debounce de 4s.
+const attachVisibilityFlush = () => {
+  if (visibilityHandlerAttached) return;
+  visibilityHandlerAttached = true;
+  if (typeof document === 'undefined') return;
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden' && dirty) {
+      runSyncIfNeeded();
+    }
+  });
+
+  if (typeof window !== 'undefined') {
+    window.addEventListener('pagehide', () => {
+      if (dirty) runSyncIfNeeded();
+    });
+  }
+};
+
 export const startAutoSync = () => {
   attachDirtyHooks();
+  attachVisibilityFlush();
   if (intervalId) return;
 
-  // Primeiro tenta trazer o que houver de mais novo na nuvem, depois liga
-  // o ciclo periódico de envio automático quando algo mudar localmente.
   runInitialPullIfNeeded().then(() => {
     runSyncIfNeeded();
   });
@@ -118,6 +187,10 @@ export const stopAutoSync = () => {
   if (intervalId) {
     clearInterval(intervalId);
     intervalId = null;
+  }
+  if (quickPushTimer) {
+    clearTimeout(quickPushTimer);
+    quickPushTimer = null;
   }
 };
 

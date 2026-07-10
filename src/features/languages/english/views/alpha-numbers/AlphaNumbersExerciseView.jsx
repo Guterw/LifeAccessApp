@@ -350,6 +350,10 @@ export default function AlphaNumbersExerciseView() {
   if (isLevelCompleted || (isLoaded && queue.length === 0)) {
     return (
       <div className="w-full pt-8 animate-fade-in px-4 min-h-screen flex flex-col items-center justify-center text-center">
+        <StreakModal
+          streakUpdate={showStreakModal ? streakUpdate : null}
+          onClose={() => setShowStreakModal(false)}
+        />
         <div className="w-24 h-24 bg-green-500/20 text-green-400 rounded-full flex items-center justify-center mb-6 shadow-[0_0_40px_rgba(34,197,94,0.3)] animate-bounce">
           <PartyPopper size={48} />
         </div>

@@ -197,6 +197,7 @@ export default function LevelView() {
 
         const streakResult = await registerLanguageActivity();
         setStreakUpdate(streakResult);
+        if (streakResult?.increased) setShowStreakModal(true);   // <-- ADD THIS LINE
 
         // Salva a conclusão no banco para atualizar o card na tela anterior
         await db.completedLevels.put({

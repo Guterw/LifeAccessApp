@@ -312,6 +312,10 @@ const [showStreakModal, setShowStreakModal] = useState(false);
   if (taskSuccess) {
     return (
       <div className="fixed inset-x-0 top-0 bottom-[80px] bg-gray-950 flex flex-col items-center justify-center p-6 text-center animate-fade-in z-10">
+        <StreakModal
+          streakUpdate={showStreakModal ? streakUpdate : null}
+          onClose={() => setShowStreakModal(false)}
+        />
         <div className="w-24 h-24 bg-green-500/20 rounded-full flex items-center justify-center mb-6">
           <CheckCircle2 className="text-green-500" size={48} />
         </div>
