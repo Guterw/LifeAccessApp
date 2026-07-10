@@ -1,5 +1,5 @@
 // src/features/languages/english/views/TrailView.jsx
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { 
@@ -22,6 +22,21 @@ export default function TrailView() {
   const completedAlphaNum = useLiveQuery(() => db.completedAlphaNum.toArray()) || [];
   const completedVocab = useLiveQuery(() => db.completedLevels.toArray()) || [];
   const userProfile = useLiveQuery(() => db.userProfile.get(1)) || { currentLevel: 0, totalXp: 0 };
+  const nodeRefs = useRef({});
+  
+  useEffect(() => {
+    // Pequeno delay para garantir que o layout (imagens, waves, etc.) já renderizou
+    const timer = setTimeout(() => {
+      const targetIndex = currentUnlockedIndex === -1 ? ENGLISH_TRAIL.length - 1 : currentUnlockedIndex;
+      const targetNode = ENGLISH_TRAIL[targetIndex];
+      const el = targetNode && nodeRefs.current[targetNode.id];
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 400);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const getText = (textObj) => {
     if (!textObj) return '';
@@ -34,6 +49,17 @@ export default function TrailView() {
     }
     if (node.type === 'vocab') {
       return completedVocab.some(c => c.level === node.targetId);
+    }
+    if (node.type === 'task') {
+      // Bosses de chat ficam salvos em 'completedAiTasks', os de voz em 'completedVoiceTasks'.
+      const isVoiceTask = node.path.includes('/ai-voice/');
+      const storageKey = isVoiceTask ? 'completedVoiceTasks' : 'completedAiTasks';
+      try {
+        const saved = JSON.parse(localStorage.getItem(storageKey) || '[]');
+        return saved.some(id => String(id) === String(node.targetId));
+      } catch {
+        return false;
+      }
     }
     return false;
   };
@@ -65,8 +91,11 @@ export default function TrailView() {
     const xOffset = getTranslateX(globalIndex);
 
     return (
-      <div key={node.id} className={`relative z-10 flex flex-col items-center ${xOffset} transition-all duration-700 ease-out py-6`}>
-        
+      <div
+        key={node.id}
+        ref={(el) => { nodeRefs.current[node.id] = el; }}
+        className={`relative z-10 flex flex-col items-center ${xOffset} transition-all duration-700 ease-out py-6`}
+      >
         {/* BALÃO DA FASE ATUAL COM O POMBO */}
         {isCurrent && (
           <div className="absolute -top-20 animate-bounce flex flex-col items-center z-40">

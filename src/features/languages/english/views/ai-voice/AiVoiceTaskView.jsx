@@ -37,6 +37,7 @@ IMPORTANT RULES:
 1. Speak naturally and keep answers concise like a real phone call (1-3 short sentences max).
 2. Stay strictly in character. Do not break character.
 3. Do not use markdown or emojis. Just plain spoken English.
+4. If (and only if) the user's LAST message satisfies the completion condition above (isCompleted = true), your "reply" MUST be a short, warm, natural closing/farewell line that wraps up this specific call in-character (e.g. saying goodbye, confirming the order/task is done) — do not leave the conversation hanging.
 
 Respond ONLY with a valid JSON object matching this exact structure:
 {
@@ -91,7 +92,7 @@ export default function AiVoiceTaskView() {
   const { taskId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const { t, uiLang } = useLanguage();
+  const { t, uiLang, registerLanguageActivity } = useLanguage();
   const [streakUpdate, setStreakUpdate] = useState(null);
 const [showStreakModal, setShowStreakModal] = useState(false);
   const backRoute = location.state?.fromTrail 

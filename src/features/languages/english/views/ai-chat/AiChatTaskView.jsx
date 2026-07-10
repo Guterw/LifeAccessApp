@@ -43,6 +43,7 @@ IMPORTANT RULES:
 1. Stay strictly in character. Never break character.
 2. The "reply" must be your in-character dialogue ONLY.
 3. If the user makes a grammar mistake, explain it IN ${nativeLang} inside the "correction" field.
+4. If (and only if) the user's LAST message satisfies the completion condition above (isCompleted = true), your "reply" MUST be a short, warm, natural closing/farewell line that wraps up this specific interaction in-character (e.g. saying goodbye, wishing them well, confirming the deal/order is done) — never leave it hanging as if the conversation continues.
 
 Respond ONLY with a valid JSON object:
 {
@@ -96,7 +97,7 @@ export default function AiChatTaskView() {
   const { taskId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const { t, uiLang } = useLanguage();
+  const { t, uiLang, registerLanguageActivity } = useLanguage();
   const isKeyboardOpen = useKeyboardOpen();
   const [streakUpdate, setStreakUpdate] = useState(null);
   const [showStreakModal, setShowStreakModal] = useState(false);

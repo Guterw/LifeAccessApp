@@ -99,7 +99,7 @@ export default function LevelView() {
 
   const backRoute = location.state?.fromTrail 
     ? '/english/trail' 
-    : '/levels';
+    : `/levels/group/${(levelData?.group && levelData.group[0]) || 'A1'}`;
 
   const currentValidAnswers = currentWord ? (
     (uiLang === 'es' && currentWord.es) ? currentWord.es : 
@@ -191,12 +191,12 @@ export default function LevelView() {
       
       if (newQueue.length === 0) {
         playCompletionSound();
+        
+        // LÓGICA DE XP ATUALIZADA: Ganha 20 XP sempre que completar
+        await addXP(20);
 
         const streakResult = await registerLanguageActivity();
         setStreakUpdate(streakResult);
-
-        // LÓGICA DE XP ATUALIZADA: Ganha 20 XP sempre que completar
-        await addXP(20);
 
         // Salva a conclusão no banco para atualizar o card na tela anterior
         await db.completedLevels.put({
