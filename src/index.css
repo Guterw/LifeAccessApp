@@ -26,7 +26,7 @@
 }
 
 body {
-  background-color: #111827; /* A cor do seu fundo (gray-950) */
+  background-color: #030712; /* gray-950 — igual ao fundo real usado nas telas do app */
   margin: 0;
   padding: 0;
   /* Isso garante que o fundo escuro preencha a área do notch */
@@ -37,7 +37,7 @@ body {
   /* Garante que o layout comece do topo real da tela */
   height: 100dvh; 
   padding-top: env(safe-area-inset-top);
-  background-color: #111827;
+  background-color: #030712; /* gray-950 */
 }
 
 /* Trava o scroll elástico no iOS/Safari */

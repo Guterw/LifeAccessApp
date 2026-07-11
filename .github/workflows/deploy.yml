@@ -40,8 +40,9 @@ jobs:
       - name: Build
         run: npm run build
         env:
-          # O GitHub injeta o segredo (definido nas Settings do repo) aqui
-          VITE_OPENROUTER_API_KEY: ${{ secrets.VITE_OPENROUTER_API_KEY }}
+          VITE_OPENROUTER_API_KEY_ONE: ${{ secrets.VITE_OPENROUTER_API_KEY_ONE }}
+          VITE_OPENROUTER_API_KEY_TWO: ${{ secrets.VITE_OPENROUTER_API_KEY_TWO }}
+          VITE_OPENROUTER_API_KEY_THREE: ${{ secrets.VITE_OPENROUTER_API_KEY_THREE }}
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Upload artifact

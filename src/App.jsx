@@ -130,7 +130,17 @@ function App() {
       {/* Guardião de Permissões: Aparece só DEPOIS do Onboarding e ANTES de liberar o app principal */}
       <FirstLaunchGuard>
         <SyncPreferenceGuard>
-          <div className="min-h-screen bg-gray-900 text-white font-sans selection:bg-blue-500/30">
+          <div 
+            className="min-h-screen text-white font-sans selection:bg-blue-500/30 relative"
+            style={{
+              backgroundColor: '#030712',
+              backgroundImage: `
+                radial-gradient(ellipse 80% 50% at 50% -10%, rgba(37, 99, 235, 0.15), transparent),
+                radial-gradient(ellipse 60% 40% at 85% 30%, rgba(147, 51, 234, 0.08), transparent)
+              `,
+              backgroundAttachment: 'fixed',
+            }}
+          >
             <div className="max-w-md mx-auto w-full px-4 pb-28">
               <Routes>
                 <Route path="/" element={<MainDashboard />} />
@@ -160,6 +170,7 @@ function App() {
                 <Route path="/english/ai-voice/tasks/:taskId" element={<AiVoiceTaskView />} />
                 <Route path="/english/ai-voice/tasks" element={<AiVoiceTaskSelectionView />} />
                 
+                {/* Trilha Inglês */}
                 <Route path="/english/trail" element={<TrailView />} />
 
                 {/* Fitness */}

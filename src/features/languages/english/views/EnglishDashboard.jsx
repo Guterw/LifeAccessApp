@@ -32,15 +32,26 @@ export default function EnglishDashboard() {
   }, []) ?? 0;
 
   return (
-    <div className="w-full pt-8 animate-fade-in px-4 pb-24 -mt-5 -mb-20">
-      
-      {/* HEADER SUPERIOR: Botão Voltar (Esquerda) e Avatar XP (Direita) */}
-      <div className="flex items-center justify-between mb-2 -ml-4 -mr-4">
+  <>
+    {/* HEADER FIXO — fica sempre visível, independente do scroll */}
+    <div className="fixed top-0 inset-x-0 h-20 z-50 bg-gray-950/85 backdrop-blur-xl border-b border-white/5 items-center justify-between px-4"
+      style={{
+        backgroundColor: '#030712',
+        backgroundImage: `
+          radial-gradient(ellipse 80% 50% at 50% -10%, rgba(37, 99, 235, 0.15), transparent),
+          radial-gradient(ellipse 60% 40% at 85% 30%, rgba(147, 51, 234, 0.08), transparent)
+          `,
+        backgroundAttachment: 'fixed',
+      }}
+    >
+      <div className="mt-3 flex items-center justify-between ">
         <BackButton to="/languages" label="" />
-        
-        {/* POMBO PERFIL */}
-        <UserProfileBadge className='-mr-2 -mt-1 mb-5'/>
+        <UserProfileBadge className="-mr-2 -mt-1 mb-5" />
       </div>
+    </div>
+
+    {/* pt-24 compensa a altura do header fixo (h-20 = 80px + folga) */}
+    <div className="w-full pt-24 animate-fade-in px-4 pb-24 -mb-20">
 
       {/* CABEÇALHO DA BANDEIRA */}
       <div className="flex flex-col items-center mb-8 -mt-2">
@@ -175,5 +186,6 @@ export default function EnglishDashboard() {
           <FooterBrand direction="flex-col" textSize="text-xs" textColor="text-white-400" />
       </div>
     </div>
+  </>
   );
 }
