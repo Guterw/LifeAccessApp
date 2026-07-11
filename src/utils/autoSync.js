@@ -21,6 +21,7 @@ const DIRTY_TABLES = [
   'counters',
   'fitnessProfile',
   'fitnessStreak',
+  'languageStreak',
   'appSettings',
   'userProfile',
 ];
