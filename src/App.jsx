@@ -44,6 +44,14 @@ import AiVoiceTaskView from './features/languages/english/views/ai-voice/AiVoice
 import AiVoiceTaskSelectionView from './features/languages/english/views/ai-voice/AiVoiceTaskSelectionView';
 import TrailView from './features/languages/english/views/TrailView';
 
+// Explained Module
+import ExplainedLessonListView from './features/languages/english/views/explained/ExplainedLessonListView';
+import ExplainedLessonView from './features/languages/english/views/explained/ExplainedLessonView';
+
+// Módulo de Ditado
+import DictationSelectionView from './features/languages/english/views/dictation/DictationSelectionView';
+import DictationExerciseView from './features/languages/english/views/dictation/DictationExerciseView';
+
 // Módulo Calendário
 import CalendarView from './features/calendar/views/CalendarView';
 
@@ -170,6 +178,14 @@ function App() {
                 <Route path="/english/ai-voice/tasks/:taskId" element={<AiVoiceTaskView />} />
                 <Route path="/english/ai-voice/tasks" element={<AiVoiceTaskSelectionView />} />
                 
+                {/* Explained Module */}
+                <Route path="/english/explained" element={<ExplainedLessonListView />} />
+                <Route path="/english/explained/:lessonId" element={<ExplainedLessonView />} />
+
+                {/* Ditado de Texto Corrido */}
+                <Route path="/english/dictation" element={<DictationSelectionView />} />
+                <Route path="/english/dictation/:textId" element={<DictationExerciseView />} />
+
                 {/* Trilha Inglês */}
                 <Route path="/english/trail" element={<TrailView />} />
 

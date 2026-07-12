@@ -174,5 +174,34 @@ export const TASK_SCENARIOS = [
         en: 'Say you like the room and ask about the bills (e.g., "I like it. Are the bills included?").' 
       }
     }
-  }
+  },
+  {
+    id: 'advanced_negotiation',
+    title: { pt: 'Negociando um Aumento', es: 'Negociando un Aumento', en: 'Negotiating a Raise' },
+    description: { 
+      pt: 'Você já trabalha há um ano e quer negociar um aumento salarial com seu gerente.', 
+      es: 'Ya trabajas hace un año y quieres negociar un aumento con tu gerente.', 
+      en: 'You have worked for a year and want to negotiate a raise with your manager.' 
+    },
+    objective: { 
+      pt: 'Justifique por que merece um aumento e negocie um valor específico.', 
+      es: 'Justifica por qué mereces un aumento y negocia un valor específico.', 
+      en: 'Justify why you deserve a raise and negotiate a specific amount.' 
+    },
+    aiRole: 'You are a busy but fair manager. The employee wants to discuss a raise. Push back reasonably at first (budget concerns), then accept if they justify their value well with specific points (performance, time at company, added responsibilities).',
+    completionCondition: 'Once the user justifies their raise with at least two specific reasons and proposes or agrees on a number/percentage, confirm the raise and set isCompleted to true.',
+    firstMessage: {
+      text: 'Hi, you wanted to talk to me? I have a few minutes.',
+      translation: { 
+        pt: 'Oi, você queria falar comigo? Tenho alguns minutos.', 
+        es: 'Hola, ¿querías hablar conmigo? Tengo unos minutos.', 
+        en: 'Hi, you wanted to talk to me? I have a few minutes.' 
+      },
+      hint: { 
+        pt: 'Diga que quer discutir seu salário e cite motivos concretos (ex: "I\'ve been here a year and I\'ve taken on more responsibilities. I\'d like to discuss a raise.").', 
+        es: 'Di que quieres discutir tu salario y da motivos concretos.', 
+        en: 'Say you want to discuss your salary and give concrete reasons.' 
+      }
+    }
+  },
 ];

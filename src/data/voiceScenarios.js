@@ -203,5 +203,63 @@ export const VOICE_SCENARIOS = [
         en: 'Order a drink, some food, and then ask how much it all costs.'
       }
     }
-  }
+  },
+  {
+    id: 'advanced_dublin_emergency',
+    title: { pt: 'Emergência: Carteira Perdida', es: 'Emergencia: Billetera Perdida', en: 'Emergency: Lost Wallet' },
+    description: {
+      pt: 'Você perdeu sua carteira com documentos e precisa reportar isso.',
+      es: 'Perdiste tu billetera con documentos y necesitas reportarlo.',
+      en: 'You lost your wallet with documents and need to report it.'
+    },
+    objective: {
+      pt: 'Explique o que aconteceu, descreva o item perdido e peça orientação sobre os próximos passos.',
+      es: 'Explica qué pasó, describe el objeto perdido y pide orientación sobre los próximos pasos.',
+      en: 'Explain what happened, describe the lost item, and ask for guidance on next steps.'
+    },
+    aiRole: 'You are a calm police station receptionist in Dublin. The user is reporting a lost wallet. Ask what was in it, where they think they lost it, and explain that you will file a report.',
+    completionCondition: 'Once the user describes the wallet/its contents and where they lost it, confirm the report is filed and set isCompleted to true.',
+    firstMessage: {
+      text: 'Hello, how can I help you today?',
+      translation: {
+        pt: 'Olá, como posso ajudar você hoje?',
+        es: 'Hola, ¿cómo puedo ayudarte hoy?',
+        en: 'Hello, how can I help you today?'
+      },
+      hint: {
+        pt: 'Explique que perdeu sua carteira (ex: "Hi, I lost my wallet. It has my ID and some cash inside.").',
+        es: 'Explica que perdiste tu billetera.',
+        en: 'Explain that you lost your wallet.'
+      }
+    }
+  },
+  {
+    id: 'final_boss_life_in_dublin',
+    title: { pt: 'Desafio Final: Um Dia Inteiro', es: 'Desafío Final: Un Día Entero', en: 'Final Boss: A Full Day' },
+    description: {
+      pt: 'Uma conversa longa e imprevisível cobrindo trabalho, compras e planos sociais.',
+      es: 'Una conversación larga e impredecible sobre trabajo, compras y planes sociales.',
+      en: 'A long, unpredictable conversation covering work, shopping, and social plans.'
+    },
+    objective: {
+      pt: 'Mantenha uma conversa fluida respondendo a perguntas sobre sua rotina, uma reclamação de um produto, e combine um encontro futuro.',
+      es: 'Mantén una conversación fluida sobre tu rutina, un reclamo de producto, y acuerda un encuentro futuro.',
+      en: 'Hold a fluid conversation about your routine, a product complaint, and agree on a future meetup.'
+    },
+    aiRole: 'You are a multi-purpose local friend/shop assistant hybrid for this final test. Ask about the user\'s day, then pivot to a minor complaint scenario (something they bought is broken), then pivot to suggesting a plan to meet up later. Use natural, slightly faster-paced English (B1/B2).',
+    completionCondition: 'Once the user has responded coherently to all three topics (their day, the complaint, and agreeing on a meetup time/place), wrap up warmly and set isCompleted to true.',
+    firstMessage: {
+      text: 'Hey! Long time no see. How has your day been?',
+      translation: {
+        pt: 'Ei! Quanto tempo. Como foi seu dia?',
+        es: '¡Hola! Cuánto tiempo. ¿Cómo estuvo tu día?',
+        en: 'Hey! Long time no see. How has your day been?'
+      },
+      hint: {
+        pt: 'Responda naturalmente sobre seu dia (ex: "It\'s been good, just busy with work.").',
+        es: 'Responde naturalmente sobre tu día.',
+        en: 'Respond naturally about your day.'
+      }
+    }
+  },
 ];

@@ -1,37 +1,32 @@
 // src/features/languages/english/views/TrailView.jsx
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
-import { 
-  Check, Lock, Type, Hash, MessageCircle, Users, Bot, Coffee, 
-  Star, Rocket, Compass, Cloud, Moon, Sparkles, Map, Mountain, TreePine
+import {
+  Check, Lock, Type, Hash, MessageCircle, Users, Bot, Coffee, Mic,
+  Star, Rocket, Compass, Cloud, Moon, Sparkles, Map, Mountain, TreePine,
+  Sun, Waves, Flame
 } from 'lucide-react';
 import { ENGLISH_TRAIL } from '../../../../data/englishTrail';
+import { SECTION_THEMES, getSectionMeta } from '../../../../data/trailSections';
 import { useLanguage } from '../../../../contexts/LanguageContext';
 import { db } from '../../../../config/dexieDb';
 import BackButton from '../../../../components/BackButton';
 import PigeonAvatar from '../../../../components/PigeonAvatar';
 import UserProfileBadge from '../../../../components/UserProfileBadge';
 
-const IconMap = { Type, Hash, MessageCircle, Users, Bot, Coffee };
+const IconMap = { Type, Hash, MessageCircle, Users, Bot, Coffee, Sparkles, Mic };
+const DecorIconMap = { Moon, TreePine, Sun, Waves, Flame, Sparkles };
 
 // ==========================================
-// SCROLL SUAVE CUSTOMIZADO
+// SCROLL SUAVE CUSTOMIZADO (curta distância)
 // ==========================================
-// Substitui scrollIntoView({behavior:'smooth'}), cujo comportamento varia
-// muito entre navegadores/WebViews (em muitos casos é abrupto/instantâneo,
-// especialmente em Android WebView e Safari mobile). Esta função anima o
-// scroll manualmente com requestAnimationFrame e uma curva de easing
-// suave (easeInOutCubic), garantindo a mesma sensação de suavidade em
-// qualquer dispositivo.
 function smoothScrollToElement(element, { duration = 900, offset = 0 } = {}) {
   if (!element) return;
 
   const startY = window.scrollY || window.pageYOffset;
   const elementRect = element.getBoundingClientRect();
   const elementY = elementRect.top + startY;
-
-  // Centraliza verticalmente o elemento na viewport (equivalente ao block: 'center')
   const targetY = elementY - (window.innerHeight / 2) + (elementRect.height / 2) + offset;
 
   const distance = targetY - startY;
@@ -44,31 +39,41 @@ function smoothScrollToElement(element, { duration = 900, offset = 0 } = {}) {
     const elapsed = timestamp - startTime;
     const progress = Math.min(elapsed / duration, 1);
     const eased = easeInOutCubic(progress);
-
     window.scrollTo(0, startY + distance * eased);
-
-    if (progress < 1) {
-      requestAnimationFrame(step);
-    }
+    if (progress < 1) requestAnimationFrame(step);
   };
 
   requestAnimationFrame(step);
+}
+
+// Agrupa o ENGLISH_TRAIL (lista plana) em seções, cortando sempre que um
+// node com id terminado em "_boss" é encontrado (o boss fica DENTRO da
+// seção que ele encerra). Isso é 100% data-driven: adicionar a Seção 7, 8...
+// no englishTrail.js não exige tocar neste componente.
+function groupIntoSections(trail) {
+  const sections = [];
+  let current = [];
+  trail.forEach((node) => {
+    current.push(node);
+    if (String(node.id).includes('_boss')) {
+      sections.push(current);
+      current = [];
+    }
+  });
+  if (current.length > 0) sections.push(current); // seção em andamento, ainda sem boss
+  return sections;
 }
 
 export default function TrailView() {
   const navigate = useNavigate();
   const { t, uiLang } = useLanguage();
 
-  // useLiveQuery com terceiro parâmetro `undefined` explícito — permite
-  // diferenciar "ainda carregando os dados do Dexie" (undefined) de
-  // "carregado e realmente vazio" ([]), evitando que o cálculo da fase
-  // atual (activeIndex) e o auto-scroll disparem prematuramente com dados
-  // incompletos.
   const completedAlphaNum = useLiveQuery(() => db.completedAlphaNum.toArray(), [], undefined);
   const completedVocab = useLiveQuery(() => db.completedLevels.toArray(), [], undefined);
 
   const nodeRefs = useRef({});
-  const hasScrolledRef = useRef(false); // garante que o auto-scroll roda uma única vez por visita
+  const sectionRefs = useRef({});
+  const hasScrolledRef = useRef(false);
 
   const dataIsReady = completedAlphaNum !== undefined && completedVocab !== undefined;
 
@@ -96,54 +101,98 @@ export default function TrailView() {
         return false;
       }
     }
+    if (node.type === 'explained') {
+      try {
+        const saved = JSON.parse(localStorage.getItem('completedExplainedLessonsCache') || '[]');
+        return saved.some(id => String(id) === String(node.targetId));
+      } catch {
+        return false;
+      }
+    }
+    if (node.type === 'dictation') {
+      try {
+        const saved = JSON.parse(localStorage.getItem('completedDictationsCache') || '[]');
+        return saved.some(id => String(id) === String(node.targetId));
+      } catch {
+        return false;
+      }
+    }
     return false;
   };
 
   const currentUnlockedIndex = ENGLISH_TRAIL.findIndex(node => !isNodeCompleted(node));
   const activeIndex = currentUnlockedIndex === -1 ? ENGLISH_TRAIL.length : currentUnlockedIndex;
 
-  // Auto-scroll até a fase atual: só roda quando os dados reais do Dexie
-  // já carregaram, e apenas uma vez por visita à tela.
+  // Agrupamento memoizado das seções (não depende de progresso, só da trilha)
+  const sections = useMemo(() => groupIntoSections(ENGLISH_TRAIL), []);
+
+  // Descobre em qual seção está o node ativo, e o índice local dentro dela
+  const { activeSectionIndex } = useMemo(() => {
+    let cursor = 0;
+    for (let i = 0; i < sections.length; i++) {
+      const len = sections[i].length;
+      if (activeIndex < cursor + len) {
+        return { activeSectionIndex: i, activeLocalIndex: activeIndex - cursor };
+      }
+      cursor += len;
+    }
+    // trilha inteira concluída: última seção
+    return { activeSectionIndex: Math.max(0, sections.length - 1), activeLocalIndex: 0 };
+  }, [sections, activeIndex]);
+
+  // ==========================================
+  // AUTO-SCROLL EM DUAS ETAPAS:
+  // 1) Pulo instantâneo (sem animação) até perto da seção correta —
+  //    evita ter que "rolar visualmente" por todas as seções anteriores,
+  //    o que ficaria lento/travado com muitas seções (10+).
+  // 2) Só then, uma animação suave e curta até o node exato.
+  // ==========================================
   useEffect(() => {
     if (!dataIsReady) return;
     if (hasScrolledRef.current) return;
-
     hasScrolledRef.current = true;
 
     const timer = setTimeout(() => {
-      const targetIndex = activeIndex >= ENGLISH_TRAIL.length ? ENGLISH_TRAIL.length - 1 : activeIndex;
-      const targetNode = ENGLISH_TRAIL[targetIndex];
-      const el = targetNode && nodeRefs.current[targetNode.id];
-      if (el) {
-        smoothScrollToElement(el, { duration: 1000 });
+      const targetGlobalIndex = activeIndex >= ENGLISH_TRAIL.length ? ENGLISH_TRAIL.length - 1 : activeIndex;
+      const targetNode = ENGLISH_TRAIL[targetGlobalIndex];
+      if (!targetNode) return;
+
+      // Etapa 1: pulo instantâneo até o topo da seção ativa (se não for a primeira)
+      if (activeSectionIndex > 0) {
+        const sectionEl = sectionRefs.current[activeSectionIndex];
+        if (sectionEl) {
+          const rect = sectionEl.getBoundingClientRect();
+          const y = rect.top + window.scrollY - 80;
+          window.scrollTo(0, y); // sem animação — instantâneo
+        }
       }
-    }, 400);
+
+      // Etapa 2: agora sim, uma animação curta e suave até o node exato
+      requestAnimationFrame(() => {
+        const el = nodeRefs.current[targetNode.id];
+        if (el) smoothScrollToElement(el, { duration: 700 });
+      });
+    }, 350);
 
     return () => clearTimeout(timer);
-  }, [dataIsReady, activeIndex]);
+  }, [dataIsReady, activeIndex, activeSectionIndex]);
 
-  const getTranslateX = (index) => {
-    const cycle = index % 4; 
+  const getTranslateX = (localIndex) => {
+    const cycle = localIndex % 4;
     if (cycle === 0) return 'translate-x-0';
-    if (cycle === 1) return 'translate-x-16'; 
+    if (cycle === 1) return 'translate-x-16';
     if (cycle === 2) return 'translate-x-0';
     if (cycle === 3) return '-translate-x-16';
     return 'translate-x-0';
   };
 
-  const section1 = ENGLISH_TRAIL.slice(0, 11);
-  const section2 = ENGLISH_TRAIL.slice(11);
-
-  const progressSec1 = Math.min(1, Math.max(0, activeIndex / (section1.length - 1)));
-  const progressSec2 = Math.min(1, Math.max(0, (activeIndex - section1.length) / (section2.length - 1)));
-
-  const renderNode = (node, globalIndex) => {
+  const renderNode = (node, globalIndex, localIndex) => {
     const isCompleted = globalIndex < activeIndex;
     const isCurrent = globalIndex === activeIndex;
     const isLocked = globalIndex > activeIndex;
-    
+
     const IconComponent = IconMap[node.icon] || Star;
-    const xOffset = getTranslateX(globalIndex);
+    const xOffset = getTranslateX(localIndex);
 
     return (
       <div
@@ -151,12 +200,11 @@ export default function TrailView() {
         ref={(el) => { nodeRefs.current[node.id] = el; }}
         className={`relative z-10 flex flex-col items-center ${xOffset} transition-all duration-700 ease-out py-6`}
       >
-        {/* BALÃO DA FASE ATUAL COM O POMBO */}
         {isCurrent && (
           <div className="absolute -top-20 animate-bounce flex flex-col items-center z-40">
-            <PigeonAvatar 
-              accessory={node.type === 'task' ? 'flatcap' : 'coffee'} 
-              className="w-14 h-14 -mb-2 drop-shadow-[0_10px_10px_rgba(0,0,0,0.5)] relative z-10" 
+            <PigeonAvatar
+              accessory={node.type === 'task' ? 'flatcap' : 'coffee'}
+              className="w-14 h-14 -mb-2 drop-shadow-[0_10px_10px_rgba(0,0,0,0.5)] relative z-10"
             />
             <div className="bg-gradient-to-r from-yellow-100 to-white text-black px-6 py-3 rounded-2xl font-black text-sm shadow-[0_20px_40px_rgba(255,255,255,0.4)] whitespace-nowrap border-2 border-yellow-300 relative">
               {getText(node.title)}
@@ -166,7 +214,6 @@ export default function TrailView() {
           </div>
         )}
 
-        {/* BOTÃO (CASA) */}
         <button
           disabled={isLocked}
           onClick={() => navigate(node.path, { state: { fromTrail: true } })}
@@ -181,11 +228,9 @@ export default function TrailView() {
           {isCurrent && (
             <div className="absolute inset-0 rounded-full border-[6px] border-white/50 animate-ping opacity-60 z-0 pointer-events-none"></div>
           )}
-
           {!isLocked && (
             <div className="absolute inset-2 border-4 border-white/20 rounded-full pointer-events-none z-10"></div>
           )}
-
           {isLocked ? (
             <Lock size={28} className="text-slate-500 drop-shadow-md z-20 relative" />
           ) : isCompleted ? (
@@ -195,7 +240,6 @@ export default function TrailView() {
           )}
         </button>
 
-        {/* TÍTULO DA FASE */}
         {!isCurrent && (
           <div className="mt-4 px-5 py-2 rounded-2xl bg-slate-950/60 backdrop-blur-md border border-white/10 shadow-2xl transition-transform hover:scale-105">
             <span className={`text-[11px] font-black tracking-widest uppercase whitespace-nowrap drop-shadow-lg
@@ -210,135 +254,108 @@ export default function TrailView() {
     );
   };
 
+  // Renderiza uma seção inteira (fundo temático + título + linha + nodes + onda de transição)
+  const renderSection = (sectionNodes, sectionIndex, globalStartIndex, isLastSection) => {
+    const meta = getSectionMeta(sectionIndex);
+    const theme = SECTION_THEMES[meta.theme] || SECTION_THEMES.night;
+    const DecorIcon = DecorIconMap[theme.decorIcon] || Sparkles;
+
+    const localActive = activeIndex - globalStartIndex;
+    const progress = sectionNodes.length > 1
+      ? Math.min(1, Math.max(0, localActive / (sectionNodes.length - 1)))
+      : (localActive >= sectionNodes.length ? 1 : 0);
+
+    return (
+      <div
+        key={`section-${sectionIndex}`}
+        ref={(el) => { sectionRefs.current[sectionIndex] = el; }}
+        className={`relative w-full bg-gradient-to-b ${theme.bgGradient} pt-24 pb-32 ${isLastSection ? 'pb-48' : ''}`}
+      >
+        {/* Glows ambiente */}
+        <div className="absolute top-[10%] left-[-10%] w-[120%] h-[300px] rounded-[100%] blur-[120px] pointer-events-none opacity-30"
+          style={{ background: theme.lineGlowRgba.replace('1)', '0.08)') }}></div>
+
+        {/* Decorações flutuantes */}
+        <div className={`absolute top-[12%] right-[10%] ${theme.decorColor} animate-pulse`}><DecorIcon size={140} /></div>
+        <div className={`absolute top-[45%] left-[8%] ${theme.decorColor2} animate-[bounce_8s_infinite]`}><Cloud size={150} /></div>
+        <div className={`absolute top-[60%] right-[15%] ${theme.decorColor3} animate-[pulse_4s_infinite]`}><Sparkles size={40} /></div>
+
+        {/* Card de título da seção */}
+        <div className="relative z-20 w-[90%] max-w-lg mx-auto mb-20">
+          <div className={`${theme.cardBg} backdrop-blur-xl border-2 ${theme.cardBorder} rounded-[2rem] p-8 text-center ${theme.cardShadow} relative overflow-hidden`}>
+            <div className={`absolute -top-6 -right-6 ${theme.decorColor} transform rotate-12`}><Rocket size={110} /></div>
+            <h1 className={`text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r ${theme.titleGradient} tracking-tight drop-shadow-lg relative z-10`}>
+              {getText(meta.title)}
+            </h1>
+            <p className={`text-sm ${theme.subtitleColor} font-black mt-2 tracking-[0.25em] uppercase relative z-10`}>
+              {getText(meta.subtitle)}
+            </p>
+          </div>
+        </div>
+
+        {/* Linha do tempo + nodes */}
+        <div className="relative flex flex-col items-center justify-start gap-12 w-full mx-auto py-4">
+          <div className={`absolute top-10 bottom-10 left-1/2 -translate-x-1/2 border-l-[8px] border-dashed ${theme.lineColorClass} z-0`}>
+            <div
+              className={`absolute top-0 left-[-8px] border-l-[8px] border-dashed ${theme.lineActiveColorClass} transition-all duration-1000 ease-out`}
+              style={{ height: `${progress * 100}%`, filter: `drop-shadow(0 0 12px ${theme.lineGlowRgba})` }}
+            ></div>
+          </div>
+
+          {sectionNodes.map((node, i) => renderNode(node, globalStartIndex + i, i))}
+        </div>
+
+        {/* Onda de transição para a próxima seção (ou rodapé, na última) */}
+        {!isLastSection && (
+          <div className="absolute bottom-0 left-0 w-full overflow-hidden leading-none z-10">
+            <svg className="relative block w-full h-[100px] sm:h-[150px]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
+              <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V120H0V95.8C59.71,118.08,130.83,112.33,189.92,98.33,235.19,87.69,278.43,71.25,321.39,56.44Z" fill={theme.waveFill}></path>
+            </svg>
+          </div>
+        )}
+
+        {/* Mensagem de "continua" só na última seção */}
+        {isLastSection && (
+          <div className="relative z-20 w-[80%] max-w-sm mx-auto mt-24 text-center">
+            <div className="p-6 bg-slate-900/80 rounded-3xl border border-white/10 text-slate-300 shadow-[0_10px_30px_rgba(0,0,0,0.5)] backdrop-blur-xl">
+              <Star size={32} className="text-yellow-500 mx-auto mb-3 animate-pulse" />
+              <p className="font-black text-lg tracking-wide">{t('trail.toBeContinued', 'CONTINUA...')}</p>
+              <p className="text-xs text-slate-400 mt-2">{t('trail.newMissions', 'Novas missões chegarão em breve.')}</p>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  // Calcula os índices globais de início de cada seção (para o renderNode saber o offset)
+  const sectionsWithOffsets = useMemo(() => {
+    let cursor = 0;
+    return sections.map((nodes) => {
+      const start = cursor;
+      cursor += nodes.length;
+      return { nodes, start };
+    });
+  }, [sections]);
+
   return (
-    // CORREÇÃO DO HEADER FIXO:
-    // O header abaixo é agora IRMÃO do container full-bleed, não filho dele.
-    // Antes, o header (position: fixed) ficava dentro de uma div com
-    // `transform` (via a classe -translate-x-1/2), e QUALQUER ancestral
-    // com `transform` cria um novo "containing block" para descendentes
-    // fixed — nesse caso o header parava de ser fixo em relação à janela
-    // e passava a ser fixo em relação a essa div, que rola junto com a
-    // página (por isso ele "descia" ao invés de ficar parado no topo).
     <>
-      {/* HEADER FIXO — fora de qualquer ancestral com transform */}
+      {/* HEADER FIXO */}
       <div className="fixed top-0 inset-x-0 h-20 bg-slate-950/85 backdrop-blur-xl z-[100] flex items-center justify-between px-4 sm:px-8 border-b border-white/10 shadow-lg">
         <div className="shrink-0 mt-5">
           <BackButton to="/english" label="" />
         </div>
-        
         <UserProfileBadge className="-mt-1 -mr-2 shrink-0" />
       </div>
 
-      {/* 
-        CONTEÚDO FULL-BLEED: técnica trocada de "left-1/2 -translate-x-1/2"
-        (que usa transform e quebrava o fixed acima) para
-        "margin-left: calc(50% - 50vw)" via style inline — atinge o mesmo
-        efeito visual (sair da largura max-w-md do container pai) sem usar
-        `transform`, então não cria containing block nenhum.
-      */}
+      {/* CONTEÚDO FULL-BLEED */}
       <div
         className="w-screen min-h-screen flex flex-col overflow-x-hidden bg-slate-950 m-0 p-0"
         style={{ marginLeft: 'calc(50% - 50vw)' }}
       >
-
-        {/* ========================================== */}
-        {/* SEÇÃO 1: OS FUNDAMENTOS (Céu Noturno/Espaço) */}
-        {/* ========================================== */}
-        <div className="relative w-full bg-gradient-to-b from-slate-950 via-indigo-950 to-[#2e1065] pt-28 pb-32">
-          
-          <div className="absolute top-[10%] left-[-10%] w-[120%] h-[300px] bg-indigo-600/10 rounded-[100%] blur-[120px] pointer-events-none"></div>
-          <div className="absolute bottom-[20%] right-[-20%] w-[150%] h-[400px] bg-purple-600/10 rounded-[100%] blur-[150px] pointer-events-none"></div>
-
-          <div className="absolute top-[12%] right-[10%] text-indigo-300/20 animate-pulse"><Moon size={150} /></div>
-          <div className="absolute top-[40%] left-[5%] text-indigo-200/10 animate-[bounce_8s_infinite]"><Cloud size={180} /></div>
-          <div className="absolute top-[60%] right-[15%] text-white/20 animate-[ping_3s_infinite]"><Star size={24} /></div>
-          <div className="absolute top-[25%] left-[15%] text-purple-300/30 animate-[pulse_4s_infinite]"><Sparkles size={50} /></div>
-
-          <div className="relative z-20 w-[90%] max-w-lg mx-auto mb-20">
-            <div className="bg-indigo-900/50 backdrop-blur-xl border-2 border-indigo-400/30 rounded-[2rem] p-8 text-center shadow-[0_0_50px_rgba(79,70,229,0.3)] relative overflow-hidden">
-              <div className="absolute -top-6 -right-6 text-indigo-400/20 transform rotate-12"><Rocket size={120} /></div>
-              <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-200 via-indigo-200 to-purple-200 tracking-tight drop-shadow-lg relative z-10">
-                {t('trail.section1', 'Seção 1')}
-              </h1>
-              <p className="text-sm text-indigo-300 font-black mt-2 tracking-[0.3em] uppercase relative z-10">
-                {t('trail.fundamentals', 'Os Fundamentos')}
-              </p>
-            </div>
-          </div>
-
-          <div className="relative flex flex-col items-center justify-start gap-12 w-full mx-auto py-4">
-            
-            <div className="absolute top-10 bottom-10 left-1/2 -translate-x-1/2 border-l-[8px] border-dashed border-indigo-900/30 z-0">
-              <div 
-                className="absolute top-0 left-[-8px] border-l-[8px] border-dashed border-indigo-400 transition-all duration-1000 ease-out"
-                style={{ 
-                  height: `${progressSec1 * 100}%`,
-                  filter: 'drop-shadow(0 0 12px rgba(129, 140, 248, 1))' 
-                }}
-              ></div>
-            </div>
-            
-            {section1.map((node, i) => renderNode(node, i))}
-          </div>
-
-          <div className="absolute bottom-0 left-0 w-full overflow-hidden leading-none z-10">
-            <svg className="relative block w-full h-[100px] sm:h-[150px]" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
-              <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V120H0V95.8C59.71,118.08,130.83,112.33,189.92,98.33,235.19,87.69,278.43,71.25,321.39,56.44Z" className="fill-[#022c22]"></path>
-            </svg>
-          </div>
-        </div>
-
-        {/* ========================================== */}
-        {/* SEÇÃO 2: PREPARAÇÃO PARA DUBLIN (Floresta/Terrestre) */}
-        {/* ========================================== */}
-        <div className="relative w-full bg-gradient-to-b from-[#022c22] via-teal-950 to-slate-950 pt-24 pb-48">
-          
-          <div className="absolute top-[30%] left-[-20%] w-[150%] h-[500px] bg-emerald-600/10 rounded-[100%] blur-[150px] pointer-events-none"></div>
-
-          <div className="absolute top-[10%] left-[5%] text-teal-300/10 animate-[pulse_6s_infinite]"><Mountain size={160} /></div>
-          <div className="absolute top-[40%] right-[10%] text-emerald-400/10 animate-[bounce_10s_infinite]"><TreePine size={120} /></div>
-          <div className="absolute bottom-[20%] left-[15%] text-teal-200/5"><Map size={200} /></div>
-
-          <div className="relative z-20 w-[90%] max-w-lg mx-auto mb-20">
-            <div className="bg-teal-900/50 backdrop-blur-xl border-2 border-teal-400/30 rounded-[2rem] p-8 text-center shadow-[0_0_50px_rgba(20,184,166,0.3)] relative overflow-hidden">
-              <div className="absolute -top-4 -left-6 text-teal-400/20 transform -rotate-12"><Compass size={140} /></div>
-              <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-200 via-teal-200 to-cyan-200 tracking-tight drop-shadow-lg relative z-10">
-                {t('trail.section2', 'Seção 2')}
-              </h1>
-              <p className="text-sm text-teal-300 font-black mt-2 tracking-[0.2em] uppercase relative z-10">
-                {t('trail.dublinPrep', 'Preparação para Dublin')}
-              </p>
-            </div>
-          </div>
-
-          <div className="relative flex flex-col items-center justify-start gap-12 w-full mx-auto py-4">
-            
-            <div className="absolute top-10 bottom-10 left-1/2 -translate-x-1/2 border-l-[8px] border-dashed border-teal-900/30 z-0">
-              <div 
-                className="absolute top-0 left-[-8px] border-l-[8px] border-dashed border-teal-400 transition-all duration-1000 ease-out"
-                style={{ 
-                  height: `${progressSec2 * 100}%`,
-                  filter: 'drop-shadow(0 0 12px rgba(45, 212, 191, 1))' 
-                }}
-              ></div>
-            </div>
-            
-            {section2.map((node, i) => {
-              const globalIndex = i + 11;
-              return renderNode(node, globalIndex);
-            })}
-          </div>
-          
-          <div className="relative z-20 w-[80%] max-w-sm mx-auto mt-24 text-center">
-             <div className="p-6 bg-slate-900/80 rounded-3xl border border-white/10 text-slate-300 shadow-[0_10px_30px_rgba(0,0,0,0.5)] backdrop-blur-xl">
-               <Star size={32} className="text-yellow-500 mx-auto mb-3 animate-pulse" />
-               <p className="font-black text-lg tracking-wide">{t('trail.toBeContinued', 'CONTINUA...')}</p>
-               <p className="text-xs text-slate-400 mt-2">{t('trail.newMissions', 'Novas missões chegarão em breve.')}</p>
-             </div>
-          </div>
-
-        </div>
-
+        {sectionsWithOffsets.map(({ nodes, start }, sectionIndex) =>
+          renderSection(nodes, sectionIndex, start, sectionIndex === sectionsWithOffsets.length - 1)
+        )}
       </div>
     </>
   );

@@ -3,7 +3,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../../../../config/dexieDb';
-import { BookOpen, Sparkles, AlertTriangle, Trophy, PlayCircle, Flame, ChevronRight, Rocket, BookOpenText } from 'lucide-react';
+import { BookOpen, Sparkles, AlertTriangle, Trophy, PlayCircle, Flame, ChevronRight, Rocket, BookOpenText, Mic } from 'lucide-react';
 import { useLanguage } from '../../../../contexts/LanguageContext';
 import BackButton from '../../../../components/BackButton';
 import FlagIcon from '../../../../components/FlagIcon';
@@ -147,7 +147,7 @@ export default function EnglishDashboard() {
 
         <button 
           onClick={() => navigate('/english/alpha-numbers')}
-          className="w-full bg-gradient-to-r from-blue-600 to-emerald-600 p-5 rounded-2xl flex items-center justify-between shadow-lg"
+          className="w-full border-b-4 border-yellow-400 bg-gradient-to-r from-blue-600 to-emerald-600 p-5 rounded-2xl flex items-center justify-between shadow-lg"
         >
           <div className="flex items-center gap-4">
             <div className="p-3 bg-white/20 text-white rounded-xl"><BookOpenText size={22} /></div>
@@ -161,7 +161,7 @@ export default function EnglishDashboard() {
 
         <button 
           onClick={() => navigate('/english/ai-hub')}
-          className="w-full bg-gradient-to-r from-purple-600 to-pink-600 p-5 rounded-2xl flex items-center justify-between shadow-lg"
+          className="w-full border-b-4 border-yellow-400 bg-gradient-to-r from-purple-600 to-pink-600 p-5 rounded-2xl flex items-center justify-between shadow-lg"
         >
           <div className="flex items-center gap-4">
             <div className="p-3 bg-white/20 text-white rounded-xl"><Sparkles size={22} /></div>
@@ -175,12 +175,42 @@ export default function EnglishDashboard() {
 
         <button 
           onClick={() => navigate('/levels')}
-          className="w-full bg-gradient-to-br from-blue-500 to-blue-700 hover:from-blue-400 hover:to-blue-600 text-white font-black py-4 rounded-2xl flex items-center justify-center gap-3 transition-all shadow-lg shadow-blue-500/20 border-b-4 border-blue-800 active:border-b-0 active:mt-1"
+          className="w-full border-yellow-400 bg-gradient-to-br from-blue-500 to-blue-700 hover:from-blue-400 hover:to-blue-600 text-white font-black py-4 rounded-2xl flex items-center justify-center gap-3 transition-all shadow-lg shadow-blue-500/20 border-b-4 active:border-b-0 active:mt-1"
         >
           <PlayCircle size={20} />
           {t('english.practiceBtn', 'Praticar Vocabulário')}
         </button>
       </div>
+
+      <button 
+        onClick={() => navigate('/english/explained')}
+        className="w-full border-b-4 border-yellow-400 bg-gradient-to-r from-red-600 to-gray-600 p-5 rounded-2xl flex items-center justify-between shadow-lg mt-5"
+      >
+        <div className="flex items-center gap-4">
+          <div className="p-3 bg-white/20 text-white rounded-xl"><Sparkles size={22} /></div>
+          <div className="text-left">
+            <h3 className="text-base font-black text-white">{t('explained.title', 'Aprendizado Explicado')}</h3>
+            <p className="text-[10px] text-pink-100 font-medium">{t('explained.subtitle', 'Get, tempos verbais, would/could...')}</p>
+          </div>
+        </div>
+        <ChevronRight className="text-white/70" />
+      </button>
+
+      {/* NOVO BOTÃO — cole isto logo abaixo do botão de Fundamentos acima */}
+        <button 
+          onClick={() => navigate('/english/dictation')}
+          className="w-full border-b-4 border-yellow-400 bg-gradient-to-r from-blue-600 to-purple-600 p-5 rounded-2xl flex items-center justify-between shadow-lg mt-6"
+        >
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-white/20 text-white rounded-xl"><Mic size={22} /></div>
+            <div className="text-left">
+              <h3 className="text-base font-black text-white">{t('dictation.title', 'Ditado')}</h3>
+              <p className="text-[10px] text-pink-100 font-medium">{t('dictation.subtitle', 'Fale o texto em voz alta')}</p>
+            </div>
+          </div>
+          <ChevronRight className="text-white/70" />
+        </button>
+
 
       <div className="shrink-0 mt-8">
           <FooterBrand direction="flex-col" textSize="text-xs" textColor="text-white-400" />

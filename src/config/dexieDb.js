@@ -8,7 +8,7 @@ export const db = new Dexie('LifeAccessDB');
 // (antes vivia solta dentro de appSettings — sujeita a sobrescrita
 // parcial em updates concorrentes e em pull/push da nuvem)
 // ==========================================
-db.version(13).stores({
+db.version(14).stores({
   appSettings: 'id, uiLanguage, isFirstAccess, userName',
   learnedWords: 'en, translation, level, category, learnedAt',
   mistakesLog: '++id, word, level, category, timestamp',
@@ -29,6 +29,8 @@ db.version(13).stores({
   fastingSessions: '++id, startTime, endTime, targetHours, protocol, completed, caloriesBurnedEstimate',
   // NOVA TABELA: espelha exatamente o padrão que já funciona no Fitness
   languageStreak: 'id, streak, lastLanguageActivity',
+  completedExplainedLessons: 'lessonId, completedAt',
+  completedDictations: '++id, textId, completedAt, xp, timeTakenSeconds',
 }).upgrade(async (tx) => {
   // Migração automática: se já existia uma ofensiva salva dentro de
   // appSettings (formato antigo), copia para a nova tabela dedicada,
