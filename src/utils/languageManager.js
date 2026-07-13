@@ -1,42 +1,51 @@
 // src/utils/languageManager.js
 import { db } from '../config/dexieDb';
-import { toDateKey, diffInDays } from './calendarUtils';
 
-// ==========================================
-// OFENSIVA DE IDIOMAS (mesmo padrão usado no Fitness: tabela dedicada
-// com upsert direto por chave, em vez de um campo solto dentro de
-// appSettings sujeito a sobrescrita parcial/concorrência).
-// ==========================================
+// Função à prova de balas para timezone local (Zera as horas, focando só no dia civil)
+const getLocalDayStart = (date) => new Date(date.getFullYear(), date.getMonth(), date.getDate());
+
 export const registerLanguageActivity = async () => {
   let record = await db.languageStreak.get(1);
   if (!record) record = { id: 1, streak: 0, lastLanguageActivity: null };
 
-  const todayStr = toDateKey(new Date());
+  const now = new Date();
+  const today = getLocalDayStart(now);
+
   const oldStreak = record.streak || 0;
-  const lastStr = record.lastLanguageActivity
-    ? toDateKey(new Date(record.lastLanguageActivity))
-    : null;
+  let newStreak = oldStreak;
+  let increased = false;
 
-  if (lastStr === todayStr) {
-    // Já estudou hoje — nada muda, nenhuma animação.
-    return { increased: false, oldStreak, newStreak: oldStreak };
-  }
+  if (record.lastLanguageActivity) {
+    const lastDate = getLocalDayStart(new Date(record.lastLanguageActivity));
+    const diffTime = today - lastDate;
+    const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24)); // Pega a diferença exata de dias
 
-  let newStreak;
-  if (lastStr) {
-    const diffDays = diffInDays(lastStr, todayStr);
-    newStreak = diffDays === 1 ? oldStreak + 1 : 1;
+    if (diffDays === 0) {
+      // Já estudou hoje — nada muda
+      return { increased: false, oldStreak, newStreak: oldStreak };
+    } else if (diffDays === 1) {
+      // Estudou ontem, a ofensiva cresce!
+      newStreak = oldStreak + 1;
+      increased = true;
+    } else {
+      // Pulou um dia ou mais, reseta a ofensiva
+      newStreak = 1;
+      increased = true;
+    }
   } else {
+    // Primeira atividade no aplicativo
     newStreak = 1;
+    increased = true;
   }
 
+  // Atualiza no banco
   await db.languageStreak.put({
     id: 1,
     streak: newStreak,
-    lastLanguageActivity: new Date().toISOString(),
+    lastLanguageActivity: now.toISOString(),
   });
 
-  return { increased: newStreak !== oldStreak, oldStreak, newStreak };
+  return { increased, oldStreak, newStreak };
 };
 
 export const getLanguageStreak = async () => {

@@ -63,6 +63,17 @@ export const LanguageProvider = ({ children }) => {
     loadSettings();
   }, []);
 
+  const isStreakActiveToday = React.useMemo(() => {
+    if (!languageStreakRecord?.lastLanguageActivity) return false;
+    const lastDate = new Date(languageStreakRecord.lastLanguageActivity);
+    const today = new Date();
+    return (
+      lastDate.getDate() === today.getDate() &&
+      lastDate.getMonth() === today.getMonth() &&
+      lastDate.getFullYear() === today.getFullYear()
+    );
+  }, [languageStreakRecord?.lastLanguageActivity]);
+
   // Função para mudar o idioma e salvar no banco
   const changeLanguage = async (langCode) => {
     setUiLang(langCode);
@@ -104,7 +115,7 @@ export const LanguageProvider = ({ children }) => {
   return (
     <LanguageContext.Provider value={{ 
       uiLang, changeLanguage, isFirstAccess, finishOnboarding, t, userName, 
-      languageStreak, registerLanguageActivity
+      languageStreak, isStreakActiveToday, registerLanguageActivity // <- Exportamos a variável
     }}>
       {children}
     </LanguageContext.Provider>

@@ -13,10 +13,8 @@ import UserProfileBadge from '../../../../components/UserProfileBadge';
 
 export default function EnglishDashboard() {
   const navigate = useNavigate();
-  const { t, languageStreak } = useLanguage();
-
+  const { t, userName, uiLang, languageStreak, isStreakActiveToday } = useLanguage();
   const learnedCount = useLiveQuery(() => db.learnedWords?.count() ?? 0, []) || 0;
-  const isStreakActive = languageStreak > 0;
   const userProfile = useLiveQuery(() => db.userProfile.get(1)) || { currentLevel: 1, totalXp: 0 };
 
   // "A Revisar" = palavras que estão no mistakesLog mas NÃO foram aprendidas (não estão em learnedWords)
@@ -64,9 +62,9 @@ export default function EnglishDashboard() {
         </h1>
         
         <div className={`flex items-center gap-2 px-5 py-1.5 rounded-full border shadow-sm relative z-10 -mb-4 ${
-          isStreakActive ? 'bg-orange-500/10 text-orange-400 border-orange-500/30' : 'bg-gray-800 text-gray-500 border-gray-700'
+          isStreakActiveToday ? 'bg-orange-500/10 text-orange-400 border-orange-500/30' : 'bg-gray-800 text-gray-500 border-gray-700'
         }`}>
-          <Flame size={16} className={isStreakActive ? 'text-orange-500' : 'text-gray-600'} />
+          <Flame size={16} className={isStreakActiveToday ? 'text-orange-500' : 'text-gray-600'} />
           <span className="font-bold text-xs tracking-wide">{languageStreak} {t('settings.days', 'dias')}</span>
         </div>
       </div>

@@ -89,6 +89,8 @@ export const calculateGoalCalorieTarget = (profile) => {
   const isLoss = diffKg < 0;
   const dailyTarget = isLoss ? tdee - dailyAdjustment : tdee + dailyAdjustment;
 
+  const getLocalDayStart = (date) => new Date(date.getFullYear(), date.getMonth(), date.getDate());
+
   return {
     dailyTarget: Math.max(1200, dailyTarget), // nunca sugere abaixo de 1200 kcal (segurança)
     dailyAdjustment,
@@ -104,24 +106,39 @@ export const registerWorkoutActivity = async () => {
   let record = await db.fitnessStreak.get(1);
   if (!record) record = { id: 1, streak: 0, lastWorkoutActivity: null };
 
-  const todayStr = toDateKey(new Date());
+  const now = new Date();
+  const today = getLocalDayStart(now);
+
   const oldStreak = record.streak || 0;
-  const lastStr = record.lastWorkoutActivity ? toDateKey(new Date(record.lastWorkoutActivity)) : null;
+  let newStreak = oldStreak;
+  let increased = false;
 
-  if (lastStr === todayStr) {
-    return { increased: false, oldStreak, newStreak: oldStreak };
-  }
+  if (record.lastWorkoutActivity) {
+    const lastDate = getLocalDayStart(new Date(record.lastWorkoutActivity));
+    const diffTime = today - lastDate;
+    const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
 
-  let newStreak;
-  if (lastStr) {
-    const diff = diffInDays(lastStr, todayStr);
-    newStreak = diff === 1 ? oldStreak + 1 : 1;
+    if (diffDays === 0) {
+      return { increased: false, oldStreak, newStreak: oldStreak };
+    } else if (diffDays === 1) {
+      newStreak = oldStreak + 1;
+      increased = true;
+    } else {
+      newStreak = 1;
+      increased = true;
+    }
   } else {
     newStreak = 1;
+    increased = true;
   }
 
-  await db.fitnessStreak.put({ id: 1, streak: newStreak, lastWorkoutActivity: new Date().toISOString() });
-  return { increased: newStreak !== oldStreak, oldStreak, newStreak };
+  await db.fitnessStreak.put({ 
+    id: 1, 
+    streak: newStreak, 
+    lastWorkoutActivity: now.toISOString() 
+  });
+  
+  return { increased, oldStreak, newStreak };
 };
 
 // ==========================================
