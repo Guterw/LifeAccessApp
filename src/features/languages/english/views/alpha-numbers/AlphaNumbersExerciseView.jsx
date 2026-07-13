@@ -115,7 +115,7 @@ export default function AlphaNumbersExerciseView() {
   const [toastStatus, setToastStatus] = useState(null);
   const [streakUpdate, setStreakUpdate] = useState(null);
   const [showStreakModal, setShowStreakModal] = useState(false);
-  
+
   const {
     transcript,
     isListening,
@@ -125,6 +125,37 @@ export default function AlphaNumbersExerciseView() {
     resetTranscript,
     hasSupport,
   } = useSpeech('en-IE');
+
+  const silenceDebounceRef = useRef(null);
+
+  useEffect(() => {
+    if (isListening) {
+      if (silenceDebounceRef.current) clearTimeout(silenceDebounceRef.current);
+      
+      // Reinicia o timer sempre que o transcript mudar ou a escuta continuar
+      silenceDebounceRef.current = setTimeout(() => {
+        stopListening(); // Após 2.5s de silêncio, desliga o mic (o que dispara o envio abaixo)
+      }, 3000); 
+    } else {
+      if (silenceDebounceRef.current) {
+        clearTimeout(silenceDebounceRef.current);
+        silenceDebounceRef.current = null;
+      }
+    }
+
+    return () => {
+      if (silenceDebounceRef.current) clearTimeout(silenceDebounceRef.current);
+    };
+  }, [transcript, isListening, stopListening]);
+
+  // 3. GATILHO DE VALIDAÇÃO/ENVIO
+  useEffect(() => {
+    // Quando o status virar 'stopped' e tivermos algo falado, processamos a resposta
+    if (speechStatus === 'stopped' && transcript.trim()) {
+       // AQUI VOCÊ CHAMA A FUNÇÃO QUE VALIDA A RESPOSTA NESTA TELA
+       // Exemplo: handleCheckAnswer(transcript) ou processVoice(transcript);
+    }
+  }, [speechStatus, transcript]);
 
   // Sincroniza o transcript parcial com o estado local da rodada
   useEffect(() => {
@@ -391,7 +422,7 @@ export default function AlphaNumbersExerciseView() {
       {/* Toast de status do microfone */}
       <SpeechToast
         status={toastStatus}
-        transcript={turnTranscript}
+        transcript={isListening ? transcript : ''}
         duration={3500}
       />
 

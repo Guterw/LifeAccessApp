@@ -26,6 +26,7 @@ export function useSpeech(lang = 'en-IE') {
   const retryCountRef = useRef(0);
   const isListeningRef = useRef(false); // ref espelho para uso nos callbacks
   const accumulatedTranscriptRef = useRef('');
+  const wasManuallyStoppedRef = useRef(false);
 
   const hasSupport =
     typeof window !== 'undefined' &&
@@ -77,6 +78,7 @@ export function useSpeech(lang = 'en-IE') {
         isListeningRef.current = true;
         setIsListening(true);
         setSpeechStatus('listening');
+        wasManuallyStoppedRef.current = false;
 
         // Reinicia o timer de silêncio a cada nova sessão
         clearSilenceTimer();
@@ -170,7 +172,11 @@ export function useSpeech(lang = 'en-IE') {
         clearSilenceTimer();
         isListeningRef.current = false;
         setIsListening(false);
-        if (!accumulatedTranscriptRef.current) {
+        // NOVA LÓGICA DE VERIFICAÇÃO:
+        if (wasManuallyStoppedRef.current) {
+          // Se o usuário clicou no botão, NUNCA dá erro de "no_speech"
+          setSpeechStatus('stopped');
+        } else if (!accumulatedTranscriptRef.current) {
           setSpeechStatus('no_speech');
         } else {
           setSpeechStatus('stopped');
@@ -192,6 +198,7 @@ export function useSpeech(lang = 'en-IE') {
 
   const stopListening = useCallback(() => {
     if (!isListeningRef.current) return;
+    wasManuallyStoppedRef.current = true; // <-- AVISA QUE FOI MANUAL
     setSpeechStatus('stopped');
     stopSafely();
   }, [stopSafely]);
