@@ -1,20 +1,25 @@
 // src/features/dashboard/views/MainDashboard.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useLiveQuery } from 'dexie-react-hooks';
 import { Globe, Dumbbell, Wallet, Calendar, Settings, Flame, Download, X, Share } from 'lucide-react';
 import { useLanguage } from '../../../contexts/LanguageContext';
+import { db } from '../../../config/dexieDb';
 import ModuleCard from '../../../components/ModuleCard';
 import FooterBrand from '../../../components/FooterBrand';
 import PigeonAvatar from '../../../components/PigeonAvatar'; 
 
 export default function MainDashboard() {
   const navigate = useNavigate();
-  const { t, userName, uiLang, languageStreak } = useLanguage();
+  const { t, userName, uiLang, languageStreak, isStreakActiveToday } = useLanguage();
 
   const rawDate = new Intl.DateTimeFormat(uiLang, { dateStyle: 'full' }).format(new Date());
   const formattedDate = rawDate.charAt(0).toUpperCase() + rawDate.slice(1);
 
-  const isStreakActive = languageStreak > 0;
+  // Ofensiva de Fitness — mesma fonte de dados usada em FitnessDashboard/SettingsView
+  const fitnessStreakRecord = useLiveQuery(() => db.fitnessStreak.get(1)) || { streak: 0 };
+  const fitnessStreak = fitnessStreakRecord.streak || 0;
+  const isFitnessStreakActive = fitnessStreak > 0;
   
   // ==========================================
   // LÓGICA DO BOTÃO DE INSTALAR (PWA & MODAL)
@@ -70,12 +75,24 @@ export default function MainDashboard() {
 
   const streakBadge = (
     <div className={`flex items-center gap-1 px-2 py-0.5 rounded-lg text-xs font-bold border shadow-sm transition-colors ${
-      isStreakActive 
+      isStreakActiveToday 
         ? 'bg-orange-500/20 text-orange-400 border-orange-500/30' 
         : 'bg-gray-700/50 text-gray-400 border-gray-600/50'
     }`}>
-      <Flame size={14} className={isStreakActive ? 'animate-pulse text-orange-500' : 'text-gray-500'} />
+      <Flame size={14} className={isStreakActiveToday ? 'animate-pulse text-orange-500' : 'text-gray-500'} />
       <span>{languageStreak || 0}</span>
+    </div>
+  );
+
+  // Badge de ofensiva do Fitness, no mesmo padrão visual do badge de Idiomas
+  const fitnessStreakBadge = (
+    <div className={`flex items-center gap-1 px-2 py-0.5 rounded-lg text-xs font-bold border shadow-sm transition-colors ${
+      isFitnessStreakActive 
+        ? 'bg-orange-500/20 text-orange-400 border-orange-500/30' 
+        : 'bg-gray-700/50 text-gray-400 border-gray-600/50'
+    }`}>
+      <Flame size={14} className={isFitnessStreakActive ? 'animate-pulse text-orange-500' : 'text-gray-500'} />
+      <span>{fitnessStreak}</span>
     </div>
   );
 
@@ -149,6 +166,7 @@ export default function MainDashboard() {
             isActive={true} 
             customBgClass="bg-gradient-to-r from-green-900/40 to-gray-800 border border-green-500/30 hover:border-green-400 shadow-lg relative z-10" 
             iconBgClass="bg-green-500/10 text-green-400" 
+            badge={fitnessStreakBadge}
           />
           <ModuleCard
             onClick={() => navigate('/finance')}

@@ -1,4 +1,5 @@
 import React from 'react';
+import { useAppVersion } from '../hooks/useAppVersion';
 
 const GithubIcon = (props) => (
   <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -13,11 +14,13 @@ export default function FooterBrand({
   direction = "flex-col" 
 }) {
   const currentYear = new Date().getFullYear(); // Pega o ano automaticamente
+  const appVersion = useAppVersion(); // Versão do app (auto via GitHub, com fallback manual)
 
   return (
     <div className={`flex ${direction} items-center justify-center gap-3 py-2 opacity-30 select-none`}>
-      <p className={`${textSize} ${textColor} font-mono`}>
+      <p className={`${textSize} ${textColor} font-mono text-center`}>
         LifeAccessApp - LuccasSilvaDev {currentYear}
+        <span className="opacity-70"> · {appVersion}</span>
       </p>
       <a 
         href="https://github.com/Guterw/" 
