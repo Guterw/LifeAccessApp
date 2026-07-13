@@ -11,6 +11,8 @@ import FooterBrand from '../../../../../components/FooterBrand';
 import { addXP } from '../../../../../utils/xpManager';
 import PigeonAvatar from '../../../../../components/PigeonAvatar';
 import StreakModal from '../../../../../components/StreakModal';
+import SpeechToast from '../../../../../components/SpeechToast';
+import { useError } from '../../../../../contexts/ErrorContext';
 
 const CEFR_LEVELS = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
 
@@ -94,19 +96,26 @@ export default function AiVoiceTaskView() {
   const location = useLocation();
   const { t, uiLang, registerLanguageActivity } = useLanguage();
   const [streakUpdate, setStreakUpdate] = useState(null);
-const [showStreakModal, setShowStreakModal] = useState(false);
+  const [showStreakModal, setShowStreakModal] = useState(false);
   const backRoute = location.state?.fromTrail 
     ? '/english/trail' 
     : '/english/ai-voice/tasks';
 
   const scenario = VOICE_SCENARIOS.find(s => s.id === taskId) || VOICE_SCENARIOS[0];
-  const { transcript, isListening, startListening, stopListening, hasSupport } = useSpeech('en-IE');
 
   const [callState, setCallState] = useState('idle'); 
   const [level, setLevel] = useState('A1');
   const [manualToggles, setManualToggles] = useState({});
   const [mainTranslationOpen, setMainTranslationOpen] = useState(false);
-  
+  const { transcript, isListening, startListening, stopListening, hasSupport, speechStatus } = useSpeech('en-IE');
+  const { showError } = useError();
+  const [micLoading, setMicLoading] = useState(false);
+  const [toastStatus, setToastStatus] = useState(null);
+
+  useEffect(() => {
+    setToastStatus(speechStatus);
+  }, [speechStatus]);
+
   const [taskSuccess, setTaskSuccess] = useState(() => {
     const savedCompleted = JSON.parse(localStorage.getItem('completedVoiceTasks') || '[]');
     return savedCompleted.includes(taskId);
@@ -217,7 +226,7 @@ const [showStreakModal, setShowStreakModal] = useState(false);
           if (result?.increased) setShowStreakModal(true);
         }
       } else {
-        setCallState('idle');
+        setCallState('listening'); // CORREÇÃO: Antes era 'idle'
         startListening(); 
       }
     };
@@ -227,23 +236,74 @@ const [showStreakModal, setShowStreakModal] = useState(false);
   };
 
   useEffect(() => {
-    if (!isListening && callState === 'listening' && transcript.trim()) {
-      handleSendVoice(transcript);
-    } else if (!isListening && callState === 'listening' && !transcript.trim()) {
-      setCallState('idle');
+    if ((speechStatus === 'stopped' || speechStatus === 'no_speech') && callState === 'listening') {
+      if (transcript.trim()) {
+        handleSendVoice(transcript);
+      } else {
+        setCallState('idle');
+      }
     }
-  }, [isListening, callState, transcript]);
+  }, [speechStatus, callState, transcript]);
 
-  const toggleMic = () => {
+  // ─── NOVO: força o envio automático após 5s sem nenhuma fala nova ───
+  const silenceDebounceRef = useRef(null);
+
+  useEffect(() => {
+    if (callState === 'listening' && isListening) {
+      if (silenceDebounceRef.current) clearTimeout(silenceDebounceRef.current);
+      silenceDebounceRef.current = setTimeout(() => {
+        stopListening();
+      }, 3000);
+    } else {
+      if (silenceDebounceRef.current) {
+        clearTimeout(silenceDebounceRef.current);
+        silenceDebounceRef.current = null;
+      }
+    }
+
+    return () => {
+      if (silenceDebounceRef.current) clearTimeout(silenceDebounceRef.current);
+    };
+  }, [transcript, isListening, callState, stopListening]);
+
+  // ==========================================
+  // CORREÇÃO CRÍTICA (Safari/iOS): antes de chamar startListening(), é
+  // preciso pedir permissão de microfone explicitamente via getUserMedia
+  // dentro do mesmo gesto de clique do usuário. Sem isso, o Safari
+  // simplesmente não inicia o SpeechRecognition — mesmo padrão já usado
+  // com sucesso em AlphaNumbersExerciseView.jsx.
+  // ==========================================
+  const toggleMic = async () => {
     if (callState === 'speaking' || callState === 'thinking' || taskSuccess) return;
 
     if (isListening) {
       stopListening();
-    } else {
-      synth.cancel();
-      setCallState('listening');
-      startListening();
+      return;
     }
+
+    if (!hasSupport) {
+      showError('Seu navegador não suporta reconhecimento de voz. Use Chrome ou Safari.');
+      return;
+    }
+
+    setMicLoading(true);
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      stream.getTracks().forEach((t) => t.stop());
+    } catch (err) {
+      setMicLoading(false);
+      if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+        showError('Acesso ao microfone negado. Verifique as permissões do navegador para este site.');
+      } else {
+        showError('Não foi possível acessar o microfone. Tente novamente.');
+      }
+      return;
+    }
+    setMicLoading(false);
+
+    synth.cancel();
+    setCallState('listening');
+    startListening();
   };
 
   const endCall = () => {
@@ -337,6 +397,7 @@ const [showStreakModal, setShowStreakModal] = useState(false);
 
   return (
     <div className="fixed inset-x-0 top-0 bottom-[80px] bg-gray-950 flex flex-col animate-fade-in z-10">
+      <SpeechToast status={toastStatus} transcript={isListening ? transcript : ''} duration={3500} />
       <StreakModal
         streakUpdate={showStreakModal ? streakUpdate : null}
         onClose={() => setShowStreakModal(false)}
@@ -478,14 +539,19 @@ const [showStreakModal, setShowStreakModal] = useState(false);
         <div className="flex items-center justify-center gap-6 sm:gap-10 mb-4 px-8">
           <button 
             onClick={toggleMic}
-            disabled={callState === 'thinking'}
+            disabled={callState === 'thinking' || micLoading}
             className={`w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center transition-all shadow-lg ${
               isListening 
                 ? 'bg-gray-100 text-gray-900 hover:bg-white' 
                 : 'bg-gray-800 text-white hover:bg-gray-700 border border-gray-700'
-            } ${callState === 'thinking' ? 'opacity-50 cursor-not-allowed' : ''}`}
+            } ${(callState === 'thinking' || micLoading) ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
-            {isListening ? <Mic size={24} /> : <MicOff size={24} />}
+            {micLoading ? (
+              <svg className="w-6 h-6 animate-spin" viewBox="0 0 24 24" fill="none">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
+              </svg>
+            ) : isListening ? <Mic size={24} /> : <MicOff size={24} />}
           </button>
 
           <button 

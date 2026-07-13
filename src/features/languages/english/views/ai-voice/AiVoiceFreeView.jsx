@@ -8,6 +8,8 @@ import { generateCloudResponse } from '../../../../../services/aiService';
 import { useSpeech } from '../../../../../hooks/useSpeech';
 import FooterBrand from '../../../../../components/FooterBrand'; 
 import PigeonAvatar from '../../../../../components/PigeonAvatar';
+import SpeechToast from '../../../../../components/SpeechToast';
+import { useError } from '../../../../../contexts/ErrorContext';
 
 const CEFR_LEVELS = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
 
@@ -80,13 +82,20 @@ const FIRST_MESSAGE = {
 export default function AiVoiceFreeView() {
   const navigate = useNavigate();
   const { t, uiLang } = useLanguage();
-  const { transcript, isListening, startListening, stopListening, hasSupport } = useSpeech('en-IE');
-
   const [callState, setCallState] = useState('idle'); 
   const [level, setLevel] = useState('A1');
   const [manualToggles, setManualToggles] = useState({});
   const [mainTranslationOpen, setMainTranslationOpen] = useState(false);
   
+  const { transcript, isListening, startListening, stopListening, hasSupport, speechStatus } = useSpeech('en-IE');
+  const { showError } = useError();
+  const [micLoading, setMicLoading] = useState(false);
+  const [toastStatus, setToastStatus] = useState(null);
+
+  useEffect(() => {
+    setToastStatus(speechStatus);
+  }, [speechStatus]);
+
   const [history, setHistory] = useState(() => {
     const saved = localStorage.getItem('aiVoiceFreeHistory');
     if (saved) {
@@ -179,7 +188,7 @@ export default function AiVoiceFreeView() {
     };
 
     utterance.onend = () => {
-      setCallState('idle');
+      setCallState('listening'); // CORREÇÃO: Antes era 'idle', o que ignorava a sua próxima fala!
       startListening(); 
     };
 
@@ -188,23 +197,75 @@ export default function AiVoiceFreeView() {
   };
 
   useEffect(() => {
-    if (!isListening && callState === 'listening' && transcript.trim()) {
-      handleSendVoice(transcript);
-    } else if (!isListening && callState === 'listening' && !transcript.trim()) {
-      setCallState('idle');
+    // Usamos o speechStatus gerado pelo useSpeech para evitar abortos prematuros
+    if ((speechStatus === 'stopped' || speechStatus === 'no_speech') && callState === 'listening') {
+      if (transcript.trim()) {
+        handleSendVoice(transcript);
+      } else {
+        setCallState('idle');
+      }
     }
-  }, [isListening, callState, transcript]);
+  }, [speechStatus, callState, transcript]);
 
-  const toggleMic = () => {
+  // ─── NOVO: força o envio automático após 5s sem nenhuma fala nova ───
+  // Isso não depende do timeout interno do hook useSpeech (que é de 8s e
+  // às vezes não dispara de forma confiável em modo contínuo). Aqui,
+  // sempre que o transcript muda enquanto estamos ouvindo, o timer reinicia.
+  // Se passarem 5s sem nenhuma mudança no texto, paramos o reconhecimento
+  // manualmente — o que aciona o useEffect acima e envia a mensagem.
+  const silenceDebounceRef = useRef(null);
+
+  useEffect(() => {
+    if (callState === 'listening' && isListening) {
+      if (silenceDebounceRef.current) clearTimeout(silenceDebounceRef.current);
+      silenceDebounceRef.current = setTimeout(() => {
+        stopListening();
+      }, 2500);
+    } else {
+      if (silenceDebounceRef.current) {
+        clearTimeout(silenceDebounceRef.current);
+        silenceDebounceRef.current = null;
+      }
+    }
+
+    return () => {
+      if (silenceDebounceRef.current) clearTimeout(silenceDebounceRef.current);
+    };
+  }, [transcript, isListening, callState, stopListening]);
+
+  const toggleMic = async () => {
     if (callState === 'speaking' || callState === 'thinking') return;
 
     if (isListening) {
       stopListening();
-    } else {
-      synth.cancel();
-      setCallState('listening');
-      startListening();
+      return;
     }
+
+    if (!hasSupport) {
+      showError('Seu navegador não suporta reconhecimento de voz. Use Chrome ou Safari.');
+      return;
+    }
+
+    // Solicita permissão explicitamente antes de iniciar (crítico no iOS/Safari,
+    // e é o mesmo padrão usado em AlphaNumbersExerciseView que já funciona)
+    setMicLoading(true);
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      stream.getTracks().forEach((t) => t.stop());
+    } catch (err) {
+      setMicLoading(false);
+      if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+        showError('Acesso ao microfone negado. Verifique as permissões do navegador para este site.');
+      } else {
+        showError('Não foi possível acessar o microfone. Tente novamente.');
+      }
+      return;
+    }
+    setMicLoading(false);
+
+    synth.cancel();
+    setCallState('listening');
+    startListening();
   };
 
   const endCall = () => {
@@ -265,7 +326,7 @@ export default function AiVoiceFreeView() {
 
   return (
     <div className="fixed inset-x-0 top-0 bottom-[80px] bg-gray-950 flex flex-col animate-fade-in z-10">
-      
+      <SpeechToast status={toastStatus} transcript={isListening ? transcript : ''} duration={3500} />
       {/* HEADER E NÍVEL */}
       <div className="flex flex-col w-full shrink-0">
         <div className="flex items-center justify-between p-4 bg-gray-900 border-b border-gray-800">
@@ -390,14 +451,19 @@ export default function AiVoiceFreeView() {
         <div className="flex items-center justify-center gap-6 sm:gap-10 mb-4 px-8">
           <button 
             onClick={toggleMic}
-            disabled={callState === 'thinking'}
+            disabled={callState === 'thinking' || micLoading}
             className={`w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center transition-all shadow-lg ${
               isListening 
                 ? 'bg-gray-100 text-gray-900 hover:bg-white' 
                 : 'bg-gray-800 text-white hover:bg-gray-700 border border-gray-700'
-            } ${callState === 'thinking' ? 'opacity-50 cursor-not-allowed' : ''}`}
+            } ${(callState === 'thinking' || micLoading) ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
-            {isListening ? <Mic size={24} /> : <MicOff size={24} />}
+            {micLoading ? (
+              <svg className="w-6 h-6 animate-spin" viewBox="0 0 24 24" fill="none">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
+              </svg>
+            ) : isListening ? <Mic size={24} /> : <MicOff size={24} />}
           </button>
 
           <button 
