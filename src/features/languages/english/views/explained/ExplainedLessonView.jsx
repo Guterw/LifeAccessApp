@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ChevronRight, ChevronLeft, BookOpen, CheckCircle2, XCircle, PartyPopper } from 'lucide-react';
+import { ChevronRight, ChevronLeft, BookOpen, CheckCircle2, XCircle, PartyPopper, Volume2 } from 'lucide-react';
 import { useLanguage } from '../../../../../contexts/LanguageContext';
 import { EXPLAINED_LESSONS } from '../../../../../data/explainedLessons';
 import { db } from '../../../../../config/dexieDb';
 import { addXP } from '../../../../../utils/xpManager';
 import BackButton from '../../../../../components/BackButton';
+import { speakInUiLang, speakInEnglish, speakSequence } from '../../../../../utils/speechHelper';
 
 export default function ExplainedLessonView() {
   const { lessonId } = useParams();
@@ -15,7 +16,6 @@ export default function ExplainedLessonView() {
 
   const getText = (obj) => obj?.[uiLang] || obj?.pt || '';
 
-  // fases: 'theory' -> 'practice' -> 'done'
   const [phase, setPhase] = useState('theory');
   const [slideIndex, setSlideIndex] = useState(0);
   const [queue, setQueue] = useState(lesson ? [...lesson.exercises] : []);
@@ -27,7 +27,27 @@ export default function ExplainedLessonView() {
   const isLastSlide = slideIndex === lesson.theory.length - 1;
   const currentQuestion = queue[0];
 
+  // Lê o slide de teoria inteiro: título + corpo no idioma do app,
+  // seguido de cada exemplo (que é sempre em inglês) com voz en-IE.
+  const playTheorySlide = () => {
+    const segments = [
+      { text: getText(current.title), lang: uiLang },
+      { text: getText(current.body), lang: uiLang },
+    ];
+    (current.examples || []).forEach((ex) => {
+      segments.push({ text: ex, lang: 'en' });
+    });
+    speakSequence(segments);
+  };
+
+  const playExercisePrompt = () => {
+    // A pergunta do exercício é narrada no idioma do app,
+    // já as opções/target (que geralmente contêm inglês) em inglês.
+    speakInUiLang(getText(currentQuestion?.question), uiLang);
+  };
+
   const nextSlide = () => {
+    window.speechSynthesis?.cancel();
     if (isLastSlide) setPhase('practice');
     else setSlideIndex(i => i + 1);
   };
@@ -48,8 +68,8 @@ export default function ExplainedLessonView() {
         await db.completedExplainedLessons.put({ lessonId: lesson.id, completedAt: new Date().toISOString() });
         const cache = JSON.parse(localStorage.getItem('completedExplainedLessonsCache') || '[]');
         if (!cache.includes(lesson.id)) {
-        cache.push(lesson.id);
-        localStorage.setItem('completedExplainedLessonsCache', JSON.stringify(cache));
+          cache.push(lesson.id);
+          localStorage.setItem('completedExplainedLessonsCache', JSON.stringify(cache));
         }
         await addXP(25);
         setPhase('done');
@@ -72,9 +92,18 @@ export default function ExplainedLessonView() {
         </div>
 
         <div className="flex-1 bg-gray-800 border border-gray-700 rounded-3xl p-6 flex flex-col shadow-xl">
-          <div className="flex items-center gap-2 mb-4 text-fuchsia-400">
-            <BookOpen size={18} />
-            <span className="text-[10px] font-black uppercase tracking-widest">{t('explained.theoryLabel', 'Explicação')} {slideIndex + 1}/{lesson.theory.length}</span>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2 text-fuchsia-400">
+              <BookOpen size={18} />
+              <span className="text-[10px] font-black uppercase tracking-widest">{t('explained.theoryLabel', 'Explicação')} {slideIndex + 1}/{lesson.theory.length}</span>
+            </div>
+            <button
+              onClick={playTheorySlide}
+              className="p-2.5 rounded-full bg-fuchsia-500/15 text-fuchsia-400 hover:bg-fuchsia-500/25 transition-colors shrink-0"
+              title={t('explained.listenSlide', 'Ouvir explicação')}
+            >
+              <Volume2 size={18} />
+            </button>
           </div>
           <h3 className="text-2xl font-black text-white mb-4">{getText(current.title)}</h3>
           <p className="text-gray-300 leading-relaxed whitespace-pre-wrap mb-6 flex-1">{getText(current.body)}</p>
@@ -83,7 +112,14 @@ export default function ExplainedLessonView() {
             <div className="bg-gray-900/60 rounded-2xl p-4 space-y-2 mb-4">
               <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">{t('explained.examples', 'Exemplos')}</span>
               {current.examples.map((ex, i) => (
-                <p key={i} className="text-sm text-fuchsia-200 italic">"{ex}"</p>
+                <button
+                  key={i}
+                  onClick={() => speakInEnglish(ex)}
+                  className="w-full text-left flex items-center gap-2 group"
+                >
+                  <Volume2 size={12} className="text-fuchsia-400 shrink-0 opacity-60 group-hover:opacity-100" />
+                  <p className="text-sm text-fuchsia-200 italic">"{ex}"</p>
+                </button>
               ))}
             </div>
           )}
@@ -117,7 +153,12 @@ export default function ExplainedLessonView() {
           {t('general.remaining', 'Faltam')} {queue.length} {queue.length === 1 ? t('general.question', 'questão') : t('general.questions', 'questões')}
         </span>
 
-        <h2 className="text-2xl font-black text-white text-center mb-8 px-2">{getText(currentQuestion?.question)}</h2>
+        <div className="flex items-center justify-center gap-2 mb-8 px-2">
+          <h2 className="text-2xl font-black text-white text-center">{getText(currentQuestion?.question)}</h2>
+          <button onClick={playExercisePrompt} className="p-2 rounded-full bg-fuchsia-500/15 text-fuchsia-400 shrink-0">
+            <Volume2 size={16} />
+          </button>
+        </div>
 
         {currentQuestion?.type === 'fill_choice' && (
           <div className="grid grid-cols-1 gap-3 max-w-sm mx-auto w-full">
@@ -125,6 +166,7 @@ export default function ExplainedLessonView() {
               <button
                 key={opt}
                 onClick={() => handleAnswer(opt)}
+                onDoubleClick={() => speakInEnglish(opt)}
                 disabled={!!feedback}
                 className="p-4 bg-gray-800 rounded-2xl border-2 border-gray-700 hover:border-fuchsia-400 text-white font-bold text-left disabled:opacity-60"
               >

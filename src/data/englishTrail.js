@@ -28,7 +28,7 @@ export const ENGLISH_TRAIL = [
   { id: 'node_5', type: 'vocab_speech', targetId: 1, 
     title: { pt: 'Falar: Saudações', en: 'Speak: Greetings', es: 'Hablar: Saludos' }, 
     color: 'bg-sky-600', shadow: 'shadow-sky-600/50', icon: 'Mic', 
-    path: '/english/vocabularies/vocab-speech/1' 
+    path: '/english/vocabularies/vocab-speech/level/1' 
   },
   { id: 'node_6', type: 'explained', targetId: 'lesson_tobe_affirmative', 
     title: { pt: 'O Verbo TO BE', en: 'Verb TO BE', es: 'Verbo TO BE' }, 
@@ -49,7 +49,7 @@ export const ENGLISH_TRAIL = [
   { id: 'node_9', type: 'vocab_reverse', targetId: 2, 
     title: { pt: 'Tradução: Pessoas', en: 'Translate: People', es: 'Traducción: Personas' }, 
     color: 'bg-purple-600', shadow: 'shadow-purple-600/50', icon: 'RotateCcw', 
-    path: '/english/vocabularies/vocab-reverse/2' 
+    path: '/english/vocabularies/vocab-reverse/level/2' 
   },
   { id: 'node_10', type: 'numbers', targetIndex: 1, 
     title: { pt: 'Números 10 a 19', en: 'Numbers 10-19', es: 'Números 10-19' }, 
@@ -109,7 +109,7 @@ export const ENGLISH_TRAIL = [
   { id: 'node_20', type: 'vocab_speech', targetId: 4, 
     title: { pt: 'Falar: Comida', en: 'Speak: Food', es: 'Hablar: Comida' }, 
     color: 'bg-sky-600', shadow: 'shadow-sky-600/50', icon: 'Mic', 
-    path: '/english/vocabularies/vocab-speech/4' 
+    path: '/english/vocabularies/vocab-speech/level/4' 
   },
   { id: 'node_21', type: 'numbers', targetIndex: 2, 
     title: { pt: 'Dezenas 20 a 100', en: 'Tens 20 to 100', es: 'Decenas 20 a 100' }, 
@@ -135,7 +135,7 @@ export const ENGLISH_TRAIL = [
   { id: 'node_25', type: 'vocab_reverse', targetId: 5, 
     title: { pt: 'Tradução: Empregos', en: 'Translate: Jobs', es: 'Traducción: Trabajos' }, 
     color: 'bg-purple-600', shadow: 'shadow-purple-600/50', icon: 'RotateCcw', 
-    path: '/english/vocabularies/vocab-reverse/5' 
+    path: '/english/vocabularies/vocab-reverse/level/5' 
   },
   { id: 'node_26', type: 'explained', targetId: 'lesson_articles', 
     title: { pt: 'A, An, The', en: 'A, An, The', es: 'A, An, The' }, 

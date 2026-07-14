@@ -86,20 +86,6 @@ function App() {
   const { isFirstAccess } = useLanguage();
   const [onboardingStep, setOnboardingStep] = useState(1);
 
-  window.forceCompleteLesson = async (lessonId) => {
-  const { db } = await import('./config/dexieDb'); // Ajuste o caminho
-  try {
-    await db.completedExplainedLessons.put({
-      lessonId: lessonId,
-      completedAt: new Date().toISOString()
-    });
-    console.log(`Missão ${lessonId} concluída com sucesso!`);
-    window.location.reload(); // Recarrega para refletir na UI
-  } catch (e) {
-    console.error("Erro ao forçar conclusão:", e);
-  }
-  };
-
   useEffect(() => {
     repairUserProfile();
 

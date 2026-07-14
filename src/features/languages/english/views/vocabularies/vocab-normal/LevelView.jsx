@@ -99,7 +99,7 @@ export default function LevelView() {
 
   const backRoute = location.state?.fromTrail 
     ? '/english/trail' 
-    : `/levels/group/${(levelData?.group && levelData.group[0]) || 'A1'}`;
+    : `/english/vocabularies/vocab-normal/levels/group/${(levelData?.group && levelData.group[0]) || 'A1'}`;
 
   const currentValidAnswers = currentWord ? (
     (uiLang === 'es' && currentWord.es) ? currentWord.es : 

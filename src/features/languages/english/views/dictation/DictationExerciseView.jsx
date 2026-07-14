@@ -9,6 +9,7 @@ import { db } from '../../../../../config/dexieDb';
 import { addXP } from '../../../../../utils/xpManager';
 import BackButton from '../../../../../components/BackButton';
 import FooterBrand from '../../../../../components/FooterBrand';
+import { getContractionExpansion } from '../../../../../data/dictationTexts';
 
 // ─── Sons (mesmo padrão usado em AlphaNumbersExerciseView.jsx) ─────────────
 const playWrongSound = () => {
@@ -57,7 +58,7 @@ const normalizeWord = (w) =>
 export default function DictationExerciseView() {
   const { textId } = useParams();
   const navigate = useNavigate();
-  const { t, registerLanguageActivity } = useLanguage();
+  const { t, uiLang, registerLanguageActivity } = useLanguage();
 
   const textData = DICTATION_TEXTS.find((d) => d.id === textId) || DICTATION_TEXTS[0];
 
@@ -325,22 +326,37 @@ export default function DictationExerciseView() {
 
       <div className="max-w-lg w-full mx-auto flex-1 flex flex-col items-center justify-center">
         {/* Texto */}
-        <div className="bg-gray-800 border border-gray-700 rounded-[2rem] p-6 sm:p-8 shadow-xl w-full mb-8">
-          <p className="text-xl sm:text-2xl leading-relaxed font-bold text-center flex flex-wrap justify-center gap-x-2 gap-y-1">
-            {textData.words.map((word, idx) => {
-              let colorClass = 'text-white'; // pendente
-              if (idx < currentIndex) colorClass = 'text-green-500';
-              else if (idx === currentIndex && errorIndex === idx) colorClass = 'text-red-500';
-              else if (idx === currentIndex) colorClass = 'text-yellow-400';
+{/* Texto */}
+      <div className="bg-gray-800 border border-gray-700 rounded-[2rem] p-6 sm:p-8 shadow-xl w-full mb-8">
+        <p className="text-xl sm:text-2xl leading-relaxed font-bold text-center flex flex-wrap justify-center gap-x-2 gap-y-1">
+          {textData.words.map((word, idx) => {
+            let colorClass = 'text-white';
+            if (idx < currentIndex) colorClass = 'text-green-500';
+            else if (idx === currentIndex && errorIndex === idx) colorClass = 'text-red-500';
+            else if (idx === currentIndex) colorClass = 'text-yellow-400';
 
-              return (
-                <span key={idx} className={`transition-colors duration-200 ${colorClass}`}>
-                  {word}
-                </span>
-              );
-            })}
-          </p>
-        </div>
+            const expansion = getContractionExpansion(word);
+
+            return (
+              <span key={idx} className={`transition-colors duration-200 ${colorClass}`}>
+                {word}
+                {expansion && (
+                  <span className={`text-[10px] font-normal align-super ml-0.5 ${idx < currentIndex ? 'text-green-500/70' : 'text-gray-500'}`}>
+                    ({expansion})
+                  </span>
+                )}
+              </span>
+            );
+          })}
+        </p>
+
+        {/* Tradução apagadinha, sempre visível, no idioma do app */}
+          {textData.translation && (
+            <p className="text-[10px] text-gray-600 text-center mt-4 italic leading-snug opacity-70">
+              {textData.translation[uiLang] || textData.translation.pt}
+            </p>
+          )}
+      </div>
 
         {status === 'idle' && (
           <button
