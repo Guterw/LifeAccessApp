@@ -9,6 +9,29 @@ import BackButton from '../../../../../../components/BackButton';
 import { addXP } from '../../../../../../utils/xpManager';
 import StreakModal from '../../../../../../components/StreakModal';
 
+const normalize = (s) => String(s || '').toLowerCase().trim();
+
+// devolve um array de respostas aceitas em inglês, mesmo que `en` seja string única
+const getAcceptedAnswers = (word) => {
+  if (!word) return [];
+  return Array.isArray(word.en) ? word.en : [word.en];
+};
+
+// texto de exibição juntando todas as respostas aceitas em inglês com " / "
+const formatAcceptedAnswers = (word) => getAcceptedAnswers(word).join(' / ');
+
+// devolve um array com TODAS as traduções (pt ou es) do array de significado
+const getAcceptedPrompts = (word, uiLang) => {
+  if (!word) return [];
+  const list = (uiLang === 'es' && word.es) ? word.es : word.pt;
+  if (Array.isArray(list) && list.length > 0) return list;
+  const enFallback = Array.isArray(word.en) ? word.en[0] : word.en;
+  return enFallback ? [enFallback] : [];
+};
+
+// texto de exibição juntando todas as traduções aceitas com " / "
+const formatAcceptedPrompts = (word, uiLang) => getAcceptedPrompts(word, uiLang).join(' / ');
+
 export default function VocabReverseView() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -31,8 +54,12 @@ export default function VocabReverseView() {
     : `/english/vocabularies/vocab-reverse/levels/group/${(levelData?.group && levelData.group[0]) || 'A1'}`;
 
   const currentWord = queue[0];
-  const promptTranslation = currentWord
-    ? ((uiLang === 'es' && currentWord.es) ? currentWord.es[0] : currentWord.pt?.[0])
+
+  const promptDisplay = currentWord ? formatAcceptedPrompts(currentWord, uiLang) : '';
+
+  const promptToSpeak = currentWord
+    ? ((uiLang === 'es' && currentWord.es) ? currentWord.es[0] : currentWord.pt?.[0]) ||
+      (Array.isArray(currentWord.en) ? currentWord.en[0] : currentWord.en)
     : '';
 
   useEffect(() => {
@@ -52,9 +79,9 @@ export default function VocabReverseView() {
 
   // FUNÇÃO ISOLADA DE FALA COM LOWERCASE (Corrige bug iOS para letras singulares)
   const speakPrompt = () => {
-    if (!window.speechSynthesis || !promptTranslation) return;
+    if (!window.speechSynthesis || !promptToSpeak) return;
     window.speechSynthesis.cancel();
-    const cleanText = String(promptTranslation).toLowerCase();
+    const cleanText = String(promptToSpeak).toLowerCase();
     const utt = new SpeechSynthesisUtterance(cleanText);
     utt.lang = uiLang === 'es' ? 'es-ES' : 'pt-BR';
     utt.rate = 0.9;
@@ -63,12 +90,12 @@ export default function VocabReverseView() {
 
   // REPRODUÇÃO AUTOMÁTICA (Auto-TTS)
   useEffect(() => {
-    if (promptTranslation && !feedback) {
+    if (promptToSpeak && !feedback) {
       const timer = setTimeout(() => { speakPrompt(); }, 400);
       return () => clearTimeout(timer);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [promptTranslation, feedback, uiLang]);
+  }, [promptToSpeak, feedback, uiLang]);
 
   const saveState = async (newQueue, newCorrectCount) => {
     await db.levelProgressReverse.put({
@@ -83,16 +110,16 @@ export default function VocabReverseView() {
     if (e) e.preventDefault();
     if (!inputVal.trim() || !currentWord) return;
 
-    const userAnswer = inputVal.trim().toLowerCase();
-    const isCorrect = userAnswer === currentWord.en.toLowerCase();
+    const acceptedNormalized = getAcceptedAnswers(currentWord).map(normalize);
+    const isCorrect = acceptedNormalized.includes(normalize(inputVal));
 
     let newQueue = [...queue];
 
     if (isCorrect) {
       setFeedback('correct');
       await db.learnedWords.put({
-        en: currentWord.en,
-        translation: promptTranslation,
+        en: Array.isArray(currentWord.en) ? currentWord.en[0] : currentWord.en,
+        translation: promptDisplay,
         level: currentLevelId,
         category: currentWord.category || 'Geral',
         learnedAt: new Date().toISOString(),
@@ -180,9 +207,11 @@ export default function VocabReverseView() {
                 ? <CheckCircle2 size={60} className="text-green-500 mb-4" />
                 : <XCircle size={60} className="text-red-500 mb-4" />}
               <p className="text-gray-300 text-sm font-bold uppercase tracking-widest mb-1">
-                {feedback === 'correct' ? t('level.excellent', 'Excelente!') : t('level.correctIs', 'A palavra correta era:')}
+                {feedback === 'correct' ? t('level.excellent', 'Excelente!') : t('level.correctIs', 'Respostas válidas:')}
               </p>
-              <p className="text-white text-2xl sm:text-3xl font-black">{currentWord?.en}</p>
+              <p className="text-white text-xl sm:text-2xl font-black px-4">
+                {formatAcceptedAnswers(currentWord)}
+              </p>
             </div>
           )}
 
@@ -199,8 +228,8 @@ export default function VocabReverseView() {
             >
               <Volume2 size={20} />
             </button>
-            <h3 className="text-3xl sm:text-4xl font-black text-white text-center break-words">
-              {promptTranslation}
+            <h3 className="text-2xl sm:text-3xl font-black text-white text-center break-words leading-snug">
+              {promptDisplay}
             </h3>
           </div>
 
