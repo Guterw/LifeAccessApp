@@ -344,4 +344,310 @@ export const EXPLAINED_LESSONS = [
       { id: 'q8', type: 'fill_choice', question: { pt: '"That\'s a good ___." (pensamento/ideia)', en: '"That\'s a good ___." (idea/thought)', es: '"That\'s a good ___." (idea/pensamiento)' }, target: 'thought', options: ['thought', 'though', 'through', 'tough'] }
     ]
   },
+  // ==========================================
+  // NOVAS LIÇÕES BÁSICAS (FUNDAÇÃO TOTAL)
+  // ==========================================
+  {
+    id: 'lesson_pronouns',
+    title: { pt: 'Quem é quem? (Os Pronomes)', en: 'Who is who? (Pronouns)', es: '¿Quién es quién? (Pronombres)' },
+    icon: 'Users',
+    theory: [
+      {
+        id: 'pro_1',
+        title: { pt: 'Eu, Você, Ele e Ela', en: 'I, You, He and She', es: 'Yo, Tú, Él y Ella' },
+        body: {
+          pt: 'Antes de aprender verbos, precisamos saber de quem estamos falando.\n\nI = Eu (Sempre escrito com letra maiúscula, mesmo no meio da frase!).\nYou = Você (Ou "Vocês", serve para os dois!).\nHe = Ele (Para homens/meninos).\nShe = Ela (Para mulheres/meninas).',
+          en: 'Before verbs, we need to know who we are talking about.\n\nI = Me (Always capital!).\nYou = You (Singular or plural!).\nHe = Him (Males).\nShe = Her (Females).',
+          es: 'Antes de los verbos, necesitamos saber de quién hablamos.\n\nI = Yo (¡Siempre en mayúscula!).\nYou = Tú / Ustedes.\nHe = Él.\nShe = Ella.'
+        },
+        examples: ['I am from Brazil.', 'You are my friend.', 'He is John.', 'She is Maria.']
+      },
+      {
+        id: 'pro_2',
+        title: { pt: 'O estranho caso do "IT"', en: 'The strange case of "IT"', es: 'El extraño caso de "IT"' },
+        body: {
+          pt: 'No português, a gente diz "Está chovendo" ou "A porta é azul, ela é bonita". No inglês, TUDO precisa de um sujeito.\n\nPara coisas, animais, tempo e objetos, usamos o "IT" (Ele/Ela para não-humanos).\n\nEx: "It is raining" (Está chovendo). Não pode dizer só "Is raining".',
+          en: 'In English, EVERY sentence needs a subject.\n\nFor things, animals, weather, and objects, we use "IT".\n\nEx: "It is raining". You cannot just say "Is raining".',
+          es: 'En inglés, TODA oración necesita un sujeto.\n\nPara cosas, animales, clima y objetos, usamos "IT".\n\nEj: "It is raining". No puedes decir solo "Is raining".'
+        },
+        examples: ['It is a dog.', 'It is cold today.', 'Where is the car? It is here.']
+      },
+      {
+        id: 'pro_3',
+        title: { pt: 'Nós e Eles (O Plural)', en: 'We and They (Plural)', es: 'Nosotros y Ellos (Plural)' },
+        body: {
+          pt: 'Para falar da galera:\n\nWe = Nós (A gente).\nThey = Eles / Elas.\n\nO "They" é super legal porque serve para TUDO no plural: homens, mulheres, objetos, cachorros... se tem mais de um, é "They"!',
+          en: 'Talking about groups:\n\nWe = Us.\nThey = Them.\n\n"They" is great because it works for EVERYTHING in plural: men, women, objects, dogs...',
+          es: 'Hablando de grupos:\n\nWe = Nosotros.\nThey = Ellos / Ellas.\n\n"They" sirve para TODO en plural: hombres, mujeres, objetos, perros...'
+        },
+        examples: ['We are family.', 'They are my brothers.', 'Where are the keys? They are on the table.']
+      }
+    ],
+    exercises: [
+      { id: 'q1', type: 'fill_choice', question: { pt: 'Como se diz "Eu" em inglês?', en: 'How do you say "Me" as a subject?', es: '¿Cómo se dice "Yo"?' }, target: 'I', options: ['i', 'I', 'Me', 'You'] },
+      { id: 'q2', type: 'fill_choice', question: { pt: 'Qual pronome usamos para um CACHORRO?', en: 'Which pronoun for a DOG?', es: '¿Qué pronombre para un PERRO?' }, target: 'It', options: ['He', 'She', 'It', 'They'] },
+      { id: 'q3', type: 'fill_choice', question: { pt: 'Qual pronome usamos para "Eles" ou "Elas"?', en: 'Which pronoun for plural third person?', es: '¿Qué pronombre para plural?' }, target: 'They', options: ['We', 'They', 'It', 'You'] }
+    ]
+  },
+  {
+    id: 'lesson_tobe_affirmative',
+    title: { pt: 'O famoso Verbo TO BE', en: 'The famous Verb TO BE', es: 'El famoso Verbo TO BE' },
+    icon: 'Sparkles',
+    theory: [
+      {
+        id: 'tb_1',
+        title: { pt: 'O que diabos é o To Be?', en: 'What on earth is To Be?', es: '¿Qué diablos es To Be?' },
+        body: {
+          pt: 'Esqueça os traumas da escola. O verbo "To Be" significa apenas duas coisas: SER ou ESTAR.\n\nEm português, você tem que adivinhar pelo contexto se "Sou" ou "Estou". No inglês, é uma palavra só que serve pros dois!\n\nI am John = Eu sou o John.\nI am in Dublin = Eu estou em Dublin.',
+          en: 'Forget school trauma. "To Be" just means existing or locating.\n\nI am John = I am John.\nI am in Dublin = I am in Dublin.',
+          es: 'Olvida los traumas escolares. "To Be" significa SER o ESTAR.\n\nI am John = Yo soy John.\nI am in Dublin = Yo estoy en Dublín.'
+        },
+        examples: ['I am happy. (Estou feliz)', 'He is my boss. (Ele é meu chefe)']
+      },
+      {
+        id: 'tb_2',
+        title: { pt: 'As 3 roupinhas do To Be', en: 'The 3 outfits of To Be', es: 'Los 3 trajes de To Be' },
+        body: {
+          pt: 'O verbo To Be tem apenas 3 "roupinhas" que ele veste dependendo de com quem está andando:\n\n1. AM: É a roupa exclusiva do "I" (Eu).\n2. IS: É a roupa dos solitários "He, She, It" (Ele/Ela).\n3. ARE: É a roupa da galera "You, We, They" (Plurais e Você).',
+          en: 'To Be wears 3 outfits depending on the pronoun:\n\n1. AM: Only for "I".\n2. IS: For "He, She, It".\n3. ARE: For "You, We, They".',
+          es: 'To Be tiene 3 trajes según el pronombre:\n\n1. AM: Solo para "I".\n2. IS: Para "He, She, It".\n3. ARE: Para "You, We, They".'
+        },
+        examples: ['I am...', 'He is...', 'She is...', 'We are...', 'They are...']
+      }
+    ],
+    exercises: [
+      { id: 'q1', type: 'fill_choice', question: { pt: 'Complete: "I ___ from Brazil."', en: 'Complete: "I ___ from Brazil."', es: 'Completa: "I ___ from Brazil."' }, target: 'am', options: ['am', 'is', 'are', 'be'] },
+      { id: 'q2', type: 'fill_choice', question: { pt: 'Complete: "She ___ my sister."', en: 'Complete: "She ___ my sister."', es: 'Completa: "She ___ my sister."' }, target: 'is', options: ['am', 'is', 'are', 'be'] },
+      { id: 'q3', type: 'fill_choice', question: { pt: 'Complete: "We ___ in Dublin."', en: 'Complete: "We ___ in Dublin."', es: 'Completa: "We ___ in Dublin."' }, target: 'are', options: ['am', 'is', 'are', 'be'] }
+    ]
+  },
+  {
+    id: 'lesson_tobe_questions',
+    title: { pt: 'To Be: Perguntas e Negativas', en: 'To Be: Questions and Negatives', es: 'To Be: Preguntas y Negativas' },
+    icon: 'MessageCircle',
+    theory: [
+      {
+        id: 'tbq_1',
+        title: { pt: 'O truque do Espelho (Perguntas)', en: 'The Mirror Trick (Questions)', es: 'El truco del Espejo (Preguntas)' },
+        body: {
+          pt: 'No português, pra fazer uma pergunta a gente só muda a voz (Você é brasileiro?).\nNo inglês, a gente tem que MOVER o verbo To Be para a FRENTE da pessoa!\n\nAfirmativa: You are Brazilian. (Você é brasileiro.)\nPergunta: Are you Brazilian? (É você brasileiro?)',
+          en: 'To ask a question in English, MOVE the To Be verb to the FRONT!\n\nAffirmative: You are Brazilian.\nQuestion: Are you Brazilian?',
+          es: '¡Para hacer una pregunta en inglés, MUEVE el verbo To Be al FRENTE!\n\nAfirmativo: You are Brazilian.\nPregunta: Are you Brazilian?'
+        },
+        examples: ['Is he your brother?', 'Are they at home?', 'Am I late?']
+      },
+      {
+        id: 'tbq_2',
+        title: { pt: 'Colando o NOT (Negativas)', en: 'Gluing the NOT (Negatives)', es: 'Pegando el NOT (Negativas)' },
+        body: {
+          pt: 'Para negar, é a coisa mais fácil do mundo: basta colocar a palavra "NOT" DEPOIS do To Be.\n\nI am NOT.\nYou are NOT (ou You aren\'t).\nShe is NOT (ou She isn\'t).\n\nVeja que o "not" vem *depois* do verbo, diferente do português que vem antes ("não sou").',
+          en: 'To negate, just put "NOT" AFTER the To Be verb.\n\nI am NOT.\nYou are NOT (or You aren\'t).\nShe is NOT (or She isn\'t).',
+          es: 'Para negar, solo pon "NOT" DESPUÉS del verbo To Be.\n\nI am NOT.\nYou are NOT (o You aren\'t).\nShe is NOT (o She isn\'t).'
+        },
+        examples: ['I am not tired.', 'He isn\'t working today.', 'We aren\'t lost.']
+      }
+    ],
+    exercises: [
+      { id: 'q1', type: 'fill_choice', question: { pt: 'Qual é a pergunta certa para "He is tall"?', en: 'Correct question for "He is tall"?', es: '¿Pregunta correcta para "He is tall"?' }, target: 'Is he tall?', options: ['Is he tall?', 'He is tall?', 'Does he tall?', 'He tall is?'] },
+      { id: 'q2', type: 'fill_choice', question: { pt: 'Como dizer "Eles NÃO são felizes"?', en: 'How to say "They are NOT happy"?', es: '¿Cómo decir "Ellos NO son felices"?' }, target: 'They are not happy.', options: ['They are not happy.', 'They not are happy.', 'Not they are happy.', 'They don\'t be happy.'] },
+      { id: 'q3', type: 'voice_dictation', question: { pt: 'Fale: "Are you from Ireland?"', en: 'Say: "Are you from Ireland?"', es: 'Di: "Are you from Ireland?"' }, target: ['are you from ireland'], instructions: { pt: 'Fale a pergunta com entonação de dúvida.', en: 'Say it like a question.', es: 'Di la pregunta con tono de duda.' } }
+    ]
+  },
+  {
+    id: 'lesson_this_that',
+    title: { pt: 'Apontando o Dedo (This, That...)', en: 'Pointing Fingers (This, That...)', es: 'Señalando (This, That...)' },
+    icon: 'Hand',
+    theory: [
+      {
+        id: 'tt_1',
+        title: { pt: 'Perto e Longe (Singular)', en: 'Near and Far (Singular)', es: 'Cerca y Lejos (Singular)' },
+        body: {
+          pt: 'Imagine que você está apontando para algo:\n\nTHIS = ISTO / ESTE / ESTA. Usado para o que está PERTO de você. (Toca com a mão).\n\nTHAT = AQUILO / AQUELE / AQUELA. Usado para o que está LONGE de você. (Aponta o dedo).',
+          en: 'Imagine pointing at something:\n\nTHIS = Near you. (You can touch it).\nTHAT = Far from you. (You point at it).',
+          es: 'Imagina que señalas algo:\n\nTHIS = Cerca de ti. (Puedes tocarlo).\nTHAT = Lejos de ti. (Lo señalas).'
+        },
+        examples: ['This is my phone. (Na minha mão)', 'That is a bird. (Lá no céu)']
+      },
+      {
+        id: 'tt_2',
+        title: { pt: 'Perto e Longe (Plural)', en: 'Near and Far (Plural)', es: 'Cerca y Lejos (Plural)' },
+        body: {
+          pt: 'E se for mais de uma coisa?\n\nTHESE = ESTES / ESTAS (Perto e plural). Pronuncia-se "Diz" sorrindo.\n\nTHOSE = AQUELES / AQUELAS (Longe e plural). Pronuncia-se "Dôuz".',
+          en: 'What if it is plural?\n\nTHESE = Near and plural.\nTHOSE = Far and plural.',
+          es: '¿Y si es plural?\n\nTHESE = Cerca y plural.\nTHOSE = Lejos y plural.'
+        },
+        examples: ['These are my shoes.', 'Those are my friends over there.']
+      }
+    ],
+    exercises: [
+      { id: 'q1', type: 'fill_choice', question: { pt: 'O que está LONGE e é SINGULAR (um só):', en: 'Far and singular:', es: 'Lejos y singular:' }, target: 'That', options: ['This', 'That', 'These', 'Those'] },
+      { id: 'q2', type: 'fill_choice', question: { pt: 'O que está PERTO e é PLURAL (vários):', en: 'Near and plural:', es: 'Cerca y plural:' }, target: 'These', options: ['This', 'That', 'These', 'Those'] }
+    ]
+  },
+  {
+    id: 'lesson_have_has',
+    title: { pt: 'O verbo TER (Have / Has)', en: 'The verb TO HAVE', es: 'El verbo TENER' },
+    icon: 'Package',
+    theory: [
+      {
+        id: 'hv_1',
+        title: { pt: 'A Posse: HAVE e HAS', en: 'Possession: HAVE and HAS', es: 'Posesión: HAVE y HAS' },
+        body: {
+          pt: 'Para dizer que você TEM alguma coisa, usamos "Have". Mas ele muda de roupa para "Has" quando falamos de Ele/Ela!\n\nI have = Eu tenho\nYou have = Você tem\nWe / They have = Nós temos / Eles têm\n\nMas cuidado com o trio parada dura (He, She, It):\nHe HAS = Ele tem\nShe HAS = Ela tem',
+          en: 'To say you own something, use "Have". But it changes to "Has" for He/She/It!\n\nI have, You have, We have, They have.\n\nHe HAS, She HAS, It HAS.',
+          es: 'Para decir que TIENES algo, usamos "Have". ¡Pero cambia a "Has" para Él/Ella/Eso!\n\nI have, You have, We have, They have.\n\nHe HAS, She HAS, It HAS.'
+        },
+        examples: ['I have a car.', 'She has a brother.', 'The house has a door. (It has)']
+      }
+    ],
+    exercises: [
+      { id: 'q1', type: 'fill_choice', question: { pt: 'Complete: "My boss ___ a new car."', en: 'Complete: "My boss ___ a new car."', es: 'Completa: "My boss ___ a new car."' }, target: 'has', options: ['have', 'has', 'haves', 'having'] },
+      { id: 'q2', type: 'fill_choice', question: { pt: 'Complete: "I ___ a meeting."', en: 'Complete: "I ___ a meeting."', es: 'Completa: "I ___ a meeting."' }, target: 'have', options: ['has', 'have', 'haves', 'am'] }
+    ]
+  },
+  {
+    id: 'lesson_question_words',
+    title: { pt: 'As Palavras com W (What, Where...)', en: 'The W-Words (Question words)', es: 'Las Palabras con W' },
+    icon: 'HelpCircle',
+    theory: [
+      {
+        id: 'qw_1',
+        title: { pt: 'Coletando Informações', en: 'Gathering Information', es: 'Recolectando Información' },
+        body: {
+          pt: 'Essas palavrinhas sempre vão no COMEÇO de qualquer pergunta. Decore-as:\n\nWHAT = O que? / Qual? (Ex: What is your name?)\nWHERE = Onde? (Ex: Where is the pub?)\nWHEN = Quando? (Ex: When is the party?)\nWHO = Quem? (Ex: Who are you?)\nWHY = Por que? (Ex: Why are you late?)\nHOW = Como? (Ex: How are you?)',
+          en: 'These words ALWAYS go at the BEGINNING of a question:\n\nWHAT = O que/Qual\nWHERE = Onde\nWHEN = Quando\nWHO = Quem\nWHY = Por que\nHOW = Como',
+          es: 'Estas palabras van SIEMPRE al INICIO de la pregunta:\n\nWHAT = ¿Qué/Cuál?\nWHERE = ¿Dónde?\nWHEN = ¿Cuándo?\nWHO = ¿Quién?\nWHY = ¿Por qué?\nHOW = ¿Cómo?'
+        },
+        examples: ['What is this?', 'Where do you live?', 'Who is she?']
+      }
+    ],
+    exercises: [
+      { id: 'q1', type: 'fill_choice', question: { pt: 'Qual palavra usamos para perguntar ONDE (lugar)?', en: 'Which word asks about LOCATION?', es: '¿Qué palabra para LUGAR?' }, target: 'Where', options: ['What', 'Who', 'When', 'Where'] },
+      { id: 'q2', type: 'fill_choice', question: { pt: 'Qual palavra usamos para perguntar QUANDO (tempo)?', en: 'Which word asks about TIME?', es: '¿Qué palabra para TIEMPO?' }, target: 'When', options: ['What', 'Who', 'When', 'Where'] }
+    ]
+  },
+  {
+    id: 'lesson_articles',
+    title: { pt: 'Um, Uma, O, A (A, An, The)', en: 'A, An, The', es: 'A, An, The' },
+    icon: 'Type',
+    theory: [
+      {
+        id: 'art_1',
+        title: { pt: 'A diferença entre A e AN', en: 'A vs AN', es: 'La diferencia entre A y AN' },
+        body: {
+          pt: 'Ambas significam "UM" ou "UMA". A regra é pelo som da próxima palavra:\n\nUse "A" antes de som de consoante:\nA car, A dog, A house.\n\nUse "AN" antes de som de vogal (para não gaguejar ao falar):\nAn apple, An elephant, An hour (o "h" é mudo).',
+          en: 'Both mean ONE thing.\n\nUse "A" before a consonant SOUND: A car.\n\nUse "AN" before a vowel SOUND: An apple, An hour.',
+          es: 'Ambos significan UN/UNA.\n\nUsa "A" antes de sonido de consonante: A car.\n\nUsa "AN" antes de sonido de vocal: An apple, An hour.'
+        },
+        examples: ['A book', 'An orange', 'An umbrella']
+      },
+      {
+        id: 'art_2',
+        title: { pt: 'O chefão: THE', en: 'The boss: THE', es: 'El jefe: THE' },
+        body: {
+          pt: 'THE significa O, A, OS, AS. Usamos para algo ESPECÍFICO, que a pessoa já sabe do que estamos falando.\n\n"I bought A car" (Comprei um carro qualquer).\n"THE car is blue" (O carro específico que comprei é azul).',
+          en: 'THE is used for SPECIFIC things we both know about.\n\n"I bought A car" (Any car).\n"THE car is blue" (The specific one I bought).',
+          es: 'THE se usa para cosas ESPECÍFICAS.\n\n"I bought A car" (Cualquier coche).\n"THE car is blue" (El específico).'
+        },
+        examples: ['The sun is hot.', 'Where is the bathroom?']
+      }
+    ],
+    exercises: [
+      { id: 'q1', type: 'fill_choice', question: { pt: 'Qual o correto para "Maçã" (apple)?', en: 'Correct for "apple"?', es: '¿Correcto para "apple"?' }, target: 'An apple', options: ['A apple', 'An apple', 'The apple'] },
+      { id: 'q2', type: 'fill_choice', question: { pt: 'Para dizer "O sol" (específico, único):', en: 'To say "The sun" (specific, unique):', es: 'Para decir "El sol":' }, target: 'The sun', options: ['A sun', 'An sun', 'The sun'] }
+    ]
+  },
+  {
+    id: 'lesson_plurals',
+    title: { pt: 'Fazendo o Plural (+ de 1)', en: 'Making Plurals', es: 'Haciendo Plurales' },
+    icon: 'Layers',
+    theory: [
+      {
+        id: 'plur_1',
+        title: { pt: 'A Regra do S', en: 'The S Rule', es: 'La Regla del S' },
+        body: {
+          pt: 'Na maioria das palavras em inglês, basta colocar um "s" no final para virar plural, igualzinho no Brasil!\n\nCar -> Cars (Carros)\nDog -> Dogs (Cachorros)\nBook -> Books (Livros)',
+          en: 'For most words, just add "s"!\n\nCar -> Cars\nDog -> Dogs\nBook -> Books',
+          es: 'Para la mayoría, ¡solo agrega "s"!\n\nCar -> Cars\nDog -> Dogs\nBook -> Books'
+        },
+        examples: ['Two cars', 'Three dogs', 'Five apples']
+      },
+      {
+        id: 'plur_2',
+        title: { pt: 'Os rebeldes (Irregulares)', en: 'The Rebels (Irregulars)', es: 'Los Rebeldes (Irregulares)' },
+        body: {
+          pt: 'Algumas palavras mudam a palavra toda no plural! Decore estes campeões de pegadinhas:\n\nMan (Homem) -> Men (Homens)\nWoman (Mulher) -> Women (Mulheres)\nChild (Criança) -> Children (Crianças)\nPerson (Pessoa) -> People (Pessoas)',
+          en: 'Some words change completely!\n\nMan -> Men\nWoman -> Women\nChild -> Children\nPerson -> People',
+          es: '¡Algunas palabras cambian completamente!\n\nMan -> Men\nWoman -> Women\nChild -> Children\nPerson -> People'
+        },
+        examples: ['One person, two people.', 'One child, three children.']
+      }
+    ],
+    exercises: [
+      { id: 'q1', type: 'fill_choice', question: { pt: 'Qual o plural de "Person" (Pessoa)?', en: 'Plural of "Person"?', es: '¿Plural de "Person"?' }, target: 'People', options: ['Persons', 'Peoples', 'People', 'Persones'] },
+      { id: 'q2', type: 'fill_choice', question: { pt: 'Qual o plural de "Child" (Criança)?', en: 'Plural of "Child"?', es: '¿Plural de "Child"?' }, target: 'Children', options: ['Childs', 'Children', 'Childrens', 'Childes'] }
+    ]
+  },
+  {
+    id: 'lesson_do_make',
+    title: { pt: 'Fazer vs Fabricar (Do / Make)', en: 'Do vs Make', es: 'Hacer vs Fabricar (Do / Make)' },
+    icon: 'Hammer',
+    theory: [
+      {
+        id: 'dm_1',
+        title: { pt: 'DO: Ações e Tarefas', en: 'DO: Actions and Tasks', es: 'DO: Acciones y Tareas' },
+        body: {
+          pt: 'Em português, "fazer um favor" e "fazer um bolo" usam o mesmo verbo. No inglês não!\n\nUse DO para ações abstratas, tarefas rotineiras ou trabalhos onde nada físico é criado.\n\nEx: Do your job (Faça seu trabalho).\nEx: Do me a favor (Me faça um favor).\nEx: Do the dishes (Lave a louça - a louça já existe, você só faz a ação).',
+          en: 'Use DO for abstract actions, routine tasks, or work where nothing physical is created.\n\nEx: Do your job.\nEx: Do me a favor.',
+          es: 'Usa DO para acciones abstractas, tareas o trabajo donde no se crea nada físico.\n\nEj: Do your job.\nEj: Do me a favor.'
+        },
+        examples: ['Do homework.', 'Do business.', 'Do the laundry.']
+      },
+      {
+        id: 'dm_2',
+        title: { pt: 'MAKE: Criar e Fabricar', en: 'MAKE: Create and Build', es: 'MAKE: Crear y Construir' },
+        body: {
+          pt: 'Use MAKE quando você vai CRIAR, CONSTRUIR ou PRODUZIR algo que não existia antes.\n\nEx: Make a cake (Fazer um bolo - você junta os ingredientes e cria o bolo).\nEx: Make coffee (Fazer café).\nEx: Make a mistake (Cometer/criar um erro).',
+          en: 'Use MAKE when you CREATE, BUILD or PRODUCE something new.\n\nEx: Make a cake.\nEx: Make coffee.',
+          es: 'Usa MAKE cuando CREAS, CONSTRUYES o PRODUCES algo nuevo.\n\nEj: Make a cake.\nEj: Make coffee.'
+        },
+        examples: ['Make breakfast.', 'Make a plan.', 'Made in China.']
+      }
+    ],
+    exercises: [
+      { id: 'q1', type: 'fill_choice', question: { pt: 'Qual usamos para o café? "___ coffee".', en: 'Which one for coffee? "___ coffee".', es: '¿Cuál para café? "___ coffee".' }, target: 'Make', options: ['Do', 'Make'] },
+      { id: 'q2', type: 'fill_choice', question: { pt: 'Para dizer "Me faça um favor": "___ me a favor".', en: 'To say "___ me a favor".', es: 'Para decir "___ me a favor".' }, target: 'Do', options: ['Do', 'Make'] }
+    ]
+  },
+  {
+    id: 'lesson_simple_present',
+    title: { pt: 'A Regra do S (Presente)', en: 'The S Rule (Present)', es: 'La Regla de la S (Presente)' },
+    icon: 'Sun',
+    theory: [
+      {
+        id: 'sp_1',
+        title: { pt: 'Verbos no Dia a Dia', en: 'Everyday Verbs', es: 'Verbos Diarios' },
+        body: {
+          pt: 'Para falar sobre coisas que você faz na rotina (Presente), o inglês é ridículo de fácil. O verbo não muda para quase ninguém!\n\nVerbo Work (Trabalhar):\nI work (Eu trabalho)\nYou work (Você trabalha)\nWe work (Nós trabalhamos)\nThey work (Eles trabalham)',
+          en: 'To talk about routine, English is super easy. The verb stays the same for almost everyone!\n\nI work, You work, We work, They work.',
+          es: 'Para hablar de rutina, el inglés es muy fácil. ¡El verbo no cambia casi para nadie!\n\nI work, You work, We work, They work.'
+        },
+        examples: ['I drink coffee.', 'You speak English.', 'They play football.']
+      },
+      {
+        id: 'sp_2',
+        title: { pt: 'A Fofoca (He, She, It)', en: 'The Gossip (He, She, It)', es: 'El Chisme (He, She, It)' },
+        body: {
+          pt: 'A única regra chata é quando falamos sobre UMA outra pessoa (Ele, Ela ou Isso). \nSempre que for HE, SHE ou IT, o verbo ganha um "S" (ou "ES") no final!\n\nI work -> She workS (Ela trabalha)\nI play -> He playS (Ele joga)\nI go -> It goES (Isso vai)\n\nIsso NÃO É PLURAL! É só uma regrinha para marcar quem é o sujeito no presente.',
+          en: 'When talking about ONE other person (He, She, It), the verb gets an "S" at the end!\n\nI work -> She workS\nI play -> He playS\nI go -> It goES',
+          es: '¡Cuando hablamos de OTRA persona (He, She, It), el verbo lleva una "S" al final!\n\nI work -> She workS\nI play -> He playS\nI go -> It goES'
+        },
+        examples: ['She likes tea.', 'He runs fast.', 'The dog barks. (It barks)']
+      }
+    ],
+    exercises: [
+      { id: 'q1', type: 'fill_choice', question: { pt: 'Complete: "He ___ in Dublin." (live)', en: 'Complete: "He ___ in Dublin." (live)', es: 'Completa: "He ___ in Dublin." (live)' }, target: 'lives', options: ['live', 'lives', 'living', 'lived'] },
+      { id: 'q2', type: 'fill_choice', question: { pt: 'Complete: "I ___ pizza." (like)', en: 'Complete: "I ___ pizza." (like)', es: 'Completa: "I ___ pizza." (like)' }, target: 'like', options: ['like', 'likes', 'liking', 'liked'] }
+    ]
+  },
 ];

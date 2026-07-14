@@ -13,28 +13,41 @@ import { startAutoHealthSync } from './utils/autoHealthSync';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from './config/firebaseConfig';
 
+// Principais Telas
 import WelcomeView from './features/onboarding/views/WelcomeView';
 import SyncChoiceView from './features/onboarding/views/SyncChoiceView';
 import NameView from './features/onboarding/views/NameView';
 import SyncPrefStepView from './features/onboarding/views/SyncPrefStepView'; // <-- NOVA ETAPA
-
+import SettingsView from './features/settings/views/SettingsView';
 import MainDashboard from './features/dashboard/views/MainDashboard';
 import LanguagesDashboard from './features/languages/views/LanguagesDashboard';
-import SettingsView from './features/settings/views/SettingsView';
-import EnglishDashboard from './features/languages/english/views/EnglishDashboard';
-import LevelListView from './features/languages/english/views/LevelListView';
-import LevelView from './features/languages/english/views/LevelView';
-import StatsView from './features/languages/english/views/StatsView';
-import LevelGroupView from './features/languages/english/views/LevelGroupView';
 
-// Módulo Alpha-Numbers
+// Módulo de Inglês
+import EnglishDashboard from './features/languages/english/views/EnglishDashboard';
+import StatsView from './features/languages/english/views/StatsView';
+
+// Módulo de Vocabularios do Inglês
+import VocabulariesMenu from './features/languages/english/views/vocabularies/VocabulariesMenu';
+import LevelListView from './features/languages/english/views/vocabularies/vocab-normal/LevelListView';
+import LevelView from './features/languages/english/views/vocabularies/vocab-normal/LevelView';
+import LevelGroupView from './features/languages/english/views/vocabularies/vocab-normal/LevelGroupView';
+
+import VocabSpeechLevelListView from './features/languages/english/views/vocabularies/vocab-speech/LevelListView';
+import VocabSpeechLevelGroupView from './features/languages/english/views/vocabularies/vocab-speech/LevelGroupView';
+import VocabSpeechView from './features/languages/english/views/vocabularies/vocab-speech/VocabSpeechView';
+
+import VocabReverseLevelListView from './features/languages/english/views/vocabularies/vocab-reverse/LevelListView';
+import VocabReverseLevelGroupView from './features/languages/english/views/vocabularies/vocab-reverse/LevelGroupView';
+import VocabReverseView from './features/languages/english/views/vocabularies/vocab-reverse/VocabReverseView';
+
+// Módulo Alpha-Numbers do Inglês
 import AlphaNumbersMenu from './features/languages/english/views/alpha-numbers/AlphaNumbersMenu';
 import AlphabetLearnView from './features/languages/english/views/alpha-numbers/AlphabetLearnView';
 import NumbersLearnView from './features/languages/english/views/alpha-numbers/NumbersLearnView';
 import ExerciseSelectionView from './features/languages/english/views/alpha-numbers/ExerciseSelectionView';
 import AlphaNumbersExerciseView from './features/languages/english/views/alpha-numbers/AlphaNumbersExerciseView';
 
-// IA Inglês Área
+// IA de Inglês Área
 import AiHubView from './features/languages/english/views/AiHubView';
 import AiChatFreeView from './features/languages/english/views/ai-chat/AiChatFreeView';
 import AiTaskSelectionView from './features/languages/english/views/ai-chat/AiTaskSelectionView';
@@ -44,11 +57,11 @@ import AiVoiceTaskView from './features/languages/english/views/ai-voice/AiVoice
 import AiVoiceTaskSelectionView from './features/languages/english/views/ai-voice/AiVoiceTaskSelectionView';
 import TrailView from './features/languages/english/views/TrailView';
 
-// Explained Module
+// Explained Module do Inglês
 import ExplainedLessonListView from './features/languages/english/views/explained/ExplainedLessonListView';
 import ExplainedLessonView from './features/languages/english/views/explained/ExplainedLessonView';
 
-// Módulo de Ditado
+// Módulo de Ditado do Inglês
 import DictationSelectionView from './features/languages/english/views/dictation/DictationSelectionView';
 import DictationExerciseView from './features/languages/english/views/dictation/DictationExerciseView';
 
@@ -72,6 +85,20 @@ import FitnessWorkoutsView from './features/fitness/views/FitnessWorkoutsView';
 function App() {
   const { isFirstAccess } = useLanguage();
   const [onboardingStep, setOnboardingStep] = useState(1);
+
+  window.forceCompleteLesson = async (lessonId) => {
+  const { db } = await import('./config/dexieDb'); // Ajuste o caminho
+  try {
+    await db.completedExplainedLessons.put({
+      lessonId: lessonId,
+      completedAt: new Date().toISOString()
+    });
+    console.log(`Missão ${lessonId} concluída com sucesso!`);
+    window.location.reload(); // Recarrega para refletir na UI
+  } catch (e) {
+    console.error("Erro ao forçar conclusão:", e);
+  }
+  };
 
   useEffect(() => {
     repairUserProfile();
@@ -151,25 +178,40 @@ function App() {
           >
             <div className="max-w-md mx-auto w-full px-4 pb-28">
               <Routes>
+                {/* Rotas Principais */}
                 <Route path="/" element={<MainDashboard />} />
                 <Route path="/settings" element={<SettingsView />} />
                 <Route path="/languages" element={<LanguagesDashboard />} />
                 
                 {/* Rotas do Módulo de Inglês */}
                 <Route path="/english" element={<EnglishDashboard />} />
-                <Route path="/levels" element={<LevelListView />} />
-                <Route path="/levels/group/:groupName" element={<LevelGroupView />} />
-                <Route path="/level/:id" element={<LevelView />} />
+                <Route path="/english/trail" element={<TrailView />} />                
                 <Route path="/english/stats" element={<StatsView />} />
+
+                {/* Vocabularios Normais de Inglês */}
+                <Route path="/english/vocabularies" element={<VocabulariesMenu />} />                
+                <Route path="/english/vocabularies/vocab-normal/levels" element={<LevelListView />} />
+                <Route path="/english/vocabularies/vocab-normal/levels/group/:groupName" element={<LevelGroupView />} />
+                <Route path="/english/vocabularies/vocab-normal/level/:id" element={<LevelView />} />
                 
-                {/* Fundamentos: Alfabeto e Números */}
+                {/* Vocabulário com Voz de Inglês*/}
+                <Route path="/english/vocabularies/vocab-speech/levels" element={<VocabSpeechLevelListView />} />
+                <Route path="/english/vocabularies/vocab-speech/levels/group/:groupName" element={<VocabSpeechLevelGroupView />} />
+                <Route path="/english/vocabularies/vocab-speech/level/:id" element={<VocabSpeechView />} />
+
+                {/* Vocabulário Inverso de Inglês */}
+                <Route path="/english/vocabularies/vocab-reverse/levels" element={<VocabReverseLevelListView />} />
+                <Route path="/english/vocabularies/vocab-reverse/levels/group/:groupName" element={<VocabReverseLevelGroupView />} />
+                <Route path="/english/vocabularies/vocab-reverse/level/:id" element={<VocabReverseView />} />
+
+                {/* Fundamentos: Alfabeto e Números  de Inglês */}
                 <Route path="/english/alpha-numbers" element={<AlphaNumbersMenu />} />
                 <Route path="/english/alpha-numbers/alphabet" element={<AlphabetLearnView />} />
                 <Route path="/english/alpha-numbers/numbers" element={<NumbersLearnView />} />
                 <Route path="/english/alpha-numbers/exercises/:mode" element={<ExerciseSelectionView />} />
                 <Route path="/english/alpha-numbers/exercise/:mode/:index" element={<AlphaNumbersExerciseView />} />
                 
-                {/* IA Inglês */}
+                {/* IA de Inglês */}
                 <Route path="/english/ai-hub" element={<AiHubView />} />
                 <Route path="/english/ai-chat/free" element={<AiChatFreeView />} />
                 <Route path="/english/ai-chat/tasks" element={<AiTaskSelectionView />} />
@@ -178,16 +220,13 @@ function App() {
                 <Route path="/english/ai-voice/tasks/:taskId" element={<AiVoiceTaskView />} />
                 <Route path="/english/ai-voice/tasks" element={<AiVoiceTaskSelectionView />} />
                 
-                {/* Explained Module */}
+                {/* Explained Module de Inglês */}
                 <Route path="/english/explained" element={<ExplainedLessonListView />} />
                 <Route path="/english/explained/:lessonId" element={<ExplainedLessonView />} />
 
-                {/* Ditado de Texto Corrido */}
+                {/* Ditado de Texto Corrido de Inglês */}
                 <Route path="/english/dictation" element={<DictationSelectionView />} />
                 <Route path="/english/dictation/:textId" element={<DictationExerciseView />} />
-
-                {/* Trilha Inglês */}
-                <Route path="/english/trail" element={<TrailView />} />
 
                 {/* Fitness */}
                 <Route path="/fitness" element={<FitnessDashboard />} />

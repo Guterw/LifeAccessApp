@@ -1,14 +1,14 @@
 // src/features/languages/english/views/LevelGroupView.jsx
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { vocabulariesLevels } from '../../../../data/vocabulariesLevels';
-import { useLanguage } from '../../../../contexts/LanguageContext';
-import BackButton from '../../../../components/BackButton';
+import { vocabulariesLevels } from '../../../../../../data/vocabulariesLevels';
+import { useLanguage } from '../../../../../../contexts/LanguageContext';
+import BackButton from '../../../../../../components/BackButton';
 import { Play, CheckCircle2, Flame, RotateCcw, AlertTriangle } from 'lucide-react';
 import { useLiveQuery } from 'dexie-react-hooks';
-import { db } from '../../../../config/dexieDb';
-import FooterBrand from '../../../../components/FooterBrand';
-import UserProfileBadge from '../../../../components/UserProfileBadge';
+import { db } from '../../../../../../config/dexieDb';
+import FooterBrand from '../../../../../../components/FooterBrand';
+import UserProfileBadge from '../../../../../../components/UserProfileBadge';
 
 export default function LevelGroupView() {
   const { groupName } = useParams();

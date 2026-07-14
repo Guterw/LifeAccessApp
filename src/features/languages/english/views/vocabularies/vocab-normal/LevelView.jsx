@@ -1,13 +1,13 @@
 // src/features/languages/english/views/LevelView.jsx
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { db } from '../../../../config/dexieDb';
-import { vocabulariesLevels } from '../../../../data/vocabulariesLevels';
+import { db } from '../../../../../../config/dexieDb';
+import { vocabulariesLevels } from '../../../../../../data/vocabulariesLevels';
 import { RotateCcw, CheckCircle2, XCircle, Flame, Volume2, Turtle } from 'lucide-react';
-import { useLanguage } from '../../../../contexts/LanguageContext';
-import BackButton from '../../../../components/BackButton';
-import { addXP } from '../../../../utils/xpManager';
-import StreakModal from '../../../../components/StreakModal';
+import { useLanguage } from '../../../../../../contexts/LanguageContext';
+import BackButton from '../../../../../../components/BackButton';
+import { addXP } from '../../../../../../utils/xpManager';
+import StreakModal from '../../../../../../components/StreakModal';
 
 // =========================================
 // FUNÇÕES DE ÁUDIO NATIVAS

@@ -172,11 +172,17 @@ export default function EnglishDashboard() {
         </button>
 
         <button 
-          onClick={() => navigate('/levels')}
-          className="w-full border-yellow-400 bg-gradient-to-br from-blue-500 to-blue-700 hover:from-blue-400 hover:to-blue-600 text-white font-black py-4 rounded-2xl flex items-center justify-center gap-3 transition-all shadow-lg shadow-blue-500/20 border-b-4 active:border-b-0 active:mt-1"
+          onClick={() => navigate('/english/vocabularies')}
+          className="w-full border-b-4 border-yellow-400 bg-gradient-to-br from-blue-500 to-blue-700 hover:from-blue-400 hover:to-blue-600 p-5 rounded-2xl flex items-center justify-between shadow-lg"
         >
-          <PlayCircle size={20} />
-          {t('english.practiceBtn', 'Praticar Vocabulário')}
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-white/20 text-white rounded-xl"><PlayCircle size={20} /></div>
+            <div className="text-left">
+              <h3 className="text-base font-black text-white">{t('english.practiceBtn', 'Praticar Vocabulários')}</h3>
+              <p className="text-[10px] text-purple-100 font-medium">{t('english.vocabularies', '')}</p>
+            </div>
+          </div>
+          <ChevronRight className="text-white/70" />
         </button>
       </div>
 

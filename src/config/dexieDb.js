@@ -21,7 +21,10 @@ export const db = new Dexie('LifeAccessDB');
 // que garante a existência da tabela e preserva qualquer dado válido
 // que já esteja nela (o upgrade abaixo é seguro e não sobrescreve nada
 // se a tabela já estiver correta).
-db.version(15).stores({
+// ==========================================
+// VERSÃO 16: Progresso para Vocab-Speech e Vocab-Reverse
+// ==========================================
+db.version(16).stores({
   appSettings: 'id, uiLanguage, isFirstAccess, userName',
   learnedWords: 'en, translation, level, category, learnedAt',
   mistakesLog: '++id, word, level, category, timestamp',
@@ -43,18 +46,9 @@ db.version(15).stores({
   languageStreak: 'id, streak, lastLanguageActivity',
   completedExplainedLessons: 'lessonId, completedAt',
   completedDictations: '++id, textId, completedAt, xp, timeTakenSeconds',
-}).upgrade(async (tx) => {
-  // Garantia defensiva: assegura que sempre exista um registro válido em
-  // languageStreak (id: 1). Se por qualquer motivo o registro anterior não
-  // existir ou estiver corrompido, cria um registro zerado em vez de deixar
-  // a tabela vazia (o que forçaria leituras futuras a sempre criar do zero
-  // silenciosamente, mascarando o problema).
-  try {
-    const existing = await tx.table('languageStreak').get(1);
-    if (!existing) {
-      await tx.table('languageStreak').put({ id: 1, streak: 0, lastLanguageActivity: null });
-    }
-  } catch (err) {
-    console.error('[dexieDb v15] Erro ao validar languageStreak durante upgrade:', err);
-  }
+  // NOVO: progresso independente para os módulos Speech e Reverse
+  levelProgressSpeech: 'level, correctCount, total, pendingQueue',
+  completedLevelsSpeech: 'level, completedAt',
+  levelProgressReverse: 'level, correctCount, total, pendingQueue',
+  completedLevelsReverse: 'level, completedAt',
 });
