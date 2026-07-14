@@ -6,6 +6,8 @@
 // adicionar uma Seção 7, 8... no futuro NUNCA quebra a tela, mesmo sem
 // editar este arquivo.
 
+// src/data/trailSections.js
+
 export const TRAIL_SECTIONS_META = [
   {
     title: { pt: 'Seção 1', en: 'Section 1', es: 'Sección 1' },
@@ -37,10 +39,30 @@ export const TRAIL_SECTIONS_META = [
     subtitle: { pt: 'Subindo de Level', en: 'Leveling Up', es: 'Subiendo de Nivel' },
     theme: 'aurora',
   },
+  // Novas Seções:
+  {
+    title: { pt: 'Seção 7', en: 'Section 7', es: 'Sección 7' },
+    subtitle: { pt: 'Reforço Essencial', en: 'Essential Reinforcement', es: 'Refuerzo Esencial' },
+    theme: 'nebula',
+  },
+  {
+    title: { pt: 'Seção 8', en: 'Section 8', es: 'Sección 8' },
+    subtitle: { pt: 'Domínio Diário', en: 'Daily Mastery', es: 'Dominio Diario' },
+    theme: 'desert',
+  },
+  {
+    title: { pt: 'Seção 9', en: 'Section 9', es: 'Sección 9' },
+    subtitle: { pt: 'Carreira e Sucesso', en: 'Career & Success', es: 'Carrera y Éxito' },
+    theme: 'tundra',
+  },
+  {
+    title: { pt: 'Seção 10', en: 'Section 10', es: 'Sección 10' },
+    subtitle: { pt: 'Mestre de Dublin', en: 'Dublin Master', es: 'Maestro de Dublín' },
+    theme: 'supernova',
+  }
 ];
 
-// Ordem cíclica de temas usada quando uma seção não tem metadata explícita
-export const THEME_CYCLE_ORDER = ['night', 'forest', 'sunset', 'ocean', 'volcano', 'aurora'];
+export const THEME_CYCLE_ORDER = ['night', 'forest', 'sunset', 'ocean', 'volcano', 'aurora', 'nebula', 'desert', 'tundra', 'supernova'];
 
 export const SECTION_THEMES = {
   night: {
@@ -136,8 +158,72 @@ export const SECTION_THEMES = {
     lineColorClass: 'border-purple-900/30',
     lineActiveColorClass: 'border-purple-400',
     lineGlowRgba: 'rgba(216,180,254,1)',
-    waveFill: '#020617',
+    waveFill: '#172554',
     decorIcon: 'Sparkles',
+  },
+  nebula: {
+    bgGradient: 'from-[#172554] via-fuchsia-950 to-[#4a044e]',
+    decorColor: 'text-fuchsia-300/20',
+    decorColor2: 'text-pink-400/10',
+    decorColor3: 'text-blue-200/5',
+    cardBg: 'bg-fuchsia-900/50',
+    cardBorder: 'border-fuchsia-400/30',
+    cardShadow: 'shadow-[0_0_50px_rgba(217,70,239,0.3)]',
+    titleGradient: 'from-blue-200 via-fuchsia-200 to-pink-200',
+    subtitleColor: 'text-fuchsia-300',
+    lineColorClass: 'border-fuchsia-900/30',
+    lineActiveColorClass: 'border-fuchsia-400',
+    lineGlowRgba: 'rgba(232, 121, 249, 1)',
+    waveFill: '#451a03',
+    decorIcon: 'Cloud',
+  },
+  desert: {
+    bgGradient: 'from-[#451a03] via-yellow-950 to-slate-950',
+    decorColor: 'text-yellow-300/20',
+    decorColor2: 'text-amber-400/10',
+    decorColor3: 'text-orange-200/5',
+    cardBg: 'bg-yellow-900/50',
+    cardBorder: 'border-yellow-400/30',
+    cardShadow: 'shadow-[0_0_50px_rgba(234,179,8,0.3)]',
+    titleGradient: 'from-amber-200 via-yellow-200 to-orange-200',
+    subtitleColor: 'text-yellow-300',
+    lineColorClass: 'border-yellow-900/30',
+    lineActiveColorClass: 'border-yellow-400',
+    lineGlowRgba: 'rgba(250, 204, 21, 1)',
+    waveFill: '#083344',
+    decorIcon: 'Mountain',
+  },
+  tundra: {
+    bgGradient: 'from-[#083344] via-cyan-950 to-slate-900',
+    decorColor: 'text-cyan-300/20',
+    decorColor2: 'text-sky-400/10',
+    decorColor3: 'text-teal-200/5',
+    cardBg: 'bg-cyan-900/50',
+    cardBorder: 'border-cyan-400/30',
+    cardShadow: 'shadow-[0_0_50px_rgba(6,182,212,0.3)]',
+    titleGradient: 'from-sky-200 via-cyan-200 to-teal-200',
+    subtitleColor: 'text-cyan-300',
+    lineColorClass: 'border-cyan-900/30',
+    lineActiveColorClass: 'border-cyan-400',
+    lineGlowRgba: 'rgba(34, 211, 238, 1)',
+    waveFill: '#4c0519',
+    decorIcon: 'Snowflake',
+  },
+  supernova: {
+    bgGradient: 'from-[#4c0519] via-rose-950 to-black',
+    decorColor: 'text-rose-300/20',
+    decorColor2: 'text-pink-400/10',
+    decorColor3: 'text-red-200/5',
+    cardBg: 'bg-rose-900/50',
+    cardBorder: 'border-rose-400/30',
+    cardShadow: 'shadow-[0_0_50px_rgba(244,63,94,0.3)]',
+    titleGradient: 'from-pink-200 via-rose-200 to-red-200',
+    subtitleColor: 'text-rose-300',
+    lineColorClass: 'border-rose-900/30',
+    lineActiveColorClass: 'border-rose-400',
+    lineGlowRgba: 'rgba(251, 113, 133, 1)',
+    waveFill: '#0f172a',
+    decorIcon: 'Star',
   },
 };
 

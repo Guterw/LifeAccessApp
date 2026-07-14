@@ -1,11 +1,13 @@
 // src/features/languages/english/views/TrailView.jsx
-import React, { useRef, useEffect, useMemo } from 'react';
+import React, { useRef, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
 import {
   Check, Lock, Type, Hash, MessageCircle, Users, Bot, Coffee, Mic,
   Star, Rocket, Compass, Cloud, Moon, Sparkles, Map, Mountain, TreePine,
-  Sun, Waves, Flame
+  Sun, Waves, Flame, Snowflake,
+  TreePalm,
+  Flag, 
 } from 'lucide-react';
 import { ENGLISH_TRAIL } from '../../../../data/englishTrail';
 import { SECTION_THEMES, getSectionMeta } from '../../../../data/trailSections';
@@ -16,7 +18,7 @@ import PigeonAvatar from '../../../../components/PigeonAvatar';
 import UserProfileBadge from '../../../../components/UserProfileBadge';
 
 const IconMap = { Type, Hash, MessageCircle, Users, Bot, Coffee, Sparkles, Mic };
-const DecorIconMap = { Moon, TreePine, Sun, Waves, Flame, Sparkles };
+const DecorIconMap = { Moon, TreePine, Sun, Waves, Flame, Sparkles, Mountain, Snowflake, Cloud, Rocket, Star };
 
 // ==========================================
 // SCROLL SUAVE CUSTOMIZADO (curta distância)
@@ -47,9 +49,7 @@ function smoothScrollToElement(element, { duration = 900, offset = 0 } = {}) {
 }
 
 // Agrupa o ENGLISH_TRAIL (lista plana) em seções, cortando sempre que um
-// node com id terminado em "_boss" é encontrado (o boss fica DENTRO da
-// seção que ele encerra). Isso é 100% data-driven: adicionar a Seção 7, 8...
-// no englishTrail.js não exige tocar neste componente.
+// node com id terminado em "_boss" é encontrado
 function groupIntoSections(trail) {
   const sections = [];
   let current = [];
@@ -123,10 +123,10 @@ export default function TrailView() {
   const currentUnlockedIndex = ENGLISH_TRAIL.findIndex(node => !isNodeCompleted(node));
   const activeIndex = currentUnlockedIndex === -1 ? ENGLISH_TRAIL.length : currentUnlockedIndex;
 
-  // Agrupamento memoizado das seções (não depende de progresso, só da trilha)
+  // Agrupamento memoizado das seções
   const sections = useMemo(() => groupIntoSections(ENGLISH_TRAIL), []);
 
-  // Descobre em qual seção está o node ativo, e o índice local dentro dela
+  // Descobre em qual seção está o node ativo
   const { activeSectionIndex } = useMemo(() => {
     let cursor = 0;
     for (let i = 0; i < sections.length; i++) {
@@ -136,16 +136,34 @@ export default function TrailView() {
       }
       cursor += len;
     }
-    // trilha inteira concluída: última seção
     return { activeSectionIndex: Math.max(0, sections.length - 1), activeLocalIndex: 0 };
   }, [sections, activeIndex]);
 
+  // Estado para o Select de Seções
+  const [selectedSection, setSelectedSection] = useState(0);
+
+  // Sincroniza o select com a seção ativa ao carregar os dados
+  useEffect(() => {
+    if (dataIsReady) {
+      setSelectedSection(activeSectionIndex);
+    }
+  }, [dataIsReady, activeSectionIndex]);
+
+  // Função para navegar via Select para a seção desejada
+  const handleSectionSelect = (e) => {
+    const targetSectionIndex = Number(e.target.value);
+    setSelectedSection(targetSectionIndex);
+
+    const sectionEl = sectionRefs.current[targetSectionIndex];
+    if (sectionEl) {
+      const rect = sectionEl.getBoundingClientRect();
+      const y = rect.top + window.scrollY - 80; // Offset para compensar o header fixo
+      window.scrollTo({ top: y, behavior: 'smooth' });
+    }
+  };
+
   // ==========================================
-  // AUTO-SCROLL EM DUAS ETAPAS:
-  // 1) Pulo instantâneo (sem animação) até perto da seção correta —
-  //    evita ter que "rolar visualmente" por todas as seções anteriores,
-  //    o que ficaria lento/travado com muitas seções (10+).
-  // 2) Só then, uma animação suave e curta até o node exato.
+  // AUTO-SCROLL EM DUAS ETAPAS (Entrada)
   // ==========================================
   useEffect(() => {
     if (!dataIsReady) return;
@@ -157,17 +175,17 @@ export default function TrailView() {
       const targetNode = ENGLISH_TRAIL[targetGlobalIndex];
       if (!targetNode) return;
 
-      // Etapa 1: pulo instantâneo até o topo da seção ativa (se não for a primeira)
+      // Etapa 1: pulo instantâneo até o topo da seção ativa
       if (activeSectionIndex > 0) {
         const sectionEl = sectionRefs.current[activeSectionIndex];
         if (sectionEl) {
           const rect = sectionEl.getBoundingClientRect();
           const y = rect.top + window.scrollY - 80;
-          window.scrollTo(0, y); // sem animação — instantâneo
+          window.scrollTo(0, y);
         }
       }
 
-      // Etapa 2: agora sim, uma animação curta e suave até o node exato
+      // Etapa 2: animação curta e suave até o node exato
       requestAnimationFrame(() => {
         const el = nodeRefs.current[targetNode.id];
         if (el) smoothScrollToElement(el, { duration: 700 });
@@ -254,11 +272,10 @@ export default function TrailView() {
     );
   };
 
-  // Renderiza uma seção inteira (fundo temático + título + linha + nodes + onda de transição)
   const renderSection = (sectionNodes, sectionIndex, globalStartIndex, isLastSection) => {
     const meta = getSectionMeta(sectionIndex);
     const theme = SECTION_THEMES[meta.theme] || SECTION_THEMES.night;
-    const DecorIcon = DecorIconMap[theme.decorIcon] || Sparkles;
+    const DecorIcon = DecorIconMap[theme.decorIcon] || Mountain;
 
     const localActive = activeIndex - globalStartIndex;
     const progress = sectionNodes.length > 1
@@ -277,8 +294,18 @@ export default function TrailView() {
 
         {/* Decorações flutuantes */}
         <div className={`absolute top-[12%] right-[10%] ${theme.decorColor} animate-pulse`}><DecorIcon size={140} /></div>
-        <div className={`absolute top-[45%] left-[8%] ${theme.decorColor2} animate-[bounce_8s_infinite]`}><Cloud size={150} /></div>
-        <div className={`absolute top-[60%] right-[15%] ${theme.decorColor3} animate-[pulse_4s_infinite]`}><Sparkles size={40} /></div>
+        <div className={`absolute top-[20%] left-[8%] ${theme.decorColor2} animate-[bounce_8s_infinite]`}><Cloud size={100} /></div>
+        <div className={`absolute top-[29%] right-[15%] ${theme.decorColor3} animate-[pulse_4s_infinite]`}><Sparkles size={50} /></div>
+        <div className={`absolute top-[36%] left-[15%] ${theme.decorColor3} animate-[pulse_4s_infinite]`}><Star size={40} /></div>
+        <div className={`absolute top-[42%] left-[10%] ${theme.decorColor} animate-pulse`}><DecorIcon size={70} /></div>
+        <div className={`absolute top-[49%] right-[8%] ${theme.decorColor2} animate-[bounce_8s_infinite]`}><TreePalm size={70} /></div>
+        <div className={`absolute top-[55%] right-[10%] ${theme.decorColor} animate-pulse`}><DecorIcon size={70} /></div>
+        <div className={`absolute top-[60%] left-[15%] ${theme.decorColor3} animate-[pulse_4s_infinite]`}><Star size={50} /></div>
+        <div className={`absolute top-[65%] left-[10%] ${theme.decorColor} animate-pulse`}><DecorIcon size={70} /></div>
+        <div className={`absolute top-[70%] right-[8%] ${theme.decorColor2} animate-[bounce_8s_infinite]`}><Flag size={70} /></div>
+        <div className={`absolute top-[75%] right-[10%] ${theme.decorColor} animate-pulse`}><DecorIcon size={70} /></div>
+        <div className={`absolute top-[85%] left-[15%] ${theme.decorColor3} animate-[pulse_4s_infinite]`}><Star size={70} /></div>
+        <div className={`absolute top-[90%] right-[10%] ${theme.decorColor} animate-pulse`}><DecorIcon size={70} /></div>
 
         {/* Card de título da seção */}
         <div className="relative z-20 w-[90%] max-w-lg mx-auto mb-20">
@@ -305,7 +332,7 @@ export default function TrailView() {
           {sectionNodes.map((node, i) => renderNode(node, globalStartIndex + i, i))}
         </div>
 
-        {/* Onda de transição para a próxima seção (ou rodapé, na última) */}
+        {/* Onda de transição para a próxima seção */}
         {!isLastSection && (
           <div className="absolute bottom-0 left-0 w-full overflow-hidden leading-none z-10">
             <svg className="relative block w-full h-[100px] sm:h-[150px]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
@@ -314,7 +341,7 @@ export default function TrailView() {
           </div>
         )}
 
-        {/* Mensagem de "continua" só na última seção */}
+        {/* Mensagem de rodapé na última seção */}
         {isLastSection && (
           <div className="relative z-20 w-[80%] max-w-sm mx-auto mt-24 text-center">
             <div className="p-6 bg-slate-900/80 rounded-3xl border border-white/10 text-slate-300 shadow-[0_10px_30px_rgba(0,0,0,0.5)] backdrop-blur-xl">
@@ -328,7 +355,6 @@ export default function TrailView() {
     );
   };
 
-  // Calcula os índices globais de início de cada seção (para o renderNode saber o offset)
   const sectionsWithOffsets = useMemo(() => {
     let cursor = 0;
     return sections.map((nodes) => {
@@ -340,11 +366,34 @@ export default function TrailView() {
 
   return (
     <>
-      {/* HEADER FIXO */}
+      {/* HEADER FIXO COM POSICIONAMENTO CENTRALIZADO */}
       <div className="fixed top-0 inset-x-0 h-20 bg-slate-950/85 backdrop-blur-xl z-[100] flex items-center justify-between px-4 sm:px-8 border-b border-white/10 shadow-lg">
+        {/* Esquerda */}
         <div className="shrink-0 mt-5">
           <BackButton to="/english" label="" />
         </div>
+        
+        {/* Meio (Select largo atuando como Título) */}
+        <div className="flex-1 flex mb-3 justify-center items-center px-2 sm:px-6">
+          <select
+            value={selectedSection}
+            onChange={handleSectionSelect}
+            className="bg-slate-900/90 text-white text-xs sm:text-sm font-black border border-white/20 rounded-2xl px-3 sm:px-5 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400 cursor-pointer w-full max-w-[180px] xs:max-w-[240px] sm:max-w-[360px] md:max-w-[420px] truncate backdrop-blur-md shadow-lg text-center"
+          >
+            {sections.map((_, idx) => {
+              const meta = getSectionMeta(idx);
+              const title = getText(meta.title) || `Seção ${idx + 1}`;
+              const subtitle = getText(meta.subtitle);
+              return (
+                <option key={idx} value={idx} className="bg-slate-950 text-white py-1">
+                  {subtitle ? `${title}: ${subtitle}` : title}
+                </option>
+              );
+            })}
+          </select>
+        </div>
+
+        {/* Direita */}
         <UserProfileBadge className="-mt-1 -mr-2 shrink-0" />
       </div>
 

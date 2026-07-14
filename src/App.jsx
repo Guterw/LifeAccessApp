@@ -59,6 +59,7 @@ import TrailView from './features/languages/english/views/TrailView';
 
 // Explained Module do Inglês
 import ExplainedLessonListView from './features/languages/english/views/explained/ExplainedLessonListView';
+import ExplainedLessonGroupView from './features/languages/english/views/explained/ExplainedLessonGroupView';
 import ExplainedLessonView from './features/languages/english/views/explained/ExplainedLessonView';
 
 // Módulo de Ditado do Inglês
@@ -208,6 +209,7 @@ function App() {
                 
                 {/* Explained Module de Inglês */}
                 <Route path="/english/explained" element={<ExplainedLessonListView />} />
+                <Route path="/english/explained/group/:groupName" element={<ExplainedLessonGroupView />} />
                 <Route path="/english/explained/:lessonId" element={<ExplainedLessonView />} />
 
                 {/* Ditado de Texto Corrido de Inglês */}

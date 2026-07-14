@@ -650,4 +650,413 @@ export const EXPLAINED_LESSONS = [
       { id: 'q2', type: 'fill_choice', question: { pt: 'Complete: "I ___ pizza." (like)', en: 'Complete: "I ___ pizza." (like)', es: 'Completa: "I ___ pizza." (like)' }, target: 'like', options: ['like', 'likes', 'liking', 'liked'] }
     ]
   },
+   // ==========================================
+  // 1. VERBO SER/ESTAR (revisão profunda de To Be, negativas curtas)
+  // ==========================================
+  {
+    id: 'lesson_tobe_negatives_deep',
+    title: { pt: 'To Be: Contrações e Respostas Curtas', en: 'To Be: Contractions & Short Answers', es: 'To Be: Contracciones y Respuestas Cortas' },
+    icon: 'MinusCircle',
+    theory: [
+      {
+        id: 'tbn_1',
+        title: { pt: 'Contrações do To Be', en: 'To Be Contractions', es: 'Contracciones de To Be' },
+        body: {
+          pt: 'No dia a dia, quase ninguém fala "I am", "you are" por extenso. Usa-se a contração:\n\nI am -> I\'m\nYou are -> You\'re\nHe is -> He\'s\nShe is -> She\'s\nIt is -> It\'s\nWe are -> We\'re\nThey are -> They\'re\n\nSão essas formas que você vai ouvir o tempo todo em conversas reais.',
+          en: 'In everyday speech, almost nobody says "I am", "you are" in full. We use the contraction:\n\nI am -> I\'m\nYou are -> You\'re\nHe is -> He\'s',
+          es: 'En el habla cotidiana, casi nadie dice "I am", "you are" completo. Se usa la contracción:\n\nI am -> I\'m\nYou are -> You\'re'
+        },
+        examples: ['I\'m tired.', 'She\'s my friend.', 'We\'re ready.']
+      },
+      {
+        id: 'tbn_2',
+        title: { pt: 'Respostas Curtas (Yes/No)', en: 'Short Answers (Yes/No)', es: 'Respuestas Cortas (Sí/No)' },
+        body: {
+          pt: 'Em inglês, responder só "Yes" ou "No" soa seco/rude. O normal é responder com uma resposta curta:\n\n"Are you tired?" -> "Yes, I am." / "No, I\'m not."\n"Is she your sister?" -> "Yes, she is." / "No, she isn\'t."\n\nRepare que na resposta curta NÃO se usa contração no "Yes, I am" (fica estranho falar "Yes, I\'m"), mas SIM se usa na negativa: "No, I\'m not."',
+          en: 'In English, answering only "Yes" or "No" sounds a bit dry/rude. Native speakers use short answers:\n\n"Are you tired?" -> "Yes, I am." / "No, I\'m not."',
+          es: 'En inglés, responder solo "Yes" o "No" suena un poco seco. Lo normal es responder con una respuesta corta.'
+        },
+        examples: ['Yes, I am.', 'No, I\'m not.', 'Yes, they are.', 'No, he isn\'t.']
+      }
+    ],
+    exercises: [
+      { id: 'q1', type: 'fill_choice', question: { pt: 'Contração de "I am":', en: 'Contraction of "I am":', es: 'Contracción de "I am":' }, target: 'I\'m', options: ['I\'m', 'I\'s', 'Im', 'I\'re'] },
+      { id: 'q2', type: 'fill_choice', question: { pt: 'Traduza para o inglês: "Ela é minha irmã"', en: 'Translate to English: "She is my sister"', es: 'Traduce al inglés: "Ella es mi hermana"' }, target: 'She is my sister.', options: ['She is my sister.', 'She are my sister.', 'Her is my sister.', 'She is my brother.'] },
+      { id: 'q3', type: 'fill_choice', question: { pt: 'Traduza para o português: "We\'re ready."', en: 'Translate to Portuguese: "We\'re ready."', es: 'Traduce al portugués: "We\'re ready."' }, target: 'Nós estamos prontos.', options: ['Nós estamos prontos.', 'Nós somos rápidos.', 'Eles estão prontos.', 'Eu estou pronto.'] },
+      { id: 'q4', type: 'fill_choice', question: { pt: 'Resposta curta positiva para "Are you tired?"', en: 'Positive short answer for "Are you tired?"', es: 'Respuesta corta positiva para "Are you tired?"' }, target: 'Yes, I am.', options: ['Yes, I am.', 'Yes, I\'m.', 'Yes I do.', 'Yes, is.'] },
+      { id: 'q5', type: 'fill_choice', question: { pt: 'Resposta curta negativa para "Is she your sister?"', en: 'Negative short answer for "Is she your sister?"', es: 'Respuesta corta negativa para "Is she your sister?"' }, target: 'No, she isn\'t.', options: ['No, she isn\'t.', 'No, not.', 'No, she not.', 'No, she don\'t.'] },
+      { id: 'q6', type: 'fill_choice', question: { pt: 'Traduza para o inglês: "Eles não estão prontos"', en: 'Translate to English: "They are not ready"', es: 'Traduce al inglés: "Ellos no están listos"' }, target: 'They aren\'t ready.', options: ['They aren\'t ready.', 'They isn\'t ready.', 'They not ready.', 'They amn\'t ready.'] },
+      { id: 'q7', type: 'fill_choice', question: { pt: 'Traduza para o português: "He\'s my boss."', en: 'Translate to Portuguese: "He\'s my boss."', es: 'Traduce al portugués: "He\'s my boss."' }, target: 'Ele é meu chefe.', options: ['Ele é meu chefe.', 'Ele tem meu chefe.', 'Ela é minha chefe.', 'Ele foi meu chefe.'] },
+      { id: 'q8', type: 'voice_dictation', question: { pt: 'Fale: "Yes, I am. No, I\'m not."', en: 'Say: "Yes, I am. No, I\'m not."', es: 'Di: "Yes, I am. No, I\'m not."' }, target: ['yes i am no i am not', 'yes i am no im not'], instructions: { pt: 'Fale as duas respostas curtas seguidas.', en: 'Say both short answers in a row.', es: 'Di las dos respuestas seguidas.' } }
+    ]
+  },
+ 
+  // ==========================================
+  // 2. PRESENT CONTINUOUS
+  // ==========================================
+  {
+    id: 'lesson_present_continuous',
+    title: { pt: 'O que está Acontecendo Agora (-ING)', en: 'What Is Happening Now (-ING)', es: 'Lo que Está Pasando Ahora (-ING)' },
+    icon: 'Play',
+    theory: [
+      {
+        id: 'pc_1',
+        title: { pt: 'To Be + Verbo-ING', en: 'To Be + Verb-ING', es: 'To Be + Verbo-ING' },
+        body: {
+          pt: 'Para dizer que algo está acontecendo NESTE momento, usamos: TO BE (am/is/are) + verbo + ING.\n\n"I am working." (Eu estou trabalhando.)\n"She is eating." (Ela está comendo.)\n"They are playing." (Eles estão jogando.)\n\nÉ o "estou fazendo" do português.',
+          en: 'To say something is happening RIGHT NOW, use: TO BE (am/is/are) + verb + ING.\n\n"I am working."\n"She is eating."',
+          es: 'Para decir que algo está pasando AHORA MISMO, usa: TO BE (am/is/are) + verbo + ING.'
+        },
+        examples: ['I am reading.', 'He is sleeping.', 'We are talking.']
+      },
+      {
+        id: 'pc_2',
+        title: { pt: 'Regras de ortografia do -ING', en: 'Spelling rules for -ING', es: 'Reglas de ortografía del -ING' },
+        body: {
+          pt: 'work -> working (regra normal: só adiciona ING)\nmake -> making (termina em "e" mudo -> tira o "e" e adiciona ING)\nrun -> running (verbo curto CVC -> dobra a última letra)\nlie -> lying (termina em "ie" -> vira "y" + ING)',
+          en: 'work -> working (normal rule)\nmake -> making (silent "e" -> drop it and add ING)\nrun -> running (short CVC verb -> double the last letter)',
+          es: 'work -> working (regla normal)\nmake -> making ("e" muda -> quítala y añade ING)\nrun -> running (verbo corto CVC -> duplica la última letra)'
+        },
+        examples: ['She is writing.', 'He is running.', 'They are swimming.']
+      }
+    ],
+    exercises: [
+      { id: 'q1', type: 'fill_choice', question: { pt: 'Complete: "I ___ working." ', en: 'Complete: "I ___ working."', es: 'Completa: "I ___ working."' }, target: 'am', options: ['am', 'is', 'are', 'be'] },
+      { id: 'q2', type: 'fill_choice', question: { pt: 'Gerúndio de "run":', en: 'Gerund of "run":', es: 'Gerundio de "run":' }, target: 'running', options: ['runing', 'running', 'runeing', 'runnning'] },
+      { id: 'q3', type: 'fill_choice', question: { pt: 'Traduza: "Ela está comendo"', en: 'Translate: "She is eating"', es: 'Traduce: "She is eating"' }, target: 'She is eating.', options: ['She is eating.', 'She eat.', 'She eating.', 'She are eating.'] },
+      { id: 'q4', type: 'fill_choice', question: { pt: 'Traduza para o português: "We are talking."', en: 'Translate to Portuguese: "We are talking."', es: 'Traduce al portugués: "We are talking."' }, target: 'Nós estamos conversando.', options: ['Nós estamos conversando.', 'Nós conversamos.', 'Nós vamos conversar.', 'Eles estão conversando.'] },
+      { id: 'q5', type: 'fill_choice', question: { pt: 'Gerúndio de "make":', en: 'Gerund of "make":', es: 'Gerundio de "make":' }, target: 'making', options: ['makeing', 'making', 'makking', 'makng'] },
+      { id: 'q6', type: 'fill_choice', question: { pt: 'Traduza: "Eles estão jogando futebol"', en: 'Translate: "They are playing football"', es: 'Traduce: "They are playing football"' }, target: 'They are playing football.', options: ['They are playing football.', 'They play football.', 'They is playing football.', 'They are play football.'] },
+      { id: 'q7', type: 'fill_choice', question: { pt: 'Traduza para o português: "He is sleeping."', en: 'Translate to Portuguese: "He is sleeping."', es: 'Traduce al portugués: "He is sleeping."' }, target: 'Ele está dormindo.', options: ['Ele está dormindo.', 'Ele dorme.', 'Ele vai dormir.', 'Ela está dormindo.'] },
+      { id: 'q8', type: 'voice_dictation', question: { pt: 'Fale: "I am reading a book."', en: 'Say: "I am reading a book."', es: 'Di: "I am reading a book."' }, target: ['i am reading a book'], instructions: { pt: 'Fale a frase devagar.', en: 'Say it slowly.', es: 'Di la frase despacio.' } }
+    ]
+  },
+ 
+  // ==========================================
+  // 3. THERE IS / THERE ARE
+  // ==========================================
+  {
+    id: 'lesson_there_is_are',
+    title: { pt: 'There Is / There Are (Existência)', en: 'There Is / There Are', es: 'There Is / There Are' },
+    icon: 'MapPin',
+    theory: [
+      {
+        id: 'tia_1',
+        title: { pt: 'Existência básica', en: 'Basic existence', es: 'Existencia básica' },
+        body: {
+          pt: '"There is" e "there are" significam "tem/há" — servem para dizer que algo EXISTE em um lugar.\n\nTHERE IS = singular ("tem um/uma...")\nTHERE ARE = plural ("tem vários...")\n\n"There is a book on the table." (Tem um livro na mesa.)\n"There are three books on the table." (Tem três livros na mesa.)',
+          en: '"There is" and "there are" mean something EXISTS somewhere.\n\nTHERE IS = singular\nTHERE ARE = plural',
+          es: '"There is" y "there are" significan que algo EXISTE en algún lugar.'
+        },
+        examples: ['There is a cat.', 'There are two cats.', 'There is water.']
+      },
+      {
+        id: 'tia_2',
+        title: { pt: 'Negativas e Perguntas', en: 'Negatives and Questions', es: 'Negativas y Preguntas' },
+        body: {
+          pt: 'Negativa: "There isn\'t" / "There aren\'t".\n"There isn\'t any milk." (Não tem leite.)\n\nPergunta: inverte a ordem.\n"Is there a bathroom here?" (Tem um banheiro aqui?)\n"Are there any seats?" (Tem alguma vaga/assento?)',
+          en: 'Negative: "There isn\'t" / "There aren\'t".\nQuestion: invert the order.\n"Is there a bathroom here?"',
+          es: 'Negativa: "There isn\'t" / "There aren\'t".\nPregunta: invierte el orden.'
+        },
+        examples: ['There isn\'t any milk.', 'Is there a bathroom?', 'Are there any seats?']
+      }
+    ],
+    exercises: [
+      { id: 'q1', type: 'fill_choice', question: { pt: 'Complete: "___ a book on the table." (singular)', en: 'Complete: "___ a book on the table."', es: 'Completa: "___ a book on the table."' }, target: 'There is', options: ['There is', 'There are', 'It is', 'They are'] },
+      { id: 'q2', type: 'fill_choice', question: { pt: 'Complete: "___ three cats in the house."', en: 'Complete: "___ three cats in the house."', es: 'Completa: "___ three cats in the house."' }, target: 'There are', options: ['There are', 'There is', 'It are', 'Is there'] },
+      { id: 'q3', type: 'fill_choice', question: { pt: 'Traduza: "Tem um banheiro aqui?"', en: 'Translate: "Is there a bathroom here?"', es: 'Traduce: "Is there a bathroom here?"' }, target: 'Is there a bathroom here?', options: ['Is there a bathroom here?', 'There is a bathroom here?', 'Is a bathroom there here?', 'There a bathroom is here?'] },
+      { id: 'q4', type: 'fill_choice', question: { pt: 'Traduza para o português: "There isn\'t any milk."', en: 'Translate to Portuguese: "There isn\'t any milk."', es: 'Traduce al portugués: "There isn\'t any milk."' }, target: 'Não tem leite.', options: ['Não tem leite.', 'Tem leite.', 'Não bebo leite.', 'Tem pouco leite.'] },
+      { id: 'q5', type: 'fill_choice', question: { pt: 'Traduza: "Tem alguma vaga?"', en: 'Translate: "Are there any seats?"', es: 'Traduce: "Are there any seats?"' }, target: 'Are there any seats?', options: ['Are there any seats?', 'There are any seats?', 'Is there any seats?', 'There seats any are?'] },
+      { id: 'q6', type: 'fill_choice', question: { pt: 'Traduza para o português: "There are two dogs."', en: 'Translate to Portuguese: "There are two dogs."', es: 'Traduce al portugués: "There are two dogs."' }, target: 'Tem dois cachorros.', options: ['Tem dois cachorros.', 'Tem um cachorro.', 'Não tem cachorro.', 'Tem três cachorros.'] },
+      { id: 'q7', type: 'fill_choice', question: { pt: 'Negativa correta de "There are seats":', en: 'Correct negative of "There are seats":', es: 'Negativa correcta de "There are seats":' }, target: 'There aren\'t any seats.', options: ['There aren\'t any seats.', 'There isn\'t any seats.', 'There not are seats.', 'There no are seats.'] },
+      { id: 'q8', type: 'voice_dictation', question: { pt: 'Fale: "There is a cat on the table."', en: 'Say: "There is a cat on the table."', es: 'Di: "There is a cat on the table."' }, target: ['there is a cat on the table'], instructions: { pt: 'Fale devagar.', en: 'Say it slowly.', es: 'Di despacio.' } }
+    ]
+  },
+ 
+  // ==========================================
+  // 4. POSSESSIVOS
+  // ==========================================
+  {
+    id: 'lesson_possessives',
+    title: { pt: 'De Quem É? (Possessivos)', en: 'Whose Is It? (Possessives)', es: '¿De Quién Es? (Posesivos)' },
+    icon: 'Key',
+    theory: [
+      {
+        id: 'poss_1',
+        title: { pt: 'Adjetivos Possessivos', en: 'Possessive Adjectives', es: 'Adjetivos Posesivos' },
+        body: {
+          pt: 'My = meu/minha\nYour = seu/sua (de você)\nHis = dele (de um homem)\nHer = dela (de uma mulher)\nIts = dele/dela (de coisa/animal)\nOur = nosso/nossa\nTheir = deles/delas\n\nSempre vêm ANTES do substantivo: "my car", "her phone".',
+          en: 'My, Your, His, Her, Its, Our, Their. They always come BEFORE the noun.',
+          es: 'My, Your, His, Her, Its, Our, Their. Siempre van ANTES del sustantivo.'
+        },
+        examples: ['This is my car.', 'That is her phone.', 'This is their house.']
+      },
+      {
+        id: 'poss_2',
+        title: { pt: 'O apóstrofo \'S', en: 'The apostrophe \'S', es: 'El apóstrofo \'S' },
+        body: {
+          pt: 'Para dizer que algo é de alguém (nome próprio), usamos \'S:\n\nJohn\'s car (o carro do John)\nMaria\'s phone (o celular da Maria)\n\nSe o nome já termina em S (plural), só se coloca o apóstrofo:\nThe boys\' room (o quarto dos meninos)',
+          en: 'To say something belongs to someone, use \'S:\n\nJohn\'s car\nMaria\'s phone',
+          es: 'Para decir que algo pertenece a alguien, usa \'S:\n\nJohn\'s car'
+        },
+        examples: ['John\'s car', 'Maria\'s phone', 'The boys\' room']
+      }
+    ],
+    exercises: [
+      { id: 'q1', type: 'fill_choice', question: { pt: 'Complete: "This is ___ car." (de você)', en: 'Complete: "This is ___ car." (yours)', es: 'Completa: "This is ___ car." (tuyo)' }, target: 'your', options: ['your', 'you', 'yours', 'you\'re'] },
+      { id: 'q2', type: 'fill_choice', question: { pt: 'Traduza: "Este é o carro do John"', en: 'Translate: "This is John\'s car"', es: 'Traduce: "This is John\'s car"' }, target: 'This is John\'s car.', options: ['This is John\'s car.', 'This is John car.', 'This is car of John.', 'This is Johns car.'] },
+      { id: 'q3', type: 'fill_choice', question: { pt: 'Traduza para o português: "That is her phone."', en: 'Translate to Portuguese: "That is her phone."', es: 'Traduce al portugués: "That is her phone."' }, target: 'Aquele é o celular dela.', options: ['Aquele é o celular dela.', 'Aquele é o celular dele.', 'Este é o celular dela.', 'Aquele é meu celular.'] },
+      { id: 'q4', type: 'fill_choice', question: { pt: 'Complete: "This is ___ house." (deles)', en: 'Complete: "This is ___ house." (theirs)', es: 'Completa: "This is ___ house." (de ellos)' }, target: 'their', options: ['their', 'there', 'they\'re', 'them'] },
+      { id: 'q5', type: 'fill_choice', question: { pt: 'Traduza: "O quarto dos meninos"', en: 'Translate: "The boys\' room"', es: 'Traduce: "The boys\' room"' }, target: 'The boys\' room', options: ['The boys\' room', 'The boy\'s room', 'The boys room', 'The room of boys\''] },
+      { id: 'q6', type: 'fill_choice', question: { pt: 'Traduza para o português: "This is my dog."', en: 'Translate to Portuguese: "This is my dog."', es: 'Traduce al portugués: "This is my dog."' }, target: 'Este é o meu cachorro.', options: ['Este é o meu cachorro.', 'Este é seu cachorro.', 'Aquele é meu cachorro.', 'Este é nosso cachorro.'] },
+      { id: 'q7', type: 'fill_choice', question: { pt: 'Qual possessivo usamos para um objeto/animal (it)?', en: 'Which possessive do we use for a thing/animal (it)?', es: '¿Qué posesivo usamos para un objeto/animal (it)?' }, target: 'Its', options: ['Its', 'It\'s', 'His', 'Their'] },
+      { id: 'q8', type: 'voice_dictation', question: { pt: 'Fale: "This is Maria\'s phone."', en: 'Say: "This is Maria\'s phone."', es: 'Di: "This is Maria\'s phone."' }, target: ['this is marias phone', 'this is maria\'s phone'], instructions: { pt: 'Fale devagar, prestando atenção no \'s.', en: 'Say it slowly, focusing on the \'s.', es: 'Di despacio, prestando atención al \'s.' } }
+    ]
+  },
+ 
+  // ==========================================
+  // 5. CAN / CAN'T (habilidade)
+  // ==========================================
+  {
+    id: 'lesson_can_cant',
+    title: { pt: 'CAN e CAN\'T (Habilidade)', en: 'CAN and CAN\'T (Ability)', es: 'CAN y CAN\'T (Habilidad)' },
+    icon: 'CheckSquare',
+    theory: [
+      {
+        id: 'can_1',
+        title: { pt: 'CAN = Consigo/Posso', en: 'CAN = I can', es: 'CAN = Puedo' },
+        body: {
+          pt: 'CAN é usado para dizer que você é CAPAZ de fazer algo (habilidade) ou tem PERMISSÃO.\n\n"I can swim." (Eu sei/consigo nadar.)\n"Can you speak English?" (Você consegue falar inglês?)\n\nCAN nunca muda de forma (não vira "cans" para he/she/it) e é seguido do verbo na forma BASE.',
+          en: 'CAN is used to say you are ABLE to do something, or have permission.\n\n"I can swim."\n"Can you speak English?"',
+          es: 'CAN se usa para decir que eres CAPAZ de hacer algo, o tienes permiso.'
+        },
+        examples: ['I can drive.', 'She can cook.', 'Can you help me?']
+      },
+      {
+        id: 'can_2',
+        title: { pt: 'CAN\'T = Não consigo', en: 'CAN\'T = I cannot', es: 'CAN\'T = No puedo' },
+        body: {
+          pt: 'A negativa de CAN é CAN\'T (ou CANNOT, mais formal).\n\n"I can\'t swim." (Eu não sei nadar.)\n"He can\'t come today." (Ele não pode vir hoje.)\n\nCuidado com a pronúncia: "can" (fraco, quase "kn") vs "can\'t" (forte, "kænt").',
+          en: 'The negative of CAN is CAN\'T (or CANNOT, more formal).\n\n"I can\'t swim."',
+          es: 'La negativa de CAN es CAN\'T (o CANNOT, más formal).'
+        },
+        examples: ['I can\'t swim.', 'He can\'t come today.', 'We can\'t find it.']
+      }
+    ],
+    exercises: [
+      { id: 'q1', type: 'fill_choice', question: { pt: 'Traduza: "Eu sei nadar"', en: 'Translate: "I can swim"', es: 'Traduce: "I can swim"' }, target: 'I can swim.', options: ['I can swim.', 'I cans swim.', 'I can to swim.', 'I could swim now.'] },
+      { id: 'q2', type: 'fill_choice', question: { pt: 'Traduza para o português: "She can cook."', en: 'Translate to Portuguese: "She can cook."', es: 'Traduce al portugués: "She can cook."' }, target: 'Ela sabe cozinhar.', options: ['Ela sabe cozinhar.', 'Ela cozinha.', 'Ela vai cozinhar.', 'Ela não sabe cozinhar.'] },
+      { id: 'q3', type: 'fill_choice', question: { pt: 'Traduza: "Ele não pode vir hoje"', en: 'Translate: "He can\'t come today"', es: 'Traduce: "He can\'t come today"' }, target: 'He can\'t come today.', options: ['He can\'t come today.', 'He no can come today.', 'He cannot comes today.', 'He can\'t comes today.'] },
+      { id: 'q4', type: 'fill_choice', question: { pt: 'Pergunta correta: "Você consegue falar inglês?"', en: 'Correct question: "Can you speak English?"', es: 'Pregunta correcta: "Can you speak English?"' }, target: 'Can you speak English?', options: ['Can you speak English?', 'You can speak English?', 'Do you can speak English?', 'Can you to speak English?'] },
+      { id: 'q5', type: 'fill_choice', question: { pt: 'Traduza para o português: "We can\'t find it."', en: 'Translate to Portuguese: "We can\'t find it."', es: 'Traduce al portugués: "We can\'t find it."' }, target: 'Nós não conseguimos encontrar.', options: ['Nós não conseguimos encontrar.', 'Nós encontramos.', 'Nós vamos encontrar.', 'Nós conseguimos encontrar.'] },
+      { id: 'q6', type: 'fill_choice', question: { pt: 'Qual verbo acompanha CAN?', en: 'Which verb form follows CAN?', es: '¿Qué forma de verbo sigue a CAN?' }, target: 'Forma base (sem to)', options: ['Forma base (sem to)', 'Com "to"', 'Com "-ing"', 'No passado'] },
+      { id: 'q7', type: 'fill_choice', question: { pt: 'Traduza: "Eu posso te ajudar"', en: 'Translate: "I can help you"', es: 'Traduce: "I can help you"' }, target: 'I can help you.', options: ['I can help you.', 'I can to help you.', 'I cans help you.', 'I helping can you.'] },
+      { id: 'q8', type: 'voice_dictation', question: { pt: 'Fale: "I can\'t swim, but I can drive."', en: 'Say: "I can\'t swim, but I can drive."', es: 'Di: "I can\'t swim, but I can drive."' }, target: ['i cant swim but i can drive', 'i can\'t swim but i can drive'], instructions: { pt: 'Fale devagar, contrastando "can" e "can\'t".', en: 'Say it slowly, contrasting "can" and "can\'t".', es: 'Di despacio, contrastando "can" y "can\'t".' } }
+    ]
+  },
+ 
+  // ==========================================
+  // 6. PREPOSIÇÕES DE LUGAR
+  // ==========================================
+  {
+    id: 'lesson_prepositions_place',
+    title: { pt: 'Preposições de Lugar (In, On, At)', en: 'Prepositions of Place', es: 'Preposiciones de Lugar' },
+    icon: 'Compass',
+    theory: [
+      {
+        id: 'prep_1',
+        title: { pt: 'IN, ON e AT', en: 'IN, ON and AT', es: 'IN, ON y AT' },
+        body: {
+          pt: 'IN = dentro de um espaço fechado/área grande: "in the box", "in London", "in the car".\nON = em cima de uma superfície: "on the table", "on the wall".\nAT = em um ponto específico: "at the door", "at the bus stop", "at home".',
+          en: 'IN = inside an enclosed space/large area.\nON = on top of a surface.\nAT = at a specific point.',
+          es: 'IN = dentro de un espacio cerrado/área grande.\nON = encima de una superficie.\nAT = en un punto específico.'
+        },
+        examples: ['The keys are in the box.', 'The book is on the table.', 'I am at the door.']
+      },
+      {
+        id: 'prep_2',
+        title: { pt: 'UNDER, BEHIND, BETWEEN', en: 'UNDER, BEHIND, BETWEEN', es: 'UNDER, BEHIND, BETWEEN' },
+        body: {
+          pt: 'UNDER = embaixo de: "The cat is under the table."\nBEHIND = atrás de: "He is behind the door."\nBETWEEN = entre (duas coisas): "The bank is between the pharmacy and the shop."',
+          en: 'UNDER = below something.\nBEHIND = at the back of.\nBETWEEN = in the middle of two things.',
+          es: 'UNDER = debajo de algo.\nBEHIND = detrás de.\nBETWEEN = entre dos cosas.'
+        },
+        examples: ['The dog is under the bed.', 'She is behind you.', 'It is between the two houses.']
+      }
+    ],
+    exercises: [
+      { id: 'q1', type: 'fill_choice', question: { pt: 'Complete: "The book is ___ the table." (em cima)', en: 'Complete: "The book is ___ the table." (on top)', es: 'Completa: "The book is ___ the table." (encima)' }, target: 'on', options: ['on', 'in', 'at', 'under'] },
+      { id: 'q2', type: 'fill_choice', question: { pt: 'Complete: "The keys are ___ the box." (dentro)', en: 'Complete: "The keys are ___ the box." (inside)', es: 'Completa: "The keys are ___ the box." (dentro)' }, target: 'in', options: ['in', 'on', 'at', 'between'] },
+      { id: 'q3', type: 'fill_choice', question: { pt: 'Traduza: "Eu estou na porta"', en: 'Translate: "I am at the door"', es: 'Traduce: "I am at the door"' }, target: 'I am at the door.', options: ['I am at the door.', 'I am in the door.', 'I am on the door.', 'I am the door.'] },
+      { id: 'q4', type: 'fill_choice', question: { pt: 'Traduza para o português: "The cat is under the table."', en: 'Translate to Portuguese: "The cat is under the table."', es: 'Traduce al portugués: "The cat is under the table."' }, target: 'O gato está embaixo da mesa.', options: ['O gato está embaixo da mesa.', 'O gato está em cima da mesa.', 'O gato está atrás da mesa.', 'O gato está perto da mesa.'] },
+      { id: 'q5', type: 'fill_choice', question: { pt: 'Traduza: "O banco fica entre a farmácia e a loja"', en: 'Translate: "The bank is between the pharmacy and the shop"', es: 'Traduce: "The bank is between the pharmacy and the shop"' }, target: 'The bank is between the pharmacy and the shop.', options: ['The bank is between the pharmacy and the shop.', 'The bank is behind the pharmacy and the shop.', 'The bank is under the pharmacy and the shop.', 'The bank is on the pharmacy and the shop.'] },
+      { id: 'q6', type: 'fill_choice', question: { pt: 'Traduza para o português: "He is behind the door."', en: 'Translate to Portuguese: "He is behind the door."', es: 'Traduce al portugués: "He is behind the door."' }, target: 'Ele está atrás da porta.', options: ['Ele está atrás da porta.', 'Ele está na porta.', 'Ele está embaixo da porta.', 'Ele está em cima da porta.'] },
+      { id: 'q7', type: 'fill_choice', question: { pt: 'Qual preposição usamos com cidades/países (dentro de uma área)?', en: 'Which preposition do we use with cities/countries?', es: '¿Qué preposición usamos con ciudades/países?' }, target: 'in', options: ['in', 'on', 'at', 'under'] },
+      { id: 'q8', type: 'voice_dictation', question: { pt: 'Fale: "The dog is under the bed."', en: 'Say: "The dog is under the bed."', es: 'Di: "The dog is under the bed."' }, target: ['the dog is under the bed'], instructions: { pt: 'Fale devagar.', en: 'Say it slowly.', es: 'Di despacio.' } }
+    ]
+  },
+ 
+  // ==========================================
+  // 7. COMPARATIVOS E SUPERLATIVOS
+  // ==========================================
+  {
+    id: 'lesson_comparatives',
+    title: { pt: 'Comparando Coisas (-ER, -EST, MORE)', en: 'Comparing Things (-ER, -EST, MORE)', es: 'Comparando Cosas (-ER, -EST, MORE)' },
+    icon: 'BarChart2',
+    theory: [
+      {
+        id: 'comp_1',
+        title: { pt: 'Adjetivos curtos: -ER e -EST', en: 'Short adjectives: -ER and -EST', es: 'Adjetivos cortos: -ER y -EST' },
+        body: {
+          pt: 'Para adjetivos curtos (1 sílaba, às vezes 2), adicionamos -ER para comparar e -EST para o superlativo:\n\ntall -> taller -> the tallest\nbig -> bigger -> the biggest (dobra a consoante)\n\n"She is taller than me." (Ela é mais alta que eu.)\n"He is the tallest in the class." (Ele é o mais alto da turma.)',
+          en: 'For short adjectives, add -ER to compare and -EST for the superlative.\n\ntall -> taller -> the tallest',
+          es: 'Para adjetivos cortos, agrega -ER para comparar y -EST para el superlativo.'
+        },
+        examples: ['She is taller than me.', 'He is the tallest.', 'This is bigger.']
+      },
+      {
+        id: 'comp_2',
+        title: { pt: 'Adjetivos longos: MORE e MOST', en: 'Long adjectives: MORE and MOST', es: 'Adjetivos largos: MORE y MOST' },
+        body: {
+          pt: 'Para adjetivos longos (2+ sílabas), usamos MORE + adjetivo, e THE MOST + adjetivo:\n\nexpensive -> more expensive -> the most expensive\n\n"This car is more expensive than that one." (Este carro é mais caro que aquele.)\n"It\'s the most expensive car here." (É o carro mais caro aqui.)\n\nIrregulares: good -> better -> the best / bad -> worse -> the worst.',
+          en: 'For long adjectives, use MORE + adjective, and THE MOST + adjective.\n\nIrregulars: good -> better -> the best.',
+          es: 'Para adjetivos largos, usa MORE + adjetivo, y THE MOST + adjetivo.'
+        },
+        examples: ['This is more expensive.', 'It\'s the most beautiful place.', 'This is better than that.']
+      }
+    ],
+    exercises: [
+      { id: 'q1', type: 'fill_choice', question: { pt: 'Comparativo de "tall":', en: 'Comparative of "tall":', es: 'Comparativo de "tall":' }, target: 'taller', options: ['taller', 'more tall', 'tallest', 'talles'] },
+      { id: 'q2', type: 'fill_choice', question: { pt: 'Superlativo de "big":', en: 'Superlative of "big":', es: 'Superlativo de "big":' }, target: 'the biggest', options: ['the biggest', 'the bigger', 'the most big', 'the bigest'] },
+      { id: 'q3', type: 'fill_choice', question: { pt: 'Traduza: "Este carro é mais caro que aquele"', en: 'Translate: "This car is more expensive than that one"', es: 'Traduce: "This car is more expensive than that one"' }, target: 'This car is more expensive than that one.', options: ['This car is more expensive than that one.', 'This car is expensiver than that one.', 'This car is the expensive than that one.', 'This car is much expensive that one.'] },
+      { id: 'q4', type: 'fill_choice', question: { pt: 'Traduza para o português: "He is the tallest in the class."', en: 'Translate to Portuguese: "He is the tallest in the class."', es: 'Traduce al portugués: "He is the tallest in the class."' }, target: 'Ele é o mais alto da turma.', options: ['Ele é o mais alto da turma.', 'Ele é alto.', 'Ele é mais alto que a turma.', 'Ele é o menor da turma.'] },
+      { id: 'q5', type: 'fill_choice', question: { pt: 'Comparativo irregular de "good":', en: 'Irregular comparative of "good":', es: 'Comparativo irregular de "good":' }, target: 'better', options: ['better', 'gooder', 'more good', 'best'] },
+      { id: 'q6', type: 'fill_choice', question: { pt: 'Traduza: "É o lugar mais bonito"', en: 'Translate: "It\'s the most beautiful place"', es: 'Traduce: "It\'s the most beautiful place"' }, target: 'It\'s the most beautiful place.', options: ['It\'s the most beautiful place.', 'It\'s the beautifulest place.', 'It\'s more beautiful place.', 'It\'s the beautiful most place.'] },
+      { id: 'q7', type: 'fill_choice', question: { pt: 'Traduza para o português: "This is better than that."', en: 'Translate to Portuguese: "This is better than that."', es: 'Traduce al portugués: "This is better than that."' }, target: 'Isto é melhor que aquilo.', options: ['Isto é melhor que aquilo.', 'Isto é pior que aquilo.', 'Isto é igual àquilo.', 'Isto é bom.'] },
+      { id: 'q8', type: 'voice_dictation', question: { pt: 'Fale: "This is the most expensive one."', en: 'Say: "This is the most expensive one."', es: 'Di: "This is the most expensive one."' }, target: ['this is the most expensive one'], instructions: { pt: 'Fale devagar.', en: 'Say it slowly.', es: 'Di despacio.' } }
+    ]
+  },
+ 
+  // ==========================================
+  // 8. ADVÉRBIOS DE FREQUÊNCIA
+  // ==========================================
+  {
+    id: 'lesson_frequency_adverbs',
+    title: { pt: 'Com que Frequência? (Always, Never...)', en: 'How Often? (Always, Never...)', es: '¿Con Qué Frecuencia? (Always, Never...)' },
+    icon: 'RotateCw',
+    theory: [
+      {
+        id: 'freq_1',
+        title: { pt: 'A escada da frequência', en: 'The frequency ladder', es: 'La escalera de la frecuencia' },
+        body: {
+          pt: 'Do mais frequente ao menos frequente:\n\nAlways (sempre) 100%\nUsually (geralmente)\nOften (frequentemente)\nSometimes (às vezes)\nRarely / Seldom (raramente)\nNever (nunca) 0%',
+          en: 'From most to least frequent:\n\nAlways, Usually, Often, Sometimes, Rarely/Seldom, Never.',
+          es: 'De más a menos frecuente:\n\nAlways, Usually, Often, Sometimes, Rarely/Seldom, Never.'
+        },
+        examples: ['I always drink coffee.', 'She never smokes.', 'We sometimes go out.']
+      },
+      {
+        id: 'freq_2',
+        title: { pt: 'Onde colocar o advérbio', en: 'Where to place the adverb', es: 'Dónde colocar el adverbio' },
+        body: {
+          pt: 'Regra geral: o advérbio de frequência vem ANTES do verbo principal, mas DEPOIS do verbo To Be.\n\n"I always drink coffee." (antes de "drink")\n"She is always late." (depois de "is")\n\n"I drink always coffee" está ERRADO!',
+          en: 'General rule: the frequency adverb comes BEFORE the main verb, but AFTER the verb To Be.\n\n"I always drink coffee."\n"She is always late."',
+          es: 'Regla general: el adverbio de frecuencia va ANTES del verbo principal, pero DESPUÉS de To Be.'
+        },
+        examples: ['I always drink coffee.', 'She is always late.', 'He usually walks to work.']
+      }
+    ],
+    exercises: [
+      { id: 'q1', type: 'fill_choice', question: { pt: 'Qual advérbio significa 0% (nunca)?', en: 'Which adverb means 0% (never)?', es: '¿Qué adverbio significa 0% (nunca)?' }, target: 'Never', options: ['Never', 'Always', 'Sometimes', 'Often'] },
+      { id: 'q2', type: 'fill_choice', question: { pt: 'Traduza: "Eu sempre bebo café"', en: 'Translate: "I always drink coffee"', es: 'Traduce: "I always drink coffee"' }, target: 'I always drink coffee.', options: ['I always drink coffee.', 'I drink always coffee.', 'Always I drink coffee.', 'I drink coffee always.'] },
+      { id: 'q3', type: 'fill_choice', question: { pt: 'Posição correta em: "She ___ is late."', en: 'Correct position: "She ___ is late."', es: 'Posición correcta: "She ___ is late."' }, target: 'She is always late.', options: ['She is always late.', 'She always is late.', 'Always she is late.', 'She is late always.'] },
+      { id: 'q4', type: 'fill_choice', question: { pt: 'Traduza para o português: "She never smokes."', en: 'Translate to Portuguese: "She never smokes."', es: 'Traduce al portugués: "She never smokes."' }, target: 'Ela nunca fuma.', options: ['Ela nunca fuma.', 'Ela sempre fuma.', 'Ela às vezes fuma.', 'Ela raramente fuma.'] },
+      { id: 'q5', type: 'fill_choice', question: { pt: 'Traduza: "Nós às vezes saímos"', en: 'Translate: "We sometimes go out"', es: 'Traduce: "We sometimes go out"' }, target: 'We sometimes go out.', options: ['We sometimes go out.', 'We go sometimes out.', 'Sometimes we go out.', 'We go out sometimes.'] },
+      { id: 'q6', type: 'fill_choice', question: { pt: 'Traduza para o português: "He usually walks to work."', en: 'Translate to Portuguese: "He usually walks to work."', es: 'Traduce al portugués: "He usually walks to work."' }, target: 'Ele geralmente vai andando para o trabalho.', options: ['Ele geralmente vai andando para o trabalho.', 'Ele sempre vai andando para o trabalho.', 'Ele nunca vai andando para o trabalho.', 'Ele às vezes vai andando para o trabalho.'] },
+      { id: 'q7', type: 'fill_choice', question: { pt: 'Qual advérbio vem depois de "seldom" na escada de frequência (mais raro)?', en: 'Which comes after "seldom" on the ladder?', es: '¿Cuál viene después de "seldom"?' }, target: 'Never', options: ['Never', 'Often', 'Usually', 'Sometimes'] },
+      { id: 'q8', type: 'voice_dictation', question: { pt: 'Fale: "I usually wake up early."', en: 'Say: "I usually wake up early."', es: 'Di: "I usually wake up early."' }, target: ['i usually wake up early'], instructions: { pt: 'Fale devagar.', en: 'Say it slowly.', es: 'Di despacio.' } }
+    ]
+  },
+ 
+  // ==========================================
+  // 9. VERBOS IRREGULARES ESSENCIAIS (2ª leva, além de past tense)
+  // ==========================================
+  {
+    id: 'lesson_irregular_verbs_core',
+    title: { pt: '20 Verbos Irregulares Essenciais', en: '20 Essential Irregular Verbs', es: '20 Verbos Irregulares Esenciales' },
+    icon: 'ListOrdered',
+    theory: [
+      {
+        id: 'irr_1',
+        title: { pt: 'Os campeões de frequência', en: 'The most frequent ones', es: 'Los más frecuentes' },
+        body: {
+          pt: 'Estes são os verbos irregulares que você vai usar TODOS OS DIAS. Base -> Passado:\n\nbe -> was/were\nhave -> had\ndo -> did\ngo -> went\nsee -> saw\nget -> got\nmake -> made\ntake -> took\ncome -> came\nknow -> knew',
+          en: 'These are the irregular verbs you will use EVERY DAY. Base -> Past:\n\nbe -> was/were, have -> had, do -> did, go -> went, see -> saw',
+          es: 'Estos son los verbos irregulares que usarás TODOS LOS DÍAS.'
+        },
+        examples: ['I was tired.', 'She had a car.', 'We went home.']
+      },
+      {
+        id: 'irr_2',
+        title: { pt: 'Mais 10 essenciais', en: '10 more essentials', es: '10 más esenciales' },
+        body: {
+          pt: 'say -> said\ntell -> told\nthink -> thought\nfind -> found\ngive -> gave\ntake -> took\nfeel -> felt\nleave -> left\nput -> put (não muda!)\nread -> read (não muda a escrita, mas MUDA a pronúncia!)',
+          en: 'say -> said, tell -> told, think -> thought, find -> found, give -> gave, put -> put (no change!)',
+          es: 'say -> said, tell -> told, think -> thought, find -> found, give -> gave'
+        },
+        examples: ['I said hello.', 'She told me a secret.', 'We found the keys.']
+      }
+    ],
+    exercises: [
+      { id: 'q1', type: 'fill_choice', question: { pt: 'Passado de "go":', en: 'Past of "go":', es: 'Pasado de "go":' }, target: 'went', options: ['went', 'goed', 'gone', 'go'] },
+      { id: 'q2', type: 'fill_choice', question: { pt: 'Passado de "have":', en: 'Past of "have":', es: 'Pasado de "have":' }, target: 'had', options: ['had', 'haved', 'have', 'has'] },
+      { id: 'q3', type: 'fill_choice', question: { pt: 'Traduza: "Eu disse olá"', en: 'Translate: "I said hello"', es: 'Traduce: "I said hello"' }, target: 'I said hello.', options: ['I said hello.', 'I say hello.', 'I sayed hello.', 'I telled hello.'] },
+      { id: 'q4', type: 'fill_choice', question: { pt: 'Traduza para o português: "We found the keys."', en: 'Translate to Portuguese: "We found the keys."', es: 'Traduce al portugués: "We found the keys."' }, target: 'Nós encontramos as chaves.', options: ['Nós encontramos as chaves.', 'Nós procuramos as chaves.', 'Nós perdemos as chaves.', 'Nós temos as chaves.'] },
+      { id: 'q5', type: 'fill_choice', question: { pt: 'Passado de "put":', en: 'Past of "put":', es: 'Pasado de "put":' }, target: 'put', options: ['put', 'putted', 'puted', 'putt'] },
+      { id: 'q6', type: 'fill_choice', question: { pt: 'Traduza: "Ela me contou um segredo"', en: 'Translate: "She told me a secret"', es: 'Traduce: "She told me a secret"' }, target: 'She told me a secret.', options: ['She told me a secret.', 'She telled me a secret.', 'She tells me a secret.', 'She said me a secret.'] },
+      { id: 'q7', type: 'fill_choice', question: { pt: 'Passado de "think":', en: 'Past of "think":', es: 'Pasado de "think":' }, target: 'thought', options: ['thought', 'thinked', 'thinken', 'think'] },
+      { id: 'q8', type: 'voice_dictation', question: { pt: 'Fale: "I saw her and I felt happy."', en: 'Say: "I saw her and I felt happy."', es: 'Di: "I saw her and I felt happy."' }, target: ['i saw her and i felt happy'], instructions: { pt: 'Fale devagar.', en: 'Say it slowly.', es: 'Di despacio.' } }
+    ]
+  },
+ 
+  // ==========================================
+  // 10. NÚMEROS ORDINAIS E DATAS
+  // ==========================================
+  {
+    id: 'lesson_ordinals_dates',
+    title: { pt: 'Ordinais e Como Falar Datas', en: 'Ordinals and Saying Dates', es: 'Ordinales y Cómo Decir Fechas' },
+    icon: 'CalendarClock',
+    theory: [
+      {
+        id: 'ord_1',
+        title: { pt: 'Números Ordinais', en: 'Ordinal Numbers', es: 'Números Ordinales' },
+        body: {
+          pt: '1st = first\n2nd = second\n3rd = third\n4th = fourth\n5th = fifth\n...a partir do 4 é só adicionar "TH" ao número (fourth, fifth, sixth...), com exceção de números terminados em 1, 2, 3 (twenty-first, twenty-second, twenty-third).',
+          en: '1st = first, 2nd = second, 3rd = third, 4th = fourth... from 4 onward, just add "TH".',
+          es: '1st = first, 2nd = second, 3rd = third, 4th = fourth...'
+        },
+        examples: ['the first day', 'the third floor', 'the twenty-first of May']
+      },
+      {
+        id: 'ord_2',
+        title: { pt: 'Como falar uma data', en: 'How to say a date', es: 'Cómo decir una fecha' },
+        body: {
+          pt: 'Em inglês, a data é falada com o ordinal + "of" + mês:\n\n"May 21st" fala-se "the twenty-first of May" ou "May the twenty-first".\n\nPara o ano, separa-se em dois blocos de dois dígitos:\n2026 = "twenty twenty-six"\n1998 = "nineteen ninety-eight"',
+          en: 'In English, dates are spoken with the ordinal + "of" + month: "May 21st" = "the twenty-first of May".',
+          es: 'En inglés, las fechas se dicen con el ordinal + "of" + mes.'
+        },
+        examples: ['the first of January', 'March the third', 'twenty twenty-six']
+      }
+    ],
+    exercises: [
+      { id: 'q1', type: 'fill_choice', question: { pt: 'Ordinal de "one":', en: 'Ordinal of "one":', es: 'Ordinal de "one":' }, target: 'first', options: ['first', 'onest', 'oneth', 'ones'] },
+      { id: 'q2', type: 'fill_choice', question: { pt: 'Ordinal de "three":', en: 'Ordinal of "three":', es: 'Ordinal de "three":' }, target: 'third', options: ['third', 'threeth', 'threerd', 'thirdth'] },
+      { id: 'q3', type: 'fill_choice', question: { pt: 'Traduza: "o primeiro dia"', en: 'Translate: "the first day"', es: 'Traduce: "the first day"' }, target: 'the first day', options: ['the first day', 'the one day', 'the day first', 'the firstest day'] },
+      { id: 'q4', type: 'fill_choice', question: { pt: 'Como se fala o ano 2026 em inglês?', en: 'How do you say the year 2026 in English?', es: '¿Cómo se dice el año 2026 en inglés?' }, target: 'twenty twenty-six', options: ['twenty twenty-six', 'two thousand twenty-six only', 'twenty-o-twenty-six', 'two zero two six'] },
+      { id: 'q5', type: 'fill_choice', question: { pt: 'Traduza para o português: "the third floor"', en: 'Translate to Portuguese: "the third floor"', es: 'Traduce al portugués: "the third floor"' }, target: 'o terceiro andar', options: ['o terceiro andar', 'o segundo andar', 'o primeiro andar', 'o quarto andar'] },
+      { id: 'q6', type: 'fill_choice', question: { pt: 'Ordinal de "twenty-one":', en: 'Ordinal of "twenty-one":', es: 'Ordinal de "twenty-one":' }, target: 'twenty-first', options: ['twenty-first', 'twenty-oneth', 'twentyone-th', 'twenty-onest'] },
+      { id: 'q7', type: 'fill_choice', question: { pt: 'Traduza: "primeiro de janeiro"', en: 'Translate: "the first of January"', es: 'Traduce: "the first of January"' }, target: 'the first of January', options: ['the first of January', 'January the one', 'the January first', 'one of January'] },
+      { id: 'q8', type: 'voice_dictation', question: { pt: 'Fale: "Today is the twenty-first of May."', en: 'Say: "Today is the twenty-first of May."', es: 'Di: "Today is the twenty-first of May."' }, target: ['today is the twenty first of may'], instructions: { pt: 'Fale devagar.', en: 'Say it slowly.', es: 'Di despacio.' } }
+    ]
+  },
 ];

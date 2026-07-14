@@ -1,435 +1,187 @@
 // src/data/englishTrail.js
 
 export const ENGLISH_TRAIL = [
+  // ==========================================
+  // SEÇÃO 1: O INÍCIO ABSOLUTO (17 Fases)
+  // Foco: A1, Alfabeto, Números base, Pronomes, To Be e Saudações.
+  // ==========================================
+  { id: 'node_1', type: 'alphabet', targetIndex: 0, title: { pt: 'Vogais (A-E)', en: 'Vowels (A-E)', es: 'Vocales (A-E)' }, color: 'bg-blue-600', shadow: 'shadow-blue-600/50', icon: 'Type', path: '/english/alpha-numbers/exercise/alphabet/0' },
+  { id: 'node_2', type: 'numbers', targetIndex: 0, title: { pt: 'Números 0 a 9', en: 'Numbers 0-9', es: 'Números 0-9' }, color: 'bg-indigo-600', shadow: 'shadow-indigo-600/50', icon: 'Hash', path: '/english/alpha-numbers/exercise/numbers/0' },
+  { id: 'node_3', type: 'explained', targetId: 'lesson_pronouns', title: { pt: 'Quem é quem? (Pronomes)', en: 'Who is who? (Pronouns)', es: '¿Quién es quién?' }, color: 'bg-fuchsia-600', shadow: 'shadow-fuchsia-600/50', icon: 'Sparkles', path: '/english/explained/lesson_pronouns' },
+  { id: 'node_4', type: 'vocab', targetId: 1, title: { pt: 'O Início de Tudo', en: 'The Beginning', es: 'El Comienzo' }, color: 'bg-emerald-600', shadow: 'shadow-emerald-600/50', icon: 'BookOpen', path: '/english/vocabularies/vocab-normal/level/1' },
+  { id: 'node_5', type: 'vocab_speech', targetId: 1, title: { pt: 'Falar: Início', en: 'Speak: Beginning', es: 'Hablar: Comienzo' }, color: 'bg-sky-600', shadow: 'shadow-sky-600/50', icon: 'Mic', path: '/english/vocabularies/vocab-speech/level/1' },
+  { id: 'node_6', type: 'vocab_reverse', targetId: 1, title: { pt: 'Tradução: Início', en: 'Translate: Beginning', es: 'Traducción: Comienzo' }, color: 'bg-purple-600', shadow: 'shadow-purple-600/50', icon: 'RotateCcw', path: '/english/vocabularies/vocab-reverse/level/1' },
+  { id: 'node_7', type: 'explained', targetId: 'lesson_tobe_affirmative', title: { pt: 'O Verbo TO BE', en: 'Verb TO BE', es: 'Verbo TO BE' }, color: 'bg-fuchsia-600', shadow: 'shadow-fuchsia-600/50', icon: 'Sparkles', path: '/english/explained/lesson_tobe_affirmative' },
+  { id: 'node_8', type: 'alphabet', targetIndex: 1, title: { pt: 'Letras F ao J', en: 'Letters F-J', es: 'Letras F-J' }, color: 'bg-blue-600', shadow: 'shadow-blue-600/50', icon: 'Type', path: '/english/alpha-numbers/exercise/alphabet/1' },
+  { id: 'node_9', type: 'vocab', targetId: 2, title: { pt: 'Ações do Dia a Dia', en: 'Everyday Actions', es: 'Acciones Diarias' }, color: 'bg-emerald-600', shadow: 'shadow-emerald-600/50', icon: 'BookOpen', path: '/english/vocabularies/vocab-normal/level/2' },
+  { id: 'node_10', type: 'vocab_speech', targetId: 2, title: { pt: 'Falar: Ações', en: 'Speak: Actions', es: 'Hablar: Acciones' }, color: 'bg-sky-600', shadow: 'shadow-sky-600/50', icon: 'Mic', path: '/english/vocabularies/vocab-speech/level/2' },
+  { id: 'node_11', type: 'explained', targetId: 'lesson_tobe_questions', title: { pt: 'To Be: Perguntas', en: 'To Be: Questions', es: 'To Be: Preguntas' }, color: 'bg-fuchsia-600', shadow: 'shadow-fuchsia-600/50', icon: 'Sparkles', path: '/english/explained/lesson_tobe_questions' },
+  { id: 'node_12', type: 'numbers', targetIndex: 1, title: { pt: 'Dezenas Irregulares', en: 'Irregular Tens', es: 'Decenas Irregulares' }, color: 'bg-indigo-600', shadow: 'shadow-indigo-600/50', icon: 'Hash', path: '/english/alpha-numbers/exercise/numbers/1' },
+  { id: 'node_13', type: 'vocab_reverse', targetId: 2, title: { pt: 'Tradução: Ações', en: 'Translate: Actions', es: 'Traducción: Acciones' }, color: 'bg-purple-600', shadow: 'shadow-purple-600/50', icon: 'RotateCcw', path: '/english/vocabularies/vocab-reverse/level/2' },
+  { id: 'node_14', type: 'vocab', targetId: 19, title: { pt: 'Números e Cores', en: 'Numbers & Colors', es: 'Números y Colores' }, color: 'bg-emerald-600', shadow: 'shadow-emerald-600/50', icon: 'BookOpen', path: '/english/vocabularies/vocab-normal/level/19' },
+  { id: 'node_15', type: 'explained', targetId: 'lesson_tobe_negatives_deep', title: { pt: 'To Be: Contrações', en: 'To Be: Contractions', es: 'To Be: Contracciones' }, color: 'bg-fuchsia-600', shadow: 'shadow-fuchsia-600/50', icon: 'Sparkles', path: '/english/explained/lesson_tobe_negatives_deep' },
+  { id: 'node_16', type: 'dictation', targetId: 'dict_1', title: { pt: 'Ditado: Minha Manhã', en: 'Dictation: My Morning', es: 'Dictado: Mi Mañana' }, color: 'bg-amber-600', shadow: 'shadow-amber-600/50', icon: 'Headphones', path: '/english/dictation/dict_1' },
+  { id: 'node_17_boss', type: 'task', targetId: 'chat_intro', title: { pt: 'Boss: Apresente-se', en: 'Boss: Introduce Yourself', es: 'Jefe: Preséntate' }, color: 'bg-red-600', shadow: 'shadow-red-600/60', icon: 'Bot', path: '/english/ai-chat/tasks/chat_intro' },
+
+  // ==========================================
+  // SEÇÃO 2: PRIMEIROS PASSOS E DIA A DIA (18 Fases)
+  // Foco: Família, This/That, Have/Has, Question Words e artigos.
+  // ==========================================
+  { id: 'node_18', type: 'alphabet', targetIndex: 2, title: { pt: 'Letras K ao R', en: 'Letters K-R', es: 'Letras K-R' }, color: 'bg-blue-600', shadow: 'shadow-blue-600/50', icon: 'Type', path: '/english/alpha-numbers/exercise/alphabet/2' },
+  { id: 'node_19', type: 'vocab', targetId: 3, title: { pt: 'Família e Pessoas', en: 'Family & People', es: 'Familia y Personas' }, color: 'bg-emerald-600', shadow: 'shadow-emerald-600/50', icon: 'BookOpen', path: '/english/vocabularies/vocab-normal/level/3' },
+  { id: 'node_20', type: 'vocab_speech', targetId: 3, title: { pt: 'Falar: Família', en: 'Speak: Family', es: 'Hablar: Familia' }, color: 'bg-sky-600', shadow: 'shadow-sky-600/50', icon: 'Mic', path: '/english/vocabularies/vocab-speech/level/3' },
+  { id: 'node_21', type: 'explained', targetId: 'lesson_this_that', title: { pt: 'This, That, These...', en: 'This, That, These...', es: 'This, That, These...' }, color: 'bg-fuchsia-600', shadow: 'shadow-fuchsia-600/50', icon: 'Sparkles', path: '/english/explained/lesson_this_that' },
+  { id: 'node_22', type: 'numbers', targetIndex: 2, title: { pt: 'Dezenas 20 a 90', en: 'Tens 20-90', es: 'Decenas 20-90' }, color: 'bg-indigo-600', shadow: 'shadow-indigo-600/50', icon: 'Hash', path: '/english/alpha-numbers/exercise/numbers/2' },
+  { id: 'node_23', type: 'vocab_reverse', targetId: 3, title: { pt: 'Tradução: Família', en: 'Translate: Family', es: 'Traducción: Familia' }, color: 'bg-purple-600', shadow: 'shadow-purple-600/50', icon: 'RotateCcw', path: '/english/vocabularies/vocab-reverse/level/3' },
+  { id: 'node_24', type: 'alphabet', targetIndex: 3, title: { pt: 'Reta Final (S-Z)', en: 'Final Stretch (S-Z)', es: 'Recta Final (S-Z)' }, color: 'bg-blue-600', shadow: 'shadow-blue-600/50', icon: 'Type', path: '/english/alpha-numbers/exercise/alphabet/3' },
+  { id: 'node_25', type: 'explained', targetId: 'lesson_have_has', title: { pt: 'O verbo TO HAVE', en: 'Verb TO HAVE', es: 'Verbo TO HAVE' }, color: 'bg-fuchsia-600', shadow: 'shadow-fuchsia-600/50', icon: 'Sparkles', path: '/english/explained/lesson_have_has' },
+  { id: 'node_26', type: 'vocab', targetId: 4, title: { pt: 'Cumprimentos', en: 'Greetings', es: 'Saludos' }, color: 'bg-emerald-600', shadow: 'shadow-emerald-600/50', icon: 'BookOpen', path: '/english/vocabularies/vocab-normal/level/4' },
+  { id: 'node_27', type: 'vocab_speech', targetId: 4, title: { pt: 'Falar: Cumprimentos', en: 'Speak: Greetings', es: 'Hablar: Saludos' }, color: 'bg-sky-600', shadow: 'shadow-sky-600/50', icon: 'Mic', path: '/english/vocabularies/vocab-speech/level/4' },
+  { id: 'node_28', type: 'numbers', targetIndex: 3, title: { pt: 'Teen vs Ty', en: 'Teen vs Ty', es: 'Teen vs Ty' }, color: 'bg-indigo-600', shadow: 'shadow-indigo-600/50', icon: 'Hash', path: '/english/alpha-numbers/exercise/numbers/3' },
+  { id: 'node_29', type: 'explained', targetId: 'lesson_question_words', title: { pt: 'Question Words', en: 'Question Words', es: 'Question Words' }, color: 'bg-fuchsia-600', shadow: 'shadow-fuchsia-600/50', icon: 'Sparkles', path: '/english/explained/lesson_question_words' },
+  { id: 'node_30', type: 'vocab_reverse', targetId: 4, title: { pt: 'Tradução: Saudações', en: 'Translate: Greetings', es: 'Traducción: Saludos' }, color: 'bg-purple-600', shadow: 'shadow-purple-600/50', icon: 'RotateCcw', path: '/english/vocabularies/vocab-reverse/level/4' },
+  { id: 'node_31', type: 'vocab', targetId: 20, title: { pt: 'Tempo e Calendário', en: 'Time & Calendar', es: 'Tiempo y Calendario' }, color: 'bg-emerald-600', shadow: 'shadow-emerald-600/50', icon: 'BookOpen', path: '/english/vocabularies/vocab-normal/level/20' },
+  { id: 'node_32', type: 'explained', targetId: 'lesson_articles', title: { pt: 'A, An, The', en: 'A, An, The', es: 'A, An, The' }, color: 'bg-fuchsia-600', shadow: 'shadow-fuchsia-600/50', icon: 'Sparkles', path: '/english/explained/lesson_articles' },
+  { id: 'node_33', type: 'dictation', targetId: 'dict_2', title: { pt: 'Ditado: No Café', en: 'Dictation: At the Cafe', es: 'Dictado: En el Café' }, color: 'bg-amber-600', shadow: 'shadow-amber-600/50', icon: 'Headphones', path: '/english/dictation/dict_2' },
+  { id: 'node_34', type: 'dictation', targetId: 'dict_3', title: { pt: 'Ditado: Família', en: 'Dictation: Family', es: 'Dictado: Familia' }, color: 'bg-amber-600', shadow: 'shadow-amber-600/50', icon: 'Headphones', path: '/english/dictation/dict_3' },
+  { id: 'node_35_boss', type: 'task', targetId: 'voice_coffee', title: { pt: 'Boss: Peça um Café (Voz)', en: 'Boss: Order a Coffee', es: 'Jefe: Pide un Café' }, color: 'bg-red-600', shadow: 'shadow-red-600/60', icon: 'Bot', path: '/english/ai-voice/tasks/voice_coffee' },
+
+  // ==========================================
+  // SEÇÃO 3: EXPLORANDO O MUNDO (18 Fases)
+  // Foco: Viagem, Plurais, Adjetivos, Present Continuous, Direções.
+  // ==========================================
+  { id: 'node_36', type: 'alphabet', targetIndex: 4, title: { pt: 'Spelling Bee', en: 'Spelling Bee', es: 'Concurso de Deletreo' }, color: 'bg-blue-600', shadow: 'shadow-blue-600/50', icon: 'Type', path: '/english/alpha-numbers/exercise/alphabet/4' },
+  { id: 'node_37', type: 'vocab', targetId: 5, title: { pt: 'Lugares e Viagem', en: 'Places & Travel', es: 'Lugares y Viaje' }, color: 'bg-emerald-600', shadow: 'shadow-emerald-600/50', icon: 'BookOpen', path: '/english/vocabularies/vocab-normal/level/5' },
+  { id: 'node_38', type: 'vocab_speech', targetId: 5, title: { pt: 'Falar: Viagem', en: 'Speak: Travel', es: 'Hablar: Viaje' }, color: 'bg-sky-600', shadow: 'shadow-sky-600/50', icon: 'Mic', path: '/english/vocabularies/vocab-speech/level/5' },
+  { id: 'node_39', type: 'explained', targetId: 'lesson_plurals', title: { pt: 'Plurais', en: 'Plurals', es: 'Plurales' }, color: 'bg-fuchsia-600', shadow: 'shadow-fuchsia-600/50', icon: 'Sparkles', path: '/english/explained/lesson_plurals' },
+  { id: 'node_40', type: 'numbers', targetIndex: 4, title: { pt: 'Centenas e Milhares', en: 'Hundreds & Thousands', es: 'Cientos y Miles' }, color: 'bg-indigo-600', shadow: 'shadow-indigo-600/50', icon: 'Hash', path: '/english/alpha-numbers/exercise/numbers/4' },
+  { id: 'node_41', type: 'vocab_reverse', targetId: 5, title: { pt: 'Tradução: Viagem', en: 'Translate: Travel', es: 'Traducción: Viaje' }, color: 'bg-purple-600', shadow: 'shadow-purple-600/50', icon: 'RotateCcw', path: '/english/vocabularies/vocab-reverse/level/5' },
+  { id: 'node_42', type: 'vocab', targetId: 21, title: { pt: 'Adjetivos e Sensações', en: 'Adjectives & Feelings', es: 'Adjetivos y Sensaciones' }, color: 'bg-emerald-600', shadow: 'shadow-emerald-600/50', icon: 'BookOpen', path: '/english/vocabularies/vocab-normal/level/21' },
+  { id: 'node_43', type: 'explained', targetId: 'lesson_present_continuous', title: { pt: 'Present Continuous', en: 'Present Continuous', es: 'Present Continuous' }, color: 'bg-fuchsia-600', shadow: 'shadow-fuchsia-600/50', icon: 'Sparkles', path: '/english/explained/lesson_present_continuous' },
+  { id: 'node_44', type: 'vocab', targetId: 6, title: { pt: 'Verbos Chave', en: 'Key Verbs', es: 'Verbos Clave' }, color: 'bg-emerald-600', shadow: 'shadow-emerald-600/50', icon: 'BookOpen', path: '/english/vocabularies/vocab-normal/level/6' },
+  { id: 'node_45', type: 'vocab_speech', targetId: 6, title: { pt: 'Sobrevivência (Fala)', en: 'Survival (Speech)', es: 'Supervivencia (Habla)' }, color: 'bg-sky-600', shadow: 'shadow-sky-600/50', icon: 'Mic', path: '/english/vocabularies/vocab-speech/level/6' },
+  { id: 'node_46', type: 'vocab_reverse', targetId: 6, title: { pt: 'Falsos Cognatos', en: 'False Friends', es: 'Falsos Amigos' }, color: 'bg-purple-600', shadow: 'shadow-purple-600/50', icon: 'RotateCcw', path: '/english/vocabularies/vocab-reverse/level/6' },
+  { id: 'node_47', type: 'explained', targetId: 'lesson_do_make', title: { pt: 'Do vs Make', en: 'Do vs Make', es: 'Do vs Make' }, color: 'bg-fuchsia-600', shadow: 'shadow-fuchsia-600/50', icon: 'Sparkles', path: '/english/explained/lesson_do_make' },
+  { id: 'node_48', type: 'vocab', targetId: 22, title: { pt: 'Verbos do Dia a Dia', en: 'Everyday Verbs', es: 'Verbos Diarios' }, color: 'bg-emerald-600', shadow: 'shadow-emerald-600/50', icon: 'BookOpen', path: '/english/vocabularies/vocab-normal/level/22' },
+  { id: 'node_49', type: 'explained', targetId: 'lesson_simple_present', title: { pt: 'Simple Present', en: 'Simple Present', es: 'Simple Present' }, color: 'bg-fuchsia-600', shadow: 'shadow-fuchsia-600/50', icon: 'Sparkles', path: '/english/explained/lesson_simple_present' },
+  { id: 'node_50', type: 'dictation', targetId: 'dict_8', title: { pt: 'Ditado: Dia Livre', en: 'Dictation: Day Off', es: 'Dictado: Día Libre' }, color: 'bg-amber-600', shadow: 'shadow-amber-600/50', icon: 'Headphones', path: '/english/dictation/dict_8' },
+  { id: 'node_51', type: 'dictation', targetId: 'dict_4', title: { pt: 'Ditado: Direções', en: 'Dictation: Directions', es: 'Dictado: Direcciones' }, color: 'bg-amber-600', shadow: 'shadow-amber-600/50', icon: 'Headphones', path: '/english/dictation/dict_4' },
+  { id: 'node_52', type: 'task', targetId: 'buy_ticket', title: { pt: 'Comprando Passagem (Voz)', en: 'Buying Ticket (Voice)', es: 'Comprando Billete (Voz)' }, color: 'bg-teal-600', shadow: 'shadow-teal-600/50', icon: 'Mic', path: '/english/ai-voice/tasks/buy_ticket' },
+  { id: 'node_53_boss', type: 'task', targetId: 'directions_bus', title: { pt: 'Boss: Direções (Chat)', en: 'Boss: Directions (Chat)', es: 'Jefe: Direcciones (Chat)' }, color: 'bg-red-600', shadow: 'shadow-red-600/60', icon: 'Bot', path: '/english/ai-chat/tasks/directions_bus' },
+
+  // ==========================================
+  // SEÇÃO 4: SOBREVIVÊNCIA BÁSICA E DIREÇÕES (17 Fases)
+  // Foco: Pedidos, Preposições, Supermercado, Possessivos e Can.
+  // ==========================================
+  { id: 'node_54', type: 'alphabet', targetIndex: 5, title: { pt: 'Spelling: Intermediário', en: 'Spelling: Intermediate', es: 'Deletreo: Intermedio' }, color: 'bg-blue-600', shadow: 'shadow-blue-600/50', icon: 'Type', path: '/english/alpha-numbers/exercise/alphabet/5' },
+  { id: 'node_55', type: 'vocab', targetId: 7, title: { pt: 'Fazendo Pedidos', en: 'Making Requests', es: 'Haciendo Pedidos' }, color: 'bg-emerald-600', shadow: 'shadow-emerald-600/50', icon: 'BookOpen', path: '/english/vocabularies/vocab-normal/level/7' },
+  { id: 'node_56', type: 'vocab_speech', targetId: 7, title: { pt: 'Fala Conectada', en: 'Connected Speech', es: 'Habla Conectada' }, color: 'bg-sky-600', shadow: 'shadow-sky-600/50', icon: 'Mic', path: '/english/vocabularies/vocab-speech/level/7' },
+  { id: 'node_57', type: 'vocab_reverse', targetId: 7, title: { pt: 'Tradução: Preposições', en: 'Translate: Prepositions', es: 'Traducción: Preposiciones' }, color: 'bg-purple-600', shadow: 'shadow-purple-600/50', icon: 'RotateCcw', path: '/english/vocabularies/vocab-reverse/level/7' },
+  { id: 'node_58', type: 'explained', targetId: 'lesson_there_is_are', title: { pt: 'There is / There are', en: 'There is / There are', es: 'There is / There are' }, color: 'bg-fuchsia-600', shadow: 'shadow-fuchsia-600/50', icon: 'Sparkles', path: '/english/explained/lesson_there_is_are' },
+  { id: 'node_59', type: 'vocab', targetId: 9, title: { pt: 'Existência e Direções', en: 'Existence & Directions', es: 'Existencia y Direcciones' }, color: 'bg-emerald-600', shadow: 'shadow-emerald-600/50', icon: 'BookOpen', path: '/english/vocabularies/vocab-normal/level/9' },
+  { id: 'node_60', type: 'explained', targetId: 'lesson_prepositions_place', title: { pt: 'Preposições de Lugar', en: 'Place Prepositions', es: 'Preposiciones de Lugar' }, color: 'bg-fuchsia-600', shadow: 'shadow-fuchsia-600/50', icon: 'Sparkles', path: '/english/explained/lesson_prepositions_place' },
+  { id: 'node_61', type: 'vocab', targetId: 8, title: { pt: 'Supermercado', en: 'Supermarket', es: 'Supermercado' }, color: 'bg-emerald-600', shadow: 'shadow-emerald-600/50', icon: 'BookOpen', path: '/english/vocabularies/vocab-normal/level/8' },
+  { id: 'node_62', type: 'alphabet', targetIndex: 6, title: { pt: 'Spelling: Avançado', en: 'Spelling: Advanced', es: 'Deletreo: Avanzado' }, color: 'bg-blue-600', shadow: 'shadow-blue-600/50', icon: 'Type', path: '/english/alpha-numbers/exercise/alphabet/6' },
+  { id: 'node_63', type: 'vocab', targetId: 10, title: { pt: 'Perguntas Abertas', en: 'Open Questions', es: 'Preguntas Abiertas' }, color: 'bg-emerald-600', shadow: 'shadow-emerald-600/50', icon: 'BookOpen', path: '/english/vocabularies/vocab-normal/level/10' },
+  { id: 'node_64', type: 'explained', targetId: 'lesson_possessives', title: { pt: 'Possessivos', en: 'Possessives', es: 'Posesivos' }, color: 'bg-fuchsia-600', shadow: 'shadow-fuchsia-600/50', icon: 'Sparkles', path: '/english/explained/lesson_possessives' },
+  { id: 'node_65', type: 'explained', targetId: 'lesson_can_cant', title: { pt: 'Can / Can\'t', en: 'Can / Can\'t', es: 'Can / Can\'t' }, color: 'bg-fuchsia-600', shadow: 'shadow-fuchsia-600/50', icon: 'Sparkles', path: '/english/explained/lesson_can_cant' },
+  { id: 'node_66', type: 'dictation', targetId: 'dict_9', title: { pt: 'Ditado: Planos', en: 'Dictation: Making Plans', es: 'Dictado: Planes' }, color: 'bg-amber-600', shadow: 'shadow-amber-600/50', icon: 'Headphones', path: '/english/dictation/dict_9' },
+  { id: 'node_67', type: 'dictation', targetId: 'dict_10', title: { pt: 'Ditado: No Telefone', en: 'Dictation: On the Phone', es: 'Dictado: Teléfono' }, color: 'bg-amber-600', shadow: 'shadow-amber-600/50', icon: 'Headphones', path: '/english/dictation/dict_10' },
+  { id: 'node_68', type: 'task', targetId: 'hotel_checkin', title: { pt: 'Check-in (Voz)', en: 'Check-in (Voice)', es: 'Check-in (Voz)' }, color: 'bg-teal-600', shadow: 'shadow-teal-600/50', icon: 'Mic', path: '/english/ai-voice/tasks/hotel_checkin' },
+  { id: 'node_69', type: 'task', targetId: 'room_rent', title: { pt: 'Aluguel (Chat)', en: 'Rent (Chat)', es: 'Alquiler (Chat)' }, color: 'bg-pink-600', shadow: 'shadow-pink-600/50', icon: 'MessageCircle', path: '/english/ai-chat/tasks/room_rent' },
+  { id: 'node_70_boss', type: 'task', targetId: 'shopping_clothes', title: { pt: 'Boss: Compras (Chat)', en: 'Boss: Shopping (Chat)', es: 'Jefe: Compras (Chat)' }, color: 'bg-red-600', shadow: 'shadow-red-600/60', icon: 'Bot', path: '/english/ai-chat/tasks/shopping_clothes' },
+
+  // ==========================================
+  // SEÇÃO 5: PREPARAÇÃO PARA O EMPREGO (17 Fases)
+  // Foco: Datas, Entrevista, Moradia, Passado e Entrevistas de IA.
+  // ==========================================
+  { id: 'node_71', type: 'explained', targetId: 'lesson_ordinals_dates', title: { pt: 'Ordinais e Datas', en: 'Ordinals & Dates', es: 'Ordinales y Fechas' }, color: 'bg-fuchsia-600', shadow: 'shadow-fuchsia-600/50', icon: 'Sparkles', path: '/english/explained/lesson_ordinals_dates' },
+  { id: 'node_72', type: 'vocab', targetId: 11, title: { pt: 'Procurando Emprego', en: 'Job Hunting', es: 'Búsqueda de Empleo' }, color: 'bg-emerald-600', shadow: 'shadow-emerald-600/50', icon: 'BookOpen', path: '/english/vocabularies/vocab-normal/level/11' },
+  { id: 'node_73', type: 'alphabet', targetIndex: 7, title: { pt: 'Spelling: Master', en: 'Spelling: Master', es: 'Deletreo: Maestro' }, color: 'bg-blue-600', shadow: 'shadow-blue-600/50', icon: 'Type', path: '/english/alpha-numbers/exercise/alphabet/7' },
+  { id: 'node_74', type: 'explained', targetId: 'lesson_comparatives', title: { pt: 'Comparativos', en: 'Comparatives', es: 'Comparativos' }, color: 'bg-fuchsia-600', shadow: 'shadow-fuchsia-600/50', icon: 'Sparkles', path: '/english/explained/lesson_comparatives' },
+  { id: 'node_75', type: 'vocab', targetId: 12, title: { pt: 'A Entrevista', en: 'The Interview', es: 'La Entrevista' }, color: 'bg-emerald-600', shadow: 'shadow-emerald-600/50', icon: 'BookOpen', path: '/english/vocabularies/vocab-normal/level/12' },
+  { id: 'node_76', type: 'explained', targetId: 'lesson_past_tense', title: { pt: 'Past Tense (Passado)', en: 'Past Tense', es: 'Pasado Simple' }, color: 'bg-fuchsia-600', shadow: 'shadow-fuchsia-600/50', icon: 'Sparkles', path: '/english/explained/lesson_past_tense' },
+  { id: 'node_77', type: 'vocab', targetId: 13, title: { pt: 'No Trabalho', en: 'At Work', es: 'En el Trabajo' }, color: 'bg-emerald-600', shadow: 'shadow-emerald-600/50', icon: 'BookOpen', path: '/english/vocabularies/vocab-normal/level/13' },
+  { id: 'node_78', type: 'explained', targetId: 'lesson_frequency_adverbs', title: { pt: 'Advérbios de Frequência', en: 'Frequency Adverbs', es: 'Adverbios de Frecuencia' }, color: 'bg-fuchsia-600', shadow: 'shadow-fuchsia-600/50', icon: 'Sparkles', path: '/english/explained/lesson_frequency_adverbs' },
+  { id: 'node_79', type: 'vocab', targetId: 14, title: { pt: 'Moradia e Burocracia', en: 'Housing & Bureaucracy', es: 'Vivienda y Burocracia' }, color: 'bg-emerald-600', shadow: 'shadow-emerald-600/50', icon: 'BookOpen', path: '/english/vocabularies/vocab-normal/level/14' },
+  { id: 'node_80', type: 'explained', targetId: 'lesson_irregular_verbs_core', title: { pt: 'Verbos Irregulares', en: 'Irregular Verbs', es: 'Verbos Irregulares' }, color: 'bg-fuchsia-600', shadow: 'shadow-fuchsia-600/50', icon: 'Sparkles', path: '/english/explained/lesson_irregular_verbs_core' },
+  { id: 'node_81', type: 'dictation', targetId: 'dict_5', title: { pt: 'Ditado: Entrevista', en: 'Dictation: Interview', es: 'Dictado: Entrevista' }, color: 'bg-amber-600', shadow: 'shadow-amber-600/50', icon: 'Headphones', path: '/english/dictation/dict_5' },
+  { id: 'node_82', type: 'dictation', targetId: 'dict_6', title: { pt: 'Ditado: No Trabalho', en: 'Dictation: At Work', es: 'Dictado: En el Trabajo' }, color: 'bg-amber-600', shadow: 'shadow-amber-600/50', icon: 'Headphones', path: '/english/dictation/dict_6' },
+  { id: 'node_83', type: 'task', targetId: 'job_hunting', title: { pt: 'Entregar CV (Voz)', en: 'Drop off CV (Voice)', es: 'Entregar CV (Voz)' }, color: 'bg-teal-600', shadow: 'shadow-teal-600/50', icon: 'Mic', path: '/english/ai-voice/tasks/job_hunting' },
+  { id: 'node_84', type: 'task', targetId: 'hospitality_interview', title: { pt: 'Entrevista (Voz)', en: 'Job Interview (Voice)', es: 'Entrevista (Voz)' }, color: 'bg-teal-600', shadow: 'shadow-teal-600/50', icon: 'Mic', path: '/english/ai-voice/tasks/hospitality_interview' },
+  { id: 'node_85', type: 'task', targetId: 'advanced_negotiation', title: { pt: 'Aumento (Chat)', en: 'Negotiate Raise (Chat)', es: 'Aumento (Chat)' }, color: 'bg-pink-600', shadow: 'shadow-pink-600/50', icon: 'MessageCircle', path: '/english/ai-chat/tasks/advanced_negotiation' },
+  { id: 'node_86', type: 'task', targetId: 'dublin_airport', title: { pt: 'Imigração (Voz)', en: 'Immigration (Voice)', es: 'Inmigración (Voz)' }, color: 'bg-teal-600', shadow: 'shadow-teal-600/50', icon: 'Mic', path: '/english/ai-voice/tasks/dublin_airport' },
+  { id: 'node_87_boss', type: 'task', targetId: 'ordering_pub', title: { pt: 'Boss: Pedido no Pub (Voz)', en: 'Boss: Pub Order (Voice)', es: 'Jefe: Pedido en Pub (Voz)' }, color: 'bg-red-600', shadow: 'shadow-red-600/60', icon: 'Bot', path: '/english/ai-voice/tasks/ordering_pub' },
+
+  // ==========================================
+  // SEÇÃO 6: VIDA SOCIAL, GÍRIAS E DESAFIOS FINAIS (16 Fases)
+  // Foco: B1/B2 Fluência, Phrasal Verbs, Gírias e Desafio da Vida Real
+  // ==========================================
+  { id: 'node_88', type: 'vocab', targetId: 15, title: { pt: 'Vida Social e Lazer', en: 'Social Life & Leisure', es: 'Vida Social y Ocio' }, color: 'bg-emerald-600', shadow: 'shadow-emerald-600/50', icon: 'BookOpen', path: '/english/vocabularies/vocab-normal/level/15' },
+  { id: 'node_89', type: 'explained', targetId: 'lesson_modals_ould', title: { pt: 'Would, Could, Should', en: 'Would, Could, Should', es: 'Would, Could, Should' }, color: 'bg-fuchsia-600', shadow: 'shadow-fuchsia-600/50', icon: 'Sparkles', path: '/english/explained/lesson_modals_ould' },
+  { id: 'node_90', type: 'vocab', targetId: 16, title: { pt: 'Problemas no Trabalho', en: 'Management & Issues', es: 'Gestión y Problemas' }, color: 'bg-emerald-600', shadow: 'shadow-emerald-600/50', icon: 'BookOpen', path: '/english/vocabularies/vocab-normal/level/16' },
+  { id: 'node_91', type: 'explained', targetId: 'lesson_particles_up_on', title: { pt: 'Partículas UP e ON', en: 'Particles UP and ON', es: 'Partículas UP y ON' }, color: 'bg-fuchsia-600', shadow: 'shadow-fuchsia-600/50', icon: 'Sparkles', path: '/english/explained/lesson_particles_up_on' },
+  { id: 'node_92', type: 'vocab', targetId: 18, title: { pt: 'Gírias Avançadas', en: 'Advanced Slang', es: 'Jerga Avanzada' }, color: 'bg-emerald-600', shadow: 'shadow-emerald-600/50', icon: 'BookOpen', path: '/english/vocabularies/vocab-normal/level/18' },
+  { id: 'node_93', type: 'explained', targetId: 'lesson_get', title: { pt: 'O verbo GET', en: 'The verb GET', es: 'El verbo GET' }, color: 'bg-fuchsia-600', shadow: 'shadow-fuchsia-600/50', icon: 'Sparkles', path: '/english/explained/lesson_get' },
+  { id: 'node_94', type: 'vocab', targetId: 17, title: { pt: 'Burocracia e Saúde', en: 'Bureaucracy & Health', es: 'Burocracia y Salud' }, color: 'bg-emerald-600', shadow: 'shadow-emerald-600/50', icon: 'BookOpen', path: '/english/vocabularies/vocab-normal/level/17' },
+  { id: 'node_95', type: 'explained', targetId: 'lesson_through_though', title: { pt: 'Through, Though...', en: 'Through, Though...', es: 'Through, Though...' }, color: 'bg-fuchsia-600', shadow: 'shadow-fuchsia-600/50', icon: 'Sparkles', path: '/english/explained/lesson_through_though' },
+  { id: 'node_96', type: 'dictation', targetId: 'dict_11', title: { pt: 'Ditado: Reclamação', en: 'Dictation: Complaining', es: 'Dictado: Reclamo' }, color: 'bg-amber-600', shadow: 'shadow-amber-600/50', icon: 'Headphones', path: '/english/dictation/dict_11' },
+  { id: 'node_97', type: 'dictation', targetId: 'dict_12', title: { pt: 'Ditado: Sextou!', en: 'Dictation: Friday!', es: 'Dictado: ¡Viernes!' }, color: 'bg-amber-600', shadow: 'shadow-amber-600/50', icon: 'Headphones', path: '/english/dictation/dict_12' },
+  { id: 'node_98', type: 'dictation', targetId: 'dict_7', title: { pt: 'Ditado: Vida em Dublin', en: 'Dictation: Life in Dublin', es: 'Dictado: Vida en Dublín' }, color: 'bg-amber-600', shadow: 'shadow-amber-600/50', icon: 'Headphones', path: '/english/dictation/dict_7' },
+  { id: 'node_99', type: 'dictation', targetId: 'dict_13', title: { pt: 'Ditado: Papo Casual', en: 'Dictation: Casual Chat', es: 'Dictado: Charla Casual' }, color: 'bg-amber-600', shadow: 'shadow-amber-600/50', icon: 'Headphones', path: '/english/dictation/dict_13' },
+  { id: 'node_100', type: 'dictation', targetId: 'dict_14', title: { pt: 'Ditado: Projeto', en: 'Dictation: Project', es: 'Dictado: Proyecto' }, color: 'bg-amber-600', shadow: 'shadow-amber-600/50', icon: 'Headphones', path: '/english/dictation/dict_14' },
+  { id: 'node_101', type: 'task', targetId: 'irish_pub', title: { pt: 'No Pub Irlandês (Chat)', en: 'Irish Pub (Chat)', es: 'Pub Irlandés (Chat)' }, color: 'bg-pink-600', shadow: 'shadow-pink-600/50', icon: 'MessageCircle', path: '/english/ai-chat/tasks/irish_pub' },
+  { id: 'node_102', type: 'task', targetId: 'advanced_dublin_emergency', title: { pt: 'Emergência (Voz)', en: 'Emergency (Voice)', es: 'Emergencia (Voz)' }, color: 'bg-teal-600', shadow: 'shadow-teal-600/50', icon: 'Mic', path: '/english/ai-voice/tasks/advanced_dublin_emergency' },
+  { id: 'node_103_boss', type: 'task', targetId: 'final_boss_life_in_dublin', title: { pt: 'Boss Final: Vida Real (Voz)', en: 'Final Boss: Real Life (Voice)', es: 'Jefe Final: Vida Real (Voz)' }, color: 'bg-red-600', shadow: 'shadow-red-600/60', icon: 'Bot', path: '/english/ai-voice/tasks/final_boss_life_in_dublin' },
+
 // ==========================================
-  // SEÇÃO 1: OS FUNDAMENTOS (17 Fases + 1 Boss)
+  // SEÇÃO 7: REFORÇO ESSENCIAL (8 Fases)
+  // Foco: Prática de Fala e Tradução para Números, Tempo, Adjetivos e Verbos Diários
   // ==========================================
-  { id: 'node_1', type: 'alphabet', targetIndex: 0, 
-    title: { pt: 'Vogais (A-E)', en: 'Vowels (A-E)', es: 'Vocales (A-E)' }, 
-    color: 'bg-blue-600', shadow: 'shadow-blue-600/50', icon: 'Type', 
-    path: '/english/alpha-numbers/exercise/alphabet/0' 
-  },
-  { id: 'node_2', type: 'numbers', targetIndex: 0, 
-    title: { pt: 'Números 0 a 9', en: 'Numbers 0-9', es: 'Números 0-9' }, 
-    color: 'bg-indigo-600', shadow: 'shadow-indigo-600/50', icon: 'Hash', 
-    path: '/english/alpha-numbers/exercise/numbers/0' 
-  },
-  { id: 'node_3', type: 'explained', targetId: 'lesson_pronouns', 
-    title: { pt: 'Quem é quem? (Pronomes)', en: 'Who is who? (Pronouns)', es: '¿Quién es quién?' }, 
-    color: 'bg-fuchsia-600', shadow: 'shadow-fuchsia-600/50', icon: 'Sparkles', 
-    path: '/english/explained/lesson_pronouns' 
-  },
-  { id: 'node_4', type: 'vocab', targetId: 1, 
-    title: { pt: 'Saudações', en: 'Greetings', es: 'Saludos' }, 
-    color: 'bg-emerald-600', shadow: 'shadow-emerald-600/50', icon: 'MessageCircle', 
-    path: '/english/vocabularies/vocab-normal/level/1' 
-  },
-  // PLACEHOLDER: Futuro módulo Vocabulário com Voz (Speech)
-  { id: 'node_5', type: 'vocab_speech', targetId: 1, 
-    title: { pt: 'Falar: Saudações', en: 'Speak: Greetings', es: 'Hablar: Saludos' }, 
-    color: 'bg-sky-600', shadow: 'shadow-sky-600/50', icon: 'Mic', 
-    path: '/english/vocabularies/vocab-speech/level/1' 
-  },
-  { id: 'node_6', type: 'explained', targetId: 'lesson_tobe_affirmative', 
-    title: { pt: 'O Verbo TO BE', en: 'Verb TO BE', es: 'Verbo TO BE' }, 
-    color: 'bg-fuchsia-600', shadow: 'shadow-fuchsia-600/50', icon: 'Sparkles', 
-    path: '/english/explained/lesson_tobe_affirmative' 
-  },
-  { id: 'node_7', type: 'alphabet', targetIndex: 1, 
-    title: { pt: 'Letras F ao J', en: 'Letters F-J', es: 'Letras F-J' }, 
-    color: 'bg-blue-600', shadow: 'shadow-blue-600/50', icon: 'Type', 
-    path: '/english/alpha-numbers/exercise/alphabet/1' 
-  },
-  { id: 'node_8', type: 'vocab', targetId: 2, 
-    title: { pt: 'Pessoas e Família', en: 'People & Family', es: 'Personas y Familia' }, 
-    color: 'bg-emerald-600', shadow: 'shadow-emerald-600/50', icon: 'Users', 
-    path: '/vocabularies/vocab-normal/level/2'
-  },
-  // PLACEHOLDER: Futuro módulo Vocabulário Inverso (Tradução)
-  { id: 'node_9', type: 'vocab_reverse', targetId: 2, 
-    title: { pt: 'Tradução: Pessoas', en: 'Translate: People', es: 'Traducción: Personas' }, 
-    color: 'bg-purple-600', shadow: 'shadow-purple-600/50', icon: 'RotateCcw', 
-    path: '/english/vocabularies/vocab-reverse/level/2' 
-  },
-  { id: 'node_10', type: 'numbers', targetIndex: 1, 
-    title: { pt: 'Números 10 a 19', en: 'Numbers 10-19', es: 'Números 10-19' }, 
-    color: 'bg-indigo-600', shadow: 'shadow-indigo-600/50', icon: 'Hash', 
-    path: '/english/alpha-numbers/exercise/numbers/1' 
-  },
-  { id: 'node_11', type: 'explained', targetId: 'lesson_tobe_questions', 
-    title: { pt: 'To Be: Perguntas', en: 'To Be: Questions', es: 'To Be: Preguntas' }, 
-    color: 'bg-fuchsia-600', shadow: 'shadow-fuchsia-600/50', icon: 'Sparkles', 
-    path: '/english/explained/lesson_tobe_questions' 
-  },
-  { id: 'node_12', type: 'alphabet', targetIndex: 2, 
-    title: { pt: 'Letras K ao R', en: 'Letters K-R', es: 'Letras K-R' }, 
-    color: 'bg-blue-600', shadow: 'shadow-blue-600/50', icon: 'Type', 
-    path: '/english/alpha-numbers/exercise/alphabet/2' 
-  },
-  { id: 'node_13', type: 'vocab', targetId: 3, 
-    title: { pt: 'Objetos Diários', en: 'Everyday Objects', es: 'Objetos Diarios' }, 
-    color: 'bg-emerald-600', shadow: 'shadow-emerald-600/50', icon: 'MessageCircle', 
-    path: '/english/vocabularies/vocab-normal/level/3' 
-  },
-  { id: 'node_14', type: 'explained', targetId: 'lesson_this_that', 
-    title: { pt: 'This, That, These...', en: 'This, That, These...', es: 'This, That, These...' }, 
-    color: 'bg-fuchsia-600', shadow: 'shadow-fuchsia-600/50', icon: 'Sparkles', 
-    path: '/english/explained/lesson_this_that' 
-  },
-  { id: 'node_15', type: 'alphabet', targetIndex: 3, 
-    title: { pt: 'Reta Final (S-Z)', en: 'Final Stretch (S-Z)', es: 'Recta Final (S-Z)' }, 
-    color: 'bg-blue-600', shadow: 'shadow-blue-600/50', icon: 'Type', 
-    path: '/english/alpha-numbers/exercise/alphabet/3' 
-  },
-  { id: 'node_16', type: 'explained', targetId: 'lesson_have_has', 
-    title: { pt: 'O verbo TO HAVE', en: 'The verb TO HAVE', es: 'El verbo TO HAVE' }, 
-    color: 'bg-fuchsia-600', shadow: 'shadow-fuchsia-600/50', icon: 'Sparkles', 
-    path: '/english/explained/lesson_have_has' 
-  },
-  { id: 'node_17', type: 'alphabet', targetIndex: 4, 
-    title: { pt: 'Spelling Bee', en: 'Spelling Bee', es: 'Concurso de Deletreo' }, 
-    color: 'bg-blue-600', shadow: 'shadow-blue-600/50', icon: 'Type', 
-    path: '/english/alpha-numbers/exercise/alphabet/4' 
-  },
-  { id: 'node_18_boss', type: 'task', targetId: 'chat_intro', 
-    title: { pt: 'Boss: Apresente-se (Chat)', en: 'Boss: Introduce Yourself', es: 'Jefe: Preséntate' }, 
-    color: 'bg-red-600', shadow: 'shadow-red-600/60', icon: 'Bot', 
-    path: '/english/ai-chat/tasks/chat_intro' 
-  },
+  { id: 'node_104', type: 'vocab_speech', targetId: 19, title: { pt: 'Falar: Números e Cores', en: 'Speak: Numbers & Colors', es: 'Hablar: Números y Colores' }, color: 'bg-sky-600', shadow: 'shadow-sky-600/50', icon: 'Mic', path: '/english/vocabularies/vocab-speech/level/19' },
+  { id: 'node_105', type: 'vocab_reverse', targetId: 19, title: { pt: 'Tradução: Números', en: 'Translate: Numbers', es: 'Traducción: Números' }, color: 'bg-purple-600', shadow: 'shadow-purple-600/50', icon: 'RotateCcw', path: '/english/vocabularies/vocab-reverse/level/19' },
+  { id: 'node_106', type: 'vocab_speech', targetId: 20, title: { pt: 'Falar: Tempo', en: 'Speak: Time', es: 'Hablar: Tiempo' }, color: 'bg-sky-600', shadow: 'shadow-sky-600/50', icon: 'Mic', path: '/english/vocabularies/vocab-speech/level/20' },
+  { id: 'node_107', type: 'vocab_reverse', targetId: 20, title: { pt: 'Tradução: Calendário', en: 'Translate: Calendar', es: 'Traducción: Calendario' }, color: 'bg-purple-600', shadow: 'shadow-purple-600/50', icon: 'RotateCcw', path: '/english/vocabularies/vocab-reverse/level/20' },
+  { id: 'node_108', type: 'vocab_speech', targetId: 21, title: { pt: 'Falar: Adjetivos', en: 'Speak: Adjectives', es: 'Hablar: Adjetivos' }, color: 'bg-sky-600', shadow: 'shadow-sky-600/50', icon: 'Mic', path: '/english/vocabularies/vocab-speech/level/21' },
+  { id: 'node_109', type: 'vocab_reverse', targetId: 21, title: { pt: 'Tradução: Sensações', en: 'Translate: Feelings', es: 'Traducción: Sensaciones' }, color: 'bg-purple-600', shadow: 'shadow-purple-600/50', icon: 'RotateCcw', path: '/english/vocabularies/vocab-reverse/level/21' },
+  { id: 'node_110', type: 'vocab_speech', targetId: 22, title: { pt: 'Falar: Ações Básicas', en: 'Speak: Basic Actions', es: 'Hablar: Acciones Básicas' }, color: 'bg-sky-600', shadow: 'shadow-sky-600/50', icon: 'Mic', path: '/english/vocabularies/vocab-speech/level/22' },
+  { id: 'node_111_boss', type: 'vocab_reverse', targetId: 22, title: { pt: 'Boss: Revisão Total (A1)', en: 'Boss: Full Review (A1)', es: 'Jefe: Repaso Total (A1)' }, color: 'bg-red-600', shadow: 'shadow-red-600/60', icon: 'Bot', path: '/english/vocabularies/vocab-reverse/level/22' },
 
   // ==========================================
-  // SEÇÃO 2: PREPARAÇÃO PARA DUBLIN (20 Fases + 1 Boss)
+  // SEÇÃO 8: DOMÍNIO DIÁRIO (7 Fases)
+  // Foco: Supermercado, Direções, Perguntas e Imigração (Chat)
   // ==========================================
-  { id: 'node_19', type: 'vocab', targetId: 4, 
-    title: { pt: 'Comida e Bebida', en: 'Food & Drinks', es: 'Comida y Bebida' }, 
-    color: 'bg-emerald-600', shadow: 'shadow-emerald-600/50', icon: 'Coffee', 
-    path: '/english/vocabularies/vocab-normal/level/4' 
-  },
-  // PLACEHOLDER
-  { id: 'node_20', type: 'vocab_speech', targetId: 4, 
-    title: { pt: 'Falar: Comida', en: 'Speak: Food', es: 'Hablar: Comida' }, 
-    color: 'bg-sky-600', shadow: 'shadow-sky-600/50', icon: 'Mic', 
-    path: '/english/vocabularies/vocab-speech/level/4' 
-  },
-  { id: 'node_21', type: 'numbers', targetIndex: 2, 
-    title: { pt: 'Dezenas 20 a 100', en: 'Tens 20 to 100', es: 'Decenas 20 a 100' }, 
-    color: 'bg-indigo-600', shadow: 'shadow-indigo-600/50', icon: 'Hash', 
-    path: '/english/alpha-numbers/exercise/numbers/2' 
-  },
-  { id: 'node_22', type: 'explained', targetId: 'lesson_question_words', 
-    title: { pt: 'Question Words (What...)', en: 'Question Words', es: 'Question Words' }, 
-    color: 'bg-fuchsia-600', shadow: 'shadow-fuchsia-600/50', icon: 'Sparkles', 
-    path: '/english/explained/lesson_question_words' 
-  },
-  { id: 'node_23', type: 'alphabet', targetIndex: 5, 
-    title: { pt: 'Spelling: Intermediário', en: 'Spelling: Intermediate', es: 'Deletreo: Intermedio' }, 
-    color: 'bg-blue-600', shadow: 'shadow-blue-600/50', icon: 'Type', 
-    path: '/english/alpha-numbers/exercise/alphabet/5' 
-  },
-  { id: 'node_24', type: 'vocab', targetId: 5, 
-    title: { pt: 'Empregos e Rotina', en: 'Jobs & Routine', es: 'Trabajos y Rutina' }, 
-    color: 'bg-emerald-600', shadow: 'shadow-emerald-600/50', icon: 'Users', 
-    path: '/english/vocabularies/vocab-normal/level/5' 
-  },
-  // PLACEHOLDER
-  { id: 'node_25', type: 'vocab_reverse', targetId: 5, 
-    title: { pt: 'Tradução: Empregos', en: 'Translate: Jobs', es: 'Traducción: Trabajos' }, 
-    color: 'bg-purple-600', shadow: 'shadow-purple-600/50', icon: 'RotateCcw', 
-    path: '/english/vocabularies/vocab-reverse/level/5' 
-  },
-  { id: 'node_26', type: 'explained', targetId: 'lesson_articles', 
-    title: { pt: 'A, An, The', en: 'A, An, The', es: 'A, An, The' }, 
-    color: 'bg-fuchsia-600', shadow: 'shadow-fuchsia-600/50', icon: 'Sparkles', 
-    path: '/english/explained/lesson_articles' 
-  },
-  { id: 'node_27', type: 'numbers', targetIndex: 3, 
-    title: { pt: 'Centenas e Milhares', en: 'Hundreds & Thousands', es: 'Cientos y Miles' }, 
-    color: 'bg-indigo-600', shadow: 'shadow-indigo-600/50', icon: 'Hash', 
-    path: '/english/alpha-numbers/exercise/numbers/3' 
-  },
-  { id: 'node_28', type: 'vocab', targetId: 6, 
-    title: { pt: 'Viagem e Aeroporto', en: 'Travel & Airport', es: 'Viaje y Aeropuerto' }, 
-    color: 'bg-emerald-600', shadow: 'shadow-emerald-600/50', icon: 'MessageCircle', 
-    path: '/english/vocabularies/vocab-normal/level/6' 
-  },
-  { id: 'node_29', type: 'explained', targetId: 'lesson_plurals', 
-    title: { pt: 'Plurais e Regra do S', en: 'Plurals & S Rule', es: 'Plurales' }, 
-    color: 'bg-fuchsia-600', shadow: 'shadow-fuchsia-600/50', icon: 'Sparkles', 
-    path: '/english/explained/lesson_plurals' 
-  },
-  { id: 'node_30', type: 'alphabet', targetIndex: 6, 
-    title: { pt: 'Spelling: Avançado', en: 'Spelling: Advanced', es: 'Deletreo: Avanzado' }, 
-    color: 'bg-blue-600', shadow: 'shadow-blue-600/50', icon: 'Type', 
-    path: '/english/alpha-numbers/exercise/alphabet/6' 
-  },
-  { id: 'node_31', type: 'vocab', targetId: 7, 
-    title: { pt: 'Tempo e Datas', en: 'Time & Dates', es: 'Tiempo y Fechas' }, 
-    color: 'bg-emerald-600', shadow: 'shadow-emerald-600/50', icon: 'MessageCircle', 
-    path: '/english/vocabularies/vocab-normal/level/7' 
-  },
-  { id: 'node_32', type: 'explained', targetId: 'lesson_do_make', 
-    title: { pt: 'Do vs Make', en: 'Do vs Make', es: 'Do vs Make' }, 
-    color: 'bg-fuchsia-600', shadow: 'shadow-fuchsia-600/50', icon: 'Sparkles', 
-    path: '/english/explained/lesson_do_make' 
-  },
-  { id: 'node_33', type: 'alphabet', targetIndex: 7, 
-    title: { pt: 'Spelling: Master', en: 'Spelling: Master', es: 'Deletreo: Maestro' }, 
-    color: 'bg-blue-600', shadow: 'shadow-blue-600/50', icon: 'Type', 
-    path: '/english/alpha-numbers/exercise/alphabet/7' 
-  },
-  { id: 'node_34', type: 'vocab', targetId: 8, 
-    title: { pt: 'Direções e Lugares', en: 'Directions & Places', es: 'Direcciones y Lugares' }, 
-    color: 'bg-emerald-600', shadow: 'shadow-emerald-600/50', icon: 'MessageCircle', 
-    path: '/english/vocabularies/vocab-normal/level/8' 
-  },
-  { id: 'node_35', type: 'explained', targetId: 'lesson_simple_present', 
-    title: { pt: 'Simple Present (Rotina)', en: 'Simple Present', es: 'Simple Present' }, 
-    color: 'bg-fuchsia-600', shadow: 'shadow-fuchsia-600/50', icon: 'Sparkles', 
-    path: '/english/explained/lesson_simple_present' 
-  },
-  // Boss seção 2
-  { id: 'node_36_boss', type: 'task', targetId: 'voice_coffee', 
-    title: { pt: 'Boss: Peça um Café (Voz)', en: 'Boss: Order a Coffee', es: 'Jefe: Pide un Café' }, 
-    color: 'bg-red-600', shadow: 'shadow-red-600/60', icon: 'Bot', 
-    path: '/english/ai-voice/tasks/voice_coffee' 
-  },
-  // ==========================================
-  // SEÇÃO 3: TRABALHO E CANDIDATURA (10 Fases + 1 Boss)
-  // ==========================================
-  { id: 'node_37', type: 'alphabet', targetIndex: 5,
-    title: { pt: 'Spelling: Intermediário', en: 'Spelling: Intermediate', es: 'Deletreo: Intermedio' },
-    color: 'bg-blue-600', shadow: 'shadow-blue-600/50', icon: 'Type',
-    path: '/english/alpha-numbers/exercise/alphabet/5' 
-  },
-  { id: 'node_38', type: 'vocab', targetId: 9,
-    title: { pt: 'Existência e Quantidade', en: 'Existence & Quantity', es: 'Existencia y Cantidad' },
-    color: 'bg-emerald-600', shadow: 'shadow-emerald-600/50', icon: 'MessageCircle',
-    path: '/english/vocabularies/vocab-normal/level/9' 
-  },
-  { id: 'node_39', type: 'numbers', targetIndex: 4,
-    title: { pt: 'Centenas e Milhares', en: 'Hundreds & Thousands', es: 'Cientos y Miles' },
-    color: 'bg-indigo-600', shadow: 'shadow-indigo-600/50', icon: 'Hash',
-    path: '/english/alpha-numbers/exercise/numbers/4' 
-  },
-  { id: 'node_40', type: 'explained', targetId: 'lesson_past_tense',
-    title: { pt: 'Past Tense Explicado', en: 'Past Tense Explained', es: 'Past Tense Explicado' },
-    color: 'bg-fuchsia-600', shadow: 'shadow-fuchsia-600/50', icon: 'Sparkles',
-    path: '/english/explained/lesson_past_tense' 
-  },
-  { id: 'node_41', type: 'vocab', targetId: 10,
-    title: { pt: 'Perguntas Abertas', en: 'Open Questions', es: 'Preguntas Abiertas' },
-    color: 'bg-emerald-600', shadow: 'shadow-emerald-600/50', icon: 'MessageCircle',
-    path: '/english/vocabularies/vocab-normal/level/10' 
-  },
-  { id: 'node_42', type: 'alphabet', targetIndex: 6,
-    title: { pt: 'Spelling: Avançado', en: 'Spelling: Advanced', es: 'Deletreo: Avanzado' },
-    color: 'bg-blue-600', shadow: 'shadow-blue-600/50', icon: 'Type',
-    path: '/english/alpha-numbers/exercise/alphabet/6' 
-  },
-  { id: 'node_43', type: 'vocab', targetId: 11,
-    title: { pt: 'Procurando Emprego', en: 'Job Hunting', es: 'Búsqueda de Empleo' },
-    color: 'bg-emerald-600', shadow: 'shadow-emerald-600/50', icon: 'Users',
-    path: '/level/11' 
-  },
-  { id: 'node_44', type: 'explained', targetId: 'lesson_modals_ould',
-    title: { pt: 'Would, Could, Should', en: 'Would, Could, Should', es: 'Would, Could, Should' },
-    color: 'bg-fuchsia-600', shadow: 'shadow-fuchsia-600/50', icon: 'Sparkles',
-    path: '/english/explained/lesson_modals_ould' 
-  },
-  { id: 'node_45', type: 'vocab', targetId: 12,
-    title: { pt: 'A Entrevista de Emprego', en: 'The Job Interview', es: 'La Entrevista de Trabajo' },
-    color: 'bg-emerald-600', shadow: 'shadow-emerald-600/50', icon: 'Users',
-    path: '/english/vocabularies/vocab-normal/level/12' 
-  },
-  { id: 'node_46', type: 'alphabet', targetIndex: 7,
-    title: { pt: 'Spelling: Master', en: 'Spelling: Master', es: 'Deletreo: Maestro' },
-    color: 'bg-blue-600', shadow: 'shadow-blue-600/50', icon: 'Type',
-    path: '/english/alpha-numbers/exercise/alphabet/7' 
-  },
-  // Boss seção 3
-  { id: 'node_47_boss', type: 'task', targetId: 'advanced_negotiation',
-    title: { pt: 'Boss: Negocie um Aumento', en: 'Boss: Negotiate a Raise', es: 'Jefe: Negocia un Aumento' },
-    color: 'bg-red-600', shadow: 'shadow-red-600/60', icon: 'Bot',
-    path: '/english/ai-chat/tasks/advanced_negotiation' 
-  },
+  { id: 'node_112', type: 'vocab_speech', targetId: 8, title: { pt: 'Falar: Compras', en: 'Speak: Shopping', es: 'Hablar: Compras' }, color: 'bg-sky-600', shadow: 'shadow-sky-600/50', icon: 'Mic', path: '/english/vocabularies/vocab-speech/level/8' },
+  { id: 'node_113', type: 'vocab_reverse', targetId: 8, title: { pt: 'Tradução: Mercado', en: 'Translate: Market', es: 'Traducción: Mercado' }, color: 'bg-purple-600', shadow: 'shadow-purple-600/50', icon: 'RotateCcw', path: '/english/vocabularies/vocab-reverse/level/8' },
+  { id: 'node_114', type: 'vocab_speech', targetId: 9, title: { pt: 'Falar: Direções', en: 'Speak: Directions', es: 'Hablar: Direcciones' }, color: 'bg-sky-600', shadow: 'shadow-sky-600/50', icon: 'Mic', path: '/english/vocabularies/vocab-speech/level/9' },
+  { id: 'node_115', type: 'vocab_reverse', targetId: 9, title: { pt: 'Tradução: Direções', en: 'Translate: Directions', es: 'Traducción: Direcciones' }, color: 'bg-purple-600', shadow: 'shadow-purple-600/50', icon: 'RotateCcw', path: '/english/vocabularies/vocab-reverse/level/9' },
+  { id: 'node_116', type: 'vocab_speech', targetId: 10, title: { pt: 'Falar: Perguntas (Wh-)', en: 'Speak: Wh- Questions', es: 'Hablar: Preguntas (Wh-)' }, color: 'bg-sky-600', shadow: 'shadow-sky-600/50', icon: 'Mic', path: '/english/vocabularies/vocab-speech/level/10' },
+  { id: 'node_117', type: 'vocab_reverse', targetId: 10, title: { pt: 'Tradução: Perguntas', en: 'Translate: Questions', es: 'Traducción: Preguntas' }, color: 'bg-purple-600', shadow: 'shadow-purple-600/50', icon: 'RotateCcw', path: '/english/vocabularies/vocab-reverse/level/10' },
+  { id: 'node_118_boss', type: 'task', targetId: 'dublin_airport', title: { pt: 'Boss: Imigração (Chat)', en: 'Boss: Immigration (Chat)', es: 'Jefe: Inmigración (Chat)' }, color: 'bg-red-600', shadow: 'shadow-red-600/60', icon: 'MessageCircle', path: '/english/ai-chat/tasks/dublin_airport' },
 
   // ==========================================
-  // SEÇÃO 4: MORADIA E VIDA SOCIAL (10 Fases + 1 Boss)
+  // SEÇÃO 9: CARREIRA E BUROCRACIA (8 Fases)
+  // Foco: Emprego, Entrevistas, Trabalho e Moradia
   // ==========================================
-  { id: 'node_48', type: 'vocab', targetId: 13,
-    title: { pt: 'No Ambiente de Trabalho', en: 'In the Workplace', es: 'En el Entorno de Trabajo' },
-    color: 'bg-emerald-600', shadow: 'shadow-emerald-600/50', icon: 'Users',
-    path: '/english/vocabularies/vocab-normal/level/13' 
-  },
-  { id: 'node_49', type: 'vocab', targetId: 14,
-    title: { pt: 'Moradia e Burocracia', en: 'Housing & Bureaucracy', es: 'Vivienda y Burocracia' },
-    color: 'bg-emerald-600', shadow: 'shadow-emerald-600/50', icon: 'MessageCircle',
-    path: '/english/vocabularies/vocab-normal/level/14' 
-  },
-  { id: 'node_50', type: 'explained', targetId: 'lesson_particles_up_on',
-    title: { pt: 'UP e ON Explicados', en: 'UP and ON Explained', es: 'UP y ON Explicados' },
-    color: 'bg-fuchsia-600', shadow: 'shadow-fuchsia-600/50', icon: 'Sparkles',
-    path: '/english/explained/lesson_particles_up_on' 
-  },
-  { id: 'node_51', type: 'vocab', targetId: 15,
-    title: { pt: 'Vida Social e Lazer', en: 'Social Life & Leisure', es: 'Vida Social y Ocio' },
-    color: 'bg-emerald-600', shadow: 'shadow-emerald-600/50', icon: 'Users',
-    path: '/english/vocabularies/vocab-normal/level/15' 
-  },
-  { id: 'node_52', type: 'dictation', targetId: 'dictation_basic_1',
-    title: { pt: 'Ditado: Rotina Matinal', en: 'Dictation: Morning Routine', es: 'Dictado: Rutina Matutina' },
-    color: 'bg-amber-600', shadow: 'shadow-amber-600/50', icon: 'Mic',
-    path: '/english/dictation/dictation_basic_1' 
-  },
-  { id: 'node_53', type: 'vocab', targetId: 16,
-    title: { pt: 'Gerenciamento e Problemas', en: 'Management & Issues', es: 'Gestión y Problemas' },
-    color: 'bg-emerald-600', shadow: 'shadow-emerald-600/50', icon: 'Users',
-    path: '/english/vocabularies/vocab-normal/level/16' 
-  },
-  { id: 'node_54', type: 'explained', targetId: 'lesson_through_though',
-    title: { pt: 'Through, Though, Tough', en: 'Through, Though, Tough', es: 'Through, Though, Tough' },
-    color: 'bg-fuchsia-600', shadow: 'shadow-fuchsia-600/50', icon: 'Sparkles',
-    path: '/english/explained/lesson_through_though' 
-  },
-  { id: 'node_55', type: 'vocab', targetId: 17,
-    title: { pt: 'Burocracia e Saúde', en: 'Bureaucracy & Health', es: 'Burocracia y Salud' },
-    color: 'bg-emerald-600', shadow: 'shadow-emerald-600/50', icon: 'MessageCircle',
-    path: '/english/vocabularies/vocab-normal/level/17' 
-  },
-  { id: 'node_56', type: 'task', targetId: 'room_rent',
-    title: { pt: 'Alugando um Quarto', en: 'Renting a Room', es: 'Alquilando una Habitación' },
-    color: 'bg-pink-600', shadow: 'shadow-pink-600/50', icon: 'MessageCircle',
-    path: '/english/ai-chat/tasks/room_rent' 
-  },
-  { id: 'node_57', type: 'task', targetId: 'job_hunting',
-    title: { pt: 'Entregando Currículo (Voz)', en: 'Dropping off CV (Voice)', es: 'Entregando Currículo (Voz)' },
-    color: 'bg-teal-600', shadow: 'shadow-teal-600/50', icon: 'Bot',
-    path: '/english/ai-voice/tasks/job_hunting' 
-  },
-  // Boss seção 4
-  { id: 'node_58_boss', type: 'task', targetId: 'advanced_dublin_emergency',
-    title: { pt: 'Boss: Carteira Perdida (Voz)', en: 'Boss: Lost Wallet (Voice)', es: 'Jefe: Billetera Perdida (Voz)' },
-    color: 'bg-red-600', shadow: 'shadow-red-600/60', icon: 'Bot',
-    path: '/english/ai-voice/tasks/advanced_dublin_emergency' 
-  },
+  { id: 'node_119', type: 'vocab_speech', targetId: 11, title: { pt: 'Falar: Emprego', en: 'Speak: Job Hunting', es: 'Hablar: Empleo' }, color: 'bg-sky-600', shadow: 'shadow-sky-600/50', icon: 'Mic', path: '/english/vocabularies/vocab-speech/level/11' },
+  { id: 'node_120', type: 'vocab_reverse', targetId: 11, title: { pt: 'Tradução: Vagas', en: 'Translate: Vacancies', es: 'Traducción: Vacantes' }, color: 'bg-purple-600', shadow: 'shadow-purple-600/50', icon: 'RotateCcw', path: '/english/vocabularies/vocab-reverse/level/11' },
+  { id: 'node_121', type: 'vocab_speech', targetId: 12, title: { pt: 'Falar: Entrevista', en: 'Speak: Interview', es: 'Hablar: Entrevista' }, color: 'bg-sky-600', shadow: 'shadow-sky-600/50', icon: 'Mic', path: '/english/vocabularies/vocab-speech/level/12' },
+  { id: 'node_122', type: 'vocab_reverse', targetId: 12, title: { pt: 'Tradução: Entrevista', en: 'Translate: Interview', es: 'Traducción: Entrevista' }, color: 'bg-purple-600', shadow: 'shadow-purple-600/50', icon: 'RotateCcw', path: '/english/vocabularies/vocab-reverse/level/12' },
+  { id: 'node_123', type: 'vocab_speech', targetId: 13, title: { pt: 'Falar: No Trabalho', en: 'Speak: At Work', es: 'Hablar: Trabajo' }, color: 'bg-sky-600', shadow: 'shadow-sky-600/50', icon: 'Mic', path: '/english/vocabularies/vocab-speech/level/13' },
+  { id: 'node_124', type: 'vocab_reverse', targetId: 13, title: { pt: 'Tradução: No Trabalho', en: 'Translate: At Work', es: 'Traducción: Trabajo' }, color: 'bg-purple-600', shadow: 'shadow-purple-600/50', icon: 'RotateCcw', path: '/english/vocabularies/vocab-reverse/level/13' },
+  { id: 'node_125', type: 'vocab_speech', targetId: 14, title: { pt: 'Falar: Moradia', en: 'Speak: Housing', es: 'Hablar: Vivienda' }, color: 'bg-sky-600', shadow: 'shadow-sky-600/50', icon: 'Mic', path: '/english/vocabularies/vocab-speech/level/14' },
+  { id: 'node_126_boss', type: 'vocab_reverse', targetId: 14, title: { pt: 'Boss: Burocracia (Tradução)', en: 'Boss: Bureaucracy (Translation)', es: 'Jefe: Burocracia' }, color: 'bg-red-600', shadow: 'shadow-red-600/60', icon: 'Bot', path: '/english/vocabularies/vocab-reverse/level/14' },
 
   // ==========================================
-  // SEÇÃO 5: GÍRIAS E FLUÊNCIA (10 Fases + 1 Boss de Ditado)
+  // SEÇÃO 10: MESTRE DE DUBLIN (8 Fases)
+  // Foco: Vida Social, Gerenciamento e Gírias Avançadas
   // ==========================================
-  { id: 'node_59', type: 'vocab', targetId: 18,
-    title: { pt: 'Slang e Expressões Avançadas', en: 'Advanced Slang & Expressions', es: 'Jerga y Expresiones Avanzadas' },
-    color: 'bg-emerald-600', shadow: 'shadow-emerald-600/50', icon: 'Users',
-    path: '/english/vocabularies/vocab-normal/level/18' 
-  },
-  { id: 'node_60', type: 'vocab', targetId: 19,
-    title: { pt: 'Números e Cores (Revisão)', en: 'Numbers & Colors (Review)', es: 'Números y Colores (Repaso)' },
-    color: 'bg-emerald-600', shadow: 'shadow-emerald-600/50', icon: 'MessageCircle',
-    path: '/english/vocabularies/vocab-normal/level/19' 
-  },
-  { id: 'node_61', type: 'vocab', targetId: 20,
-    title: { pt: 'Tempo e Calendário', en: 'Time & Calendar', es: 'Tiempo y Calendario' },
-    color: 'bg-emerald-600', shadow: 'shadow-emerald-600/50', icon: 'MessageCircle',
-    path: '/english/vocabularies/vocab-normal/level/20' 
-  },
-  { id: 'node_62', type: 'vocab', targetId: 21,
-    title: { pt: 'Adjetivos e Sensações', en: 'Adjectives & Feelings', es: 'Adjetivos y Sensaciones' },
-    color: 'bg-emerald-600', shadow: 'shadow-emerald-600/50', icon: 'Users',
-    path: '/english/vocabularies/vocab-normal/level/21' 
-  },
-  { id: 'node_63', type: 'vocab', targetId: 22,
-    title: { pt: 'Verbos e Objetos Comuns', en: 'Verbs & Common Objects', es: 'Verbos y Objetos Comunes' },
-    color: 'bg-emerald-600', shadow: 'shadow-emerald-600/50', icon: 'MessageCircle',
-    path: '/english/vocabularies/vocab-normal/level/22' 
-  },
-  { id: 'node_64', type: 'task', targetId: 'irish_pub',
-    title: { pt: 'No Pub Irlandês', en: 'At the Irish Pub', es: 'En el Pub Irlandés' },
-    color: 'bg-pink-600', shadow: 'shadow-pink-600/50', icon: 'MessageCircle',
-    path: '/english/ai-chat/tasks/irish_pub' 
-  },
-  { id: 'node_65', type: 'task', targetId: 'dublin_airport',
-    title: { pt: 'Imigração em Dublin (Chat)', en: 'Dublin Immigration (Chat)', es: 'Inmigración en Dublín (Chat)' },
-    color: 'bg-pink-600', shadow: 'shadow-pink-600/50', icon: 'MessageCircle',
-    path: '/english/ai-chat/tasks/dublin_airport' 
-  },
-  { id: 'node_66', type: 'task', targetId: 'hotel_checkin',
-    title: { pt: 'Check-in no Hostel (Voz)', en: 'Hostel Check-in (Voice)', es: 'Check-in en el Hostal (Voz)' },
-    color: 'bg-teal-600', shadow: 'shadow-teal-600/50', icon: 'Bot',
-    path: '/english/ai-voice/tasks/hotel_checkin' 
-  },
-  { id: 'node_67', type: 'dictation', targetId: 'dictation_basic_2',
-    title: { pt: 'Ditado: No Café', en: 'Dictation: At the Cafe', es: 'Dictado: En el Café' },
-    color: 'bg-amber-600', shadow: 'shadow-amber-600/50', icon: 'Mic',
-    path: '/english/dictation/dictation_basic_2' 
-  },
-  { id: 'node_68', type: 'task', targetId: 'ordering_pub',
-    title: { pt: 'Pedido no Pub (Voz)', en: 'Ordering at a Pub (Voice)', es: 'Pedido en el Pub (Voz)' },
-    color: 'bg-teal-600', shadow: 'shadow-teal-600/50', icon: 'Bot',
-    path: '/english/ai-voice/tasks/ordering_pub' 
-  },
-  // Boss seção 5
-  { id: 'node_69_boss', type: 'dictation', targetId: 'dictation_boss_advanced',
-    title: { pt: 'Boss: Um Dia em Dublin (Ditado)', en: 'Boss: A Day in Dublin (Dictation)', es: 'Jefe: Un Día en Dublín (Dictado)' },
-    color: 'bg-red-600', shadow: 'shadow-red-600/60', icon: 'Mic',
-    path: '/english/dictation/dictation_boss_advanced' 
-  },
-
-  // ==========================================
-  // SEÇÃO 6: FLUÊNCIA FINAL (10 Fases + Boss Final)
-  // ==========================================
-  { id: 'node_70', type: 'task', targetId: 'shopping_clothes',
-    title: { pt: 'Comprando Roupas (Chat)', en: 'Clothes Shopping (Chat)', es: 'Comprando Ropa (Chat)' },
-    color: 'bg-pink-600', shadow: 'shadow-pink-600/50', icon: 'MessageCircle',
-    path: '/english/ai-chat/tasks/shopping_clothes' 
-  },
-  { id: 'node_71', type: 'task', targetId: 'directions_bus',
-    title: { pt: 'Pedindo Informações (Chat)', en: 'Asking for Directions (Chat)', es: 'Pidiendo Direcciones (Chat)' },
-    color: 'bg-pink-600', shadow: 'shadow-pink-600/50', icon: 'MessageCircle',
-    path: '/english/ai-chat/tasks/directions_bus' 
-  },
-  { id: 'node_72', type: 'vocab', targetId: 3,
-    title: { pt: 'Família e Pessoas (Revisão)', en: 'Family & People (Review)', es: 'Familia y Personas (Repaso)' },
-    color: 'bg-emerald-600', shadow: 'shadow-emerald-600/50', icon: 'Users',
-    path: '/english/vocabularies/vocab-normal/level/3' 
-  },
-  { id: 'node_73', type: 'explained', targetId: 'lesson_modals_ould',
-    title: { pt: 'Would/Could/Should (Revisão)', en: 'Would/Could/Should (Review)', es: 'Would/Could/Should (Repaso)' },
-    color: 'bg-fuchsia-600', shadow: 'shadow-fuchsia-600/50', icon: 'Sparkles',
-    path: '/english/explained/lesson_modals_ould' 
-  },
-  { id: 'node_74', type: 'task', targetId: 'dublin_airport',
-    title: { pt: 'Imigração em Dublin (Voz)', en: 'Dublin Immigration (Voice)', es: 'Inmigración en Dublín (Voz)' },
-    color: 'bg-teal-600', shadow: 'shadow-teal-600/50', icon: 'Bot',
-    path: '/english/ai-voice/tasks/dublin_airport' 
-  },
-  { id: 'node_75', type: 'explained', targetId: 'lesson_particles_up_on',
-    title: { pt: 'UP e ON (Revisão)', en: 'UP and ON (Review)', es: 'UP y ON (Repaso)' },
-    color: 'bg-fuchsia-600', shadow: 'shadow-fuchsia-600/50', icon: 'Sparkles',
-    path: '/english/explained/lesson_particles_up_on' 
-  },
-  { id: 'node_76', type: 'vocab', targetId: 8,
-    title: { pt: 'Direções e Lugares (Revisão)', en: 'Directions & Places (Review)', es: 'Direcciones y Lugares (Repaso)' },
-    color: 'bg-emerald-600', shadow: 'shadow-emerald-600/50', icon: 'MessageCircle',
-    path: '/english/vocabularies/vocab-normal/level/8' 
-  },
-  { id: 'node_77', type: 'task', targetId: 'hospitality_interview',
-    title: { pt: 'Entrevista de Emprego (Voz)', en: 'Job Interview (Voice)', es: 'Entrevista de Trabajo (Voz)' },
-    color: 'bg-teal-600', shadow: 'shadow-teal-600/50', icon: 'Bot',
-    path: '/english/ai-voice/tasks/hospitality_interview' 
-  },
-  { id: 'node_78', type: 'dictation', targetId: 'dictation_basic_3',
-    title: { pt: 'Ditado: Fim de Semana', en: 'Dictation: The Weekend', es: 'Dictado: Fin de Semana' },
-    color: 'bg-amber-600', shadow: 'shadow-amber-600/50', icon: 'Mic',
-    path: '/english/dictation/dictation_basic_3' 
-  },
-  { id: 'node_79', type: 'explained', targetId: 'lesson_get',
-    title: { pt: 'O Verbo GET (Revisão Final)', en: 'The Verb GET (Final Review)', es: 'El Verbo GET (Repaso Final)' },
-    color: 'bg-fuchsia-600', shadow: 'shadow-fuchsia-600/50', icon: 'Sparkles',
-    path: '/english/explained/lesson_get' 
-  },
-  // Boss seção 6
-  { id: 'node_80_boss', type: 'task', targetId: 'final_boss_life_in_dublin',
-    title: { pt: 'Boss Final: Um Dia Inteiro (Voz)', en: 'Final Boss: A Full Day (Voice)', es: 'Jefe Final: Un Día Entero (Voz)' },
-    color: 'bg-red-600', shadow: 'shadow-red-600/60', icon: 'Bot',
-    path: '/english/ai-voice/tasks/final_boss_life_in_dublin' 
-  },
+  { id: 'node_127', type: 'vocab_speech', targetId: 15, title: { pt: 'Falar: Vida Social', en: 'Speak: Social Life', es: 'Hablar: Vida Social' }, color: 'bg-sky-600', shadow: 'shadow-sky-600/50', icon: 'Mic', path: '/english/vocabularies/vocab-speech/level/15' },
+  { id: 'node_128', type: 'vocab_reverse', targetId: 15, title: { pt: 'Tradução: Lazer', en: 'Translate: Leisure', es: 'Traducción: Ocio' }, color: 'bg-purple-600', shadow: 'shadow-purple-600/50', icon: 'RotateCcw', path: '/english/vocabularies/vocab-reverse/level/15' },
+  { id: 'node_129', type: 'vocab_speech', targetId: 16, title: { pt: 'Falar: Problemas', en: 'Speak: Issues', es: 'Hablar: Problemas' }, color: 'bg-sky-600', shadow: 'shadow-sky-600/50', icon: 'Mic', path: '/english/vocabularies/vocab-speech/level/16' },
+  { id: 'node_130', type: 'vocab_reverse', targetId: 16, title: { pt: 'Tradução: Gerenciamento', en: 'Translate: Management', es: 'Traducción: Gestión' }, color: 'bg-purple-600', shadow: 'shadow-purple-600/50', icon: 'RotateCcw', path: '/english/vocabularies/vocab-reverse/level/16' },
+  { id: 'node_131', type: 'vocab_speech', targetId: 17, title: { pt: 'Falar: Saúde', en: 'Speak: Health', es: 'Hablar: Salud' }, color: 'bg-sky-600', shadow: 'shadow-sky-600/50', icon: 'Mic', path: '/english/vocabularies/vocab-speech/level/17' },
+  { id: 'node_132', type: 'vocab_reverse', targetId: 17, title: { pt: 'Tradução: Emergências', en: 'Translate: Emergencies', es: 'Traducción: Emergencias' }, color: 'bg-purple-600', shadow: 'shadow-purple-600/50', icon: 'RotateCcw', path: '/english/vocabularies/vocab-reverse/level/17' },
+  { id: 'node_133', type: 'vocab_speech', targetId: 18, title: { pt: 'Falar: Gírias', en: 'Speak: Slang', es: 'Hablar: Jerga' }, color: 'bg-sky-600', shadow: 'shadow-sky-600/50', icon: 'Mic', path: '/english/vocabularies/vocab-speech/level/18' },
+  { id: 'node_134_boss', type: 'vocab_reverse', targetId: 18, title: { pt: 'Boss Final: Irlandês Nativo', en: 'Final Boss: Native Irish', es: 'Jefe Final: Irlandés Nativo' }, color: 'bg-red-600', shadow: 'shadow-red-600/60', icon: 'Bot', path: '/english/vocabularies/vocab-reverse/level/18' }
 ];
