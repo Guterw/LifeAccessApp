@@ -69,13 +69,18 @@ export default function TrailView() {
   const { t, uiLang } = useLanguage();
 
   const completedAlphaNum = useLiveQuery(() => db.completedAlphaNum.toArray(), [], undefined);
-  const completedVocab = useLiveQuery(() => db.completedLevels.toArray(), [], undefined);
+  const completedVocabNormal = useLiveQuery(() => db.completedLevels.toArray(), [], undefined);
+  const completedVocabSpeech = useLiveQuery(() => db.completedLevelsSpeech.toArray(), [], undefined);
+  const completedVocabReverse = useLiveQuery(() => db.completedLevelsReverse.toArray(), [], undefined);
 
   const nodeRefs = useRef({});
   const sectionRefs = useRef({});
   const hasScrolledRef = useRef(false);
 
-  const dataIsReady = completedAlphaNum !== undefined && completedVocab !== undefined;
+  const dataIsReady = completedAlphaNum !== undefined 
+  && completedVocabNormal !== undefined 
+  && completedVocabSpeech !== undefined 
+  && completedVocabReverse !== undefined;
 
   const getText = (textObj) => {
     if (!textObj) return '';
@@ -89,7 +94,13 @@ export default function TrailView() {
       return completedAlphaNum.some(c => c.mode === node.type && c.exerciseIndex === node.targetIndex);
     }
     if (node.type === 'vocab') {
-      return completedVocab.some(c => c.level === node.targetId);
+      return completedVocabNormal.some(c => c.level === node.targetId);
+    }
+    if (node.type === 'vocab_speech') {
+      return completedVocabSpeech.some(c => c.level === node.targetId);
+    }
+    if (node.type === 'vocab_reverse') {
+      return completedVocabReverse.some(c => c.level === node.targetId);
     }
     if (node.type === 'task') {
       const isVoiceTask = node.path.includes('/ai-voice/');
