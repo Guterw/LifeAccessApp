@@ -7,6 +7,7 @@ import { useLanguage } from '../../../contexts/LanguageContext';
 import { FITNESS_GROUPS } from '../../../data/fitnessGroups';
 import BackButton from '../../../components/BackButton';
 import FooterBrand from '../../../components/FooterBrand';
+import { useFitness } from '../../../contexts/FitnessContext';
 
 export default function FitnessStatsView() {
   const { t, uiLang } = useLanguage();
@@ -23,7 +24,8 @@ export default function FitnessStatsView() {
     const calories = completed.filter(c => c.groupId === groupId).reduce((sum, c) => sum + (c.caloriesBurned || 0), 0);
     return { groupId, title: getText(group.title), count, calories };
   });
-
+  const { caloriesToday, caloriesWeek, caloriesMonth, caloriesTotal, resetTodayCalories, resetWeekCalories, resetMonthCalories, resetTotalCalories } = useFitness();
+  
   const totalXp = completed.reduce((sum, c) => sum + (c.xp || 0), 0);
 
   return (
@@ -54,7 +56,28 @@ export default function FitnessStatsView() {
           <p className="text-2xl font-black text-white">{completed.length}</p>
         </div>
       </div>
-
+      <div className="grid grid-cols-2 gap-3 mb-6">
+        <div className="bg-gray-800 p-4 rounded-2xl border border-gray-700">
+          <p className="text-[10px] text-gray-500 font-bold uppercase mb-1">Hoje</p>
+          <p className="text-xl font-black text-green-400">{Math.round(caloriesToday)} kcal</p>
+          <button onClick={() => window.confirm('Resetar calorias de hoje?') && resetTodayCalories()} className="text-[10px] text-red-400 font-bold mt-1">Resetar</button>
+        </div>
+        <div className="bg-gray-800 p-4 rounded-2xl border border-gray-700">
+          <p className="text-[10px] text-gray-500 font-bold uppercase mb-1">Semana</p>
+          <p className="text-xl font-black text-green-400">{Math.round(caloriesWeek)} kcal</p>
+          <button onClick={() => window.confirm('Resetar calorias da semana?') && resetWeekCalories()} className="text-[10px] text-red-400 font-bold mt-1">Resetar</button>
+        </div>
+        <div className="bg-gray-800 p-4 rounded-2xl border border-gray-700">
+          <p className="text-[10px] text-gray-500 font-bold uppercase mb-1">Mês</p>
+          <p className="text-xl font-black text-green-400">{Math.round(caloriesMonth)} kcal</p>
+          <button onClick={() => window.confirm('Resetar calorias do mês?') && resetMonthCalories()} className="text-[10px] text-red-400 font-bold mt-1">Resetar</button>
+        </div>
+        <div className="bg-gray-800 p-4 rounded-2xl border border-gray-700">
+          <p className="text-[10px] text-gray-500 font-bold uppercase mb-1">Total</p>
+          <p className="text-xl font-black text-green-400">{Math.round(caloriesTotal)} kcal</p>
+          <button onClick={() => window.confirm('Resetar TODAS as calorias?') && resetTotalCalories()} className="text-[10px] text-red-400 font-bold mt-1">Resetar</button>
+        </div>
+      </div>
       <h3 className="font-bold text-gray-400 mb-3 uppercase tracking-wider text-sm">{t('fitness.byGroup', 'Por Grupo Muscular')}</h3>
       <div className="space-y-3">
         {byGroup.map(g => (

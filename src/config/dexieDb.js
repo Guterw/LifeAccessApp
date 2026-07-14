@@ -4,25 +4,7 @@ import Dexie from 'dexie';
 export const db = new Dexie('LifeAccessDB');
 
 // ==========================================
-// 🔼 VERSÃO 15: CORREÇÃO CRÍTICA DA OFENSIVA DE IDIOMAS
-// ==========================================
-// Motivo desta versão existir: navegadores que já tinham o banco local
-// aberto em uma "versão 14" anterior a esta tabela dedicada existir
-// (ex: builds de teste anteriores) NUNCA rodam o .upgrade() acima, pois
-// o Dexie só executa migrações quando o NÚMERO da versão aumenta — ele
-// não compara o conteúdo do .stores(). Isso fazia a tabela `languageStreak`
-// nunca ser criada/preservada corretamente para esses usuários, e a
-// ofensiva de Inglês "resetava" e ficava travada em 1, mesmo com a lógica
-// de cálculo estando 100% correta (idêntica à do Fitness, que não sofria
-// desse problema por já existir desde antes).
-//
-// Ao forçar esta nova versão, garantimos que TODOS os usuários, não
-// importa em qual schema estavam presos, passem por uma migração real
-// que garante a existência da tabela e preserva qualquer dado válido
-// que já esteja nela (o upgrade abaixo é seguro e não sobrescreve nada
-// se a tabela já estiver correta).
-// ==========================================
-// VERSÃO 16: Progresso para Vocab-Speech e Vocab-Reverse
+// VERSÃO 16 (mantida — já existia)
 // ==========================================
 db.version(16).stores({
   appSettings: 'id, uiLanguage, isFirstAccess, userName',
@@ -46,9 +28,30 @@ db.version(16).stores({
   languageStreak: 'id, streak, lastLanguageActivity',
   completedExplainedLessons: 'lessonId, completedAt',
   completedDictations: '++id, textId, completedAt, xp, timeTakenSeconds',
-  // NOVO: progresso independente para os módulos Speech e Reverse
   levelProgressSpeech: 'level, correctCount, total, pendingQueue',
   completedLevelsSpeech: 'level, completedAt',
   levelProgressReverse: 'level, correctCount, total, pendingQueue',
   completedLevelsReverse: 'level, completedAt',
+});
+
+// ==========================================
+// VERSÃO 17: Log de calorias do Fitness (exercícios + jejum)
+// ==========================================
+// Usado por fitnessManager.js (logCalorieEvent / getCalorieBreakdown) para
+// permitir quebrar as calorias queimadas por Hoje / Semana / Mês / Total,
+// sem depender apenas do acumulador único fitnessProfile.caloriesBurnedTotal.
+// Compatibilidade: nenhuma tabela existente é alterada, apenas adicionada.
+db.version(17).stores({
+  fitnessCalorieLog: '++id, date, amount, source, createdAt',
+});
+
+// ==========================================
+// VERSÃO 18: Diário Alimentar (preparação para dieta + scanner de IA futuro)
+// ==========================================
+// dietLog guarda cada entrada de alimento consumido em um dia. O campo
+// `source` diferencia entradas manuais ('manual') de futuras leituras
+// automáticas por IA ('ai_scanner'), sem precisar de nova migração quando
+// esse recurso for implementado.
+db.version(18).stores({
+  dietLog: '++id, date, foodName, calories, source, createdAt',
 });

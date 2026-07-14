@@ -8,6 +8,7 @@ import { db } from '../../../config/dexieDb';
 import ModuleCard from '../../../components/ModuleCard';
 import FooterBrand from '../../../components/FooterBrand';
 import PigeonAvatar from '../../../components/PigeonAvatar'; 
+import { useFitness } from '../../../contexts/FitnessContext';
 
 export default function MainDashboard() {
   const navigate = useNavigate();
@@ -17,10 +18,7 @@ export default function MainDashboard() {
   const formattedDate = rawDate.charAt(0).toUpperCase() + rawDate.slice(1);
 
   // Ofensiva de Fitness — mesma fonte de dados usada em FitnessDashboard/SettingsView
-  const fitnessStreakRecord = useLiveQuery(() => db.fitnessStreak.get(1)) || { streak: 0 };
-  const fitnessStreak = fitnessStreakRecord.streak || 0;
-  const isFitnessStreakActive = fitnessStreak > 0;
-  
+  const { fitnessStreak, isFitnessStreakActive } = useFitness();
   // ==========================================
   // LÓGICA DO BOTÃO DE INSTALAR (PWA & MODAL)
   // ==========================================

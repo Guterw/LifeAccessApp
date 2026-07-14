@@ -11,6 +11,7 @@ import BackButton from '../../../components/BackButton';
 import FooterBrand from '../../../components/FooterBrand';
 import PigeonAvatar from '../../../components/PigeonAvatar';
 import FitnessOnboarding from './FitnessOnboarding';
+import { useFitness } from '../../../contexts/FitnessContext';
 
 const LOADING = '__LOADING__';
 
@@ -19,8 +20,7 @@ export default function FitnessDashboard() {
   const { t } = useLanguage();
 
   const profile = useLiveQuery(() => db.fitnessProfile.get(1), [], LOADING);
-  const streak = useLiveQuery(() => db.fitnessStreak.get(1), [], { streak: 0 }) || { streak: 0 };
-  // totalXp é COMPARTILHADO entre Idiomas e Fitness — é o mesmo contador de level da conta
+  const { fitnessStreak, isFitnessStreakActive, caloriesToday } = useFitness();  // totalXp é COMPARTILHADO entre Idiomas e Fitness — é o mesmo contador de level da conta
   const userProfile = useLiveQuery(() => db.userProfile.get(1), [], { totalXp: 0 }) || { totalXp: 0 };
 
   if (profile === LOADING) {
@@ -100,16 +100,16 @@ export default function FitnessDashboard() {
         >
           <div className="flex items-center gap-4">
             <div className="p-3 bg-orange-500/20 rounded-2xl">
-              <Flame className={streak.streak > 0 ? 'text-orange-500' : 'text-gray-500'} size={24} />
+              <Flame className={isFitnessStreakActive ? 'text-orange-500' : 'text-gray-500'} size={24} />
             </div>
             <div className="text-left">
               <p className="text-xs text-gray-400 font-bold uppercase tracking-wide">{t('fitness.streak', 'Ofensiva de Treino')}</p>
-              <p className="text-xl font-black text-white">{streak.streak} {t('settings.days', 'dias')}</p>
+              <p className="text-xl font-black text-white">{fitnessStreak} {t('settings.days', 'dias')}</p>
             </div>
           </div>
           <div className="text-right">
-            <p className="text-xs text-gray-400 font-bold uppercase tracking-wide">{t('fitness.calories', 'Calorias')}</p>
-            <p className="text-lg font-black text-green-400">{Math.round(profile.caloriesBurnedTotal || 0)} kcal</p>
+            <p className="text-xs text-gray-400 font-bold uppercase tracking-wide">{t('fitness.caloriesToday', 'Calorias de Hoje')}</p>
+            <p className="text-lg font-black text-green-400">{Math.round(caloriesToday)} kcal</p>
           </div>
         </button>
       </div>

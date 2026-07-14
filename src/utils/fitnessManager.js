@@ -102,21 +102,23 @@ export const calculateGoalCalorieTarget = (profile) => {
 // ==========================================
 // OFENSIVA DE TREINO
 // ==========================================
+// ==========================================
+// OFENSIVA DE TREINO — CORRIGIDA (data civil, sem hora/minuto/segundo)
+// Usa a MESMA lógica de toDateKey/diffInDays já usada no languageManager.js
+// e no calendário, em vez de comparar objetos Date com horário embutido.
+// ==========================================
 export const registerWorkoutActivity = async () => {
   let record = await db.fitnessStreak.get(1);
   if (!record) record = { id: 1, streak: 0, lastWorkoutActivity: null };
 
-  const now = new Date();
-  const today = getLocalDayStart(now);
-
+  const todayStr = toDateKey(new Date());
   const oldStreak = record.streak || 0;
   let newStreak = oldStreak;
   let increased = false;
 
   if (record.lastWorkoutActivity) {
-    const lastDate = getLocalDayStart(new Date(record.lastWorkoutActivity));
-    const diffTime = today - lastDate;
-    const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+    const lastKey = toDateKey(new Date(record.lastWorkoutActivity));
+    const diffDays = diffInDays(lastKey, todayStr);
 
     if (diffDays === 0) {
       return { increased: false, oldStreak, newStreak: oldStreak };
@@ -132,17 +134,122 @@ export const registerWorkoutActivity = async () => {
     increased = true;
   }
 
-  await db.fitnessStreak.put({ 
-    id: 1, 
-    streak: newStreak, 
-    lastWorkoutActivity: now.toISOString() 
+  await db.fitnessStreak.put({
+    id: 1,
+    streak: newStreak,
+    lastWorkoutActivity: new Date().toISOString(),
   });
-  
+
   return { increased, oldStreak, newStreak };
 };
 
 // ==========================================
-// EXERCÍCIOS
+// CALORIAS: DIA / SEMANA / MÊS / TOTAL
+// ==========================================
+// Cada exercício concluído (completeFitnessExercise) e cada jejum concluído
+// (endFast) agora também gravam um registro leve em `fitnessCalorieLog`
+// (ver dexieDb.js) com a data (YYYY-MM-DD) e as calorias daquele evento.
+// Isso permite calcular "calorias de hoje", "desta semana", "deste mês" e
+// resetar cada uma dessas janelas independentemente do total acumulado.
+
+const logCalorieEvent = async (amount, source = 'exercise') => {
+  if (!amount) return;
+  await db.fitnessCalorieLog.add({
+    date: toDateKey(new Date()),
+    amount,
+    source, // 'exercise' | 'fasting'
+    createdAt: new Date().toISOString(),
+  });
+};
+
+// Retorna { today, week, month, total } calculado a partir do log +
+// do total histórico salvo em fitnessProfile.caloriesBurnedTotal (que
+// serve de "piso" caso o log tenha sido parcialmente limpo no passado).
+export const getCalorieBreakdown = async () => {
+  const profile = await db.fitnessProfile.get(1) || { caloriesBurnedTotal: 0 };
+  const allLogs = await db.fitnessCalorieLog.toArray();
+
+  const now = new Date();
+  const todayKeyStr = toDateKey(now);
+
+  // Início da semana (Domingo) e do mês, em formato YYYY-MM-DD
+  const startOfWeek = new Date(now);
+  startOfWeek.setDate(now.getDate() - now.getDay());
+  const startOfWeekKey = toDateKey(startOfWeek);
+
+  const startOfMonthKey = toDateKey(new Date(now.getFullYear(), now.getMonth(), 1));
+
+  let today = 0, week = 0, month = 0, logTotal = 0;
+  allLogs.forEach((entry) => {
+    logTotal += entry.amount || 0;
+    if (entry.date === todayKeyStr) today += entry.amount || 0;
+    if (entry.date >= startOfWeekKey) week += entry.amount || 0;
+    if (entry.date >= startOfMonthKey) month += entry.amount || 0;
+  });
+
+  return {
+    today,
+    week,
+    month,
+    total: profile.caloriesBurnedTotal || 0,
+  };
+};
+
+// Reseta as calorias de HOJE: remove os logs de hoje e subtrai do total
+export const resetTodayCalories = async () => {
+  const todayKeyStr = toDateKey(new Date());
+  const todayLogs = await db.fitnessCalorieLog.where('date').equals(todayKeyStr).toArray();
+  const amountToSubtract = todayLogs.reduce((sum, l) => sum + (l.amount || 0), 0);
+
+  await db.fitnessCalorieLog.where('date').equals(todayKeyStr).delete();
+
+  const profile = await db.fitnessProfile.get(1) || { id: 1, caloriesBurnedTotal: 0 };
+  profile.caloriesBurnedTotal = Math.max(0, (profile.caloriesBurnedTotal || 0) - amountToSubtract);
+  await db.fitnessProfile.put(profile);
+};
+
+// Reseta as calorias da SEMANA atual (domingo até hoje)
+export const resetWeekCalories = async () => {
+  const now = new Date();
+  const startOfWeek = new Date(now);
+  startOfWeek.setDate(now.getDate() - now.getDay());
+  const startOfWeekKey = toDateKey(startOfWeek);
+
+  const weekLogs = await db.fitnessCalorieLog.where('date').aboveOrEqual(startOfWeekKey).toArray();
+  const amountToSubtract = weekLogs.reduce((sum, l) => sum + (l.amount || 0), 0);
+
+  await db.fitnessCalorieLog.where('date').aboveOrEqual(startOfWeekKey).delete();
+
+  const profile = await db.fitnessProfile.get(1) || { id: 1, caloriesBurnedTotal: 0 };
+  profile.caloriesBurnedTotal = Math.max(0, (profile.caloriesBurnedTotal || 0) - amountToSubtract);
+  await db.fitnessProfile.put(profile);
+};
+
+// Reseta as calorias do MÊS atual
+export const resetMonthCalories = async () => {
+  const now = new Date();
+  const startOfMonthKey = toDateKey(new Date(now.getFullYear(), now.getMonth(), 1));
+
+  const monthLogs = await db.fitnessCalorieLog.where('date').aboveOrEqual(startOfMonthKey).toArray();
+  const amountToSubtract = monthLogs.reduce((sum, l) => sum + (l.amount || 0), 0);
+
+  await db.fitnessCalorieLog.where('date').aboveOrEqual(startOfMonthKey).delete();
+
+  const profile = await db.fitnessProfile.get(1) || { id: 1, caloriesBurnedTotal: 0 };
+  profile.caloriesBurnedTotal = Math.max(0, (profile.caloriesBurnedTotal || 0) - amountToSubtract);
+  await db.fitnessProfile.put(profile);
+};
+
+// Reseta TUDO (histórico completo de calorias)
+export const resetTotalCalories = async () => {
+  await db.fitnessCalorieLog.clear();
+  const profile = await db.fitnessProfile.get(1) || { id: 1 };
+  profile.caloriesBurnedTotal = 0;
+  await db.fitnessProfile.put(profile);
+};
+
+// ==========================================
+// EXERCÍCIOS — agora também grava no log de calorias
 // ==========================================
 export const completeFitnessExercise = async ({ groupId, exerciseId, caloriesBurned = 0, xp = 15 }) => {
   await db.completedFitnessExercises.put({
@@ -154,6 +261,7 @@ export const completeFitnessExercise = async ({ groupId, exerciseId, caloriesBur
   const profile = await db.fitnessProfile.get(1) || { id: 1, caloriesBurnedTotal: 0 };
   profile.caloriesBurnedTotal = (profile.caloriesBurnedTotal || 0) + caloriesBurned;
   await db.fitnessProfile.put(profile);
+  await logCalorieEvent(caloriesBurned, 'exercise');
 
   await addXP(xp);
   const streakResult = await registerWorkoutActivity();
@@ -222,7 +330,7 @@ export const endFast = async (sessionId, profile) => {
   const end = new Date();
   const hoursElapsed = (end - start) / (1000 * 60 * 60);
   const caloriesBurnedEstimate = calculateFastingCaloriesBurned(hoursElapsed, profile);
-  const completed = hoursElapsed >= session.targetHours * 0.9; // tolerância de 10%
+  const completed = hoursElapsed >= session.targetHours * 0.9;
 
   await db.fastingSessions.update(sessionId, {
     endTime: end.toISOString(),
@@ -233,6 +341,7 @@ export const endFast = async (sessionId, profile) => {
   const fitnessProfile = await db.fitnessProfile.get(1) || { id: 1, caloriesBurnedTotal: 0 };
   fitnessProfile.caloriesBurnedTotal = (fitnessProfile.caloriesBurnedTotal || 0) + caloriesBurnedEstimate;
   await db.fitnessProfile.put(fitnessProfile);
+  await logCalorieEvent(caloriesBurnedEstimate, 'fasting');
 
   if (completed) await addXP(10);
 

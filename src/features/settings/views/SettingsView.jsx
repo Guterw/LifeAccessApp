@@ -21,6 +21,7 @@ import { calculateLevel, repairUserProfile } from '../../../utils/xpManager';
 import { todayKey } from '../../../utils/calendarUtils';
 import { pullHealthData, pushHealthData, isHealthBridgeNative } from '../../../utils/healthSync';
 import { getExchangeRateBRLtoEUR, convertCurrency, formatCurrencyValue } from '../../../utils/currencyManager';
+import { useFitness } from '../../../contexts/FitnessContext';
 
 export default function SettingsView() {
   const { t, userName, uiLang, changeLanguage, languageStreak } = useLanguage();
@@ -63,9 +64,8 @@ export default function SettingsView() {
   // ==========================================
   // NOVO: FITNESS — ofensiva/streak direto do Dexie (fonte real, não localStorage)
   // ==========================================
-  const fitnessStreakRecord = useLiveQuery(() => db.fitnessStreak.get(1)) || { streak: 0 };
   const fitnessProfile = useLiveQuery(() => db.fitnessProfile.get(1)) || { caloriesBurnedTotal: 0 };
-  const fitnessStreak = fitnessStreakRecord.streak || 0;
+  const { fitnessStreak, isFitnessStreakActive } = useFitness();
 
   // ==========================================
   // NOVO: FINANÇAS — resumo (receitas, gastos, saldo)
