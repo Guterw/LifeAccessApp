@@ -14,6 +14,27 @@ import { useError } from '../../../../../../contexts/ErrorContext';
 
 const normalize = (s) => String(s || '').toLowerCase().replace(/[^a-z0-9\s]/g, '').trim();
 
+// devolve um array de respostas aceitas em inglês, mesmo que `en` seja string única
+const getAcceptedAnswers = (word) => {
+  if (!word) return [];
+  return Array.isArray(word.en) ? word.en : [word.en];
+};
+
+// texto de exibição juntando todas as respostas aceitas em inglês com " / "
+const formatAcceptedAnswers = (word) => getAcceptedAnswers(word).join(' / ');
+
+// devolve um array com TODAS as traduções (pt ou es) do array de significado
+const getAcceptedPrompts = (word, uiLang) => {
+  if (!word) return [];
+  const list = (uiLang === 'es' && word.es) ? word.es : word.pt;
+  if (Array.isArray(list) && list.length > 0) return list;
+  const enFallback = Array.isArray(word.en) ? word.en[0] : word.en;
+  return enFallback ? [enFallback] : [];
+};
+
+// texto de exibição juntando todas as traduções aceitas com " / "
+const formatAcceptedPrompts = (word, uiLang) => getAcceptedPrompts(word, uiLang).join(' / ');
+
 export default function VocabSpeechView() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -32,7 +53,6 @@ export default function VocabSpeechView() {
   const [streakUpdate, setStreakUpdate] = useState(null);
   const [showStreakModal, setShowStreakModal] = useState(false);
 
-  // Estados Visuais do Microfone
   const [turnTranscript, setTurnTranscript] = useState('');
   const [toastStatus, setToastStatus] = useState(null);
   const silenceDebounceRef = useRef(null);
@@ -44,10 +64,12 @@ export default function VocabSpeechView() {
     : `/english/vocabularies/vocab-speech/levels/group/${(levelData?.group && levelData.group[0]) || 'A1'}`;
 
   const currentWord = queue[0];
-  
-  // Extrai a palavra no idioma base do app para a interface e para a voz
-  const promptTranslation = currentWord
-    ? ((uiLang === 'es' && currentWord.es) ? currentWord.es[0] : currentWord.pt?.[0]) || currentWord.en
+
+  const promptDisplay = currentWord ? formatAcceptedPrompts(currentWord, uiLang) : '';
+
+  const promptToSpeak = currentWord
+    ? ((uiLang === 'es' && currentWord.es) ? currentWord.es[0] : currentWord.pt?.[0]) ||
+      (Array.isArray(currentWord.en) ? currentWord.en[0] : currentWord.en)
     : '';
 
   useEffect(() => {
@@ -74,27 +96,24 @@ export default function VocabSpeechView() {
     });
   };
 
-  // Função atualizada para ditar em Português/Espanhol e com toLowerCase()
   const speakPrompt = () => {
-    if (!window.speechSynthesis || !promptTranslation) return;
+    if (!window.speechSynthesis || !promptToSpeak) return;
     window.speechSynthesis.cancel();
-    const cleanText = String(promptTranslation).toLowerCase(); 
+    const cleanText = String(promptToSpeak).toLowerCase();
     const utt = new SpeechSynthesisUtterance(cleanText);
     utt.lang = uiLang === 'es' ? 'es-ES' : 'pt-BR';
     utt.rate = 0.9;
     window.speechSynthesis.speak(utt);
   };
 
-  // 1. REPRODUÇÃO AUTOMÁTICA (Auto-TTS em PT/ES)
   useEffect(() => {
-    if (promptTranslation && !feedback && !isListening) {
+    if (promptToSpeak && !feedback && !isListening) {
       const timer = setTimeout(() => { speakPrompt(); }, 400);
       return () => clearTimeout(timer);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [promptTranslation, feedback]);
+  }, [promptToSpeak, feedback]);
 
-  // 2. CONTROLE DO MICROFONE E PERMISSÃO iOS
   const handleMic = async () => {
     if (feedback) return;
     if (isListening) { stopListening(); return; }
@@ -115,7 +134,6 @@ export default function VocabSpeechView() {
     startListening();
   };
 
-  // 3. ATUALIZAÇÃO VISUAL E AUTO-STOP POR SILÊNCIO (2.5s)
   useEffect(() => {
     setToastStatus(speechStatus);
   }, [speechStatus]);
@@ -127,7 +145,7 @@ export default function VocabSpeechView() {
   useEffect(() => {
     if (isListening) {
       if (silenceDebounceRef.current) clearTimeout(silenceDebounceRef.current);
-      silenceDebounceRef.current = setTimeout(() => { stopListening(); }, 5000);
+      silenceDebounceRef.current = setTimeout(() => { stopListening(); }, 3000);
     } else {
       if (silenceDebounceRef.current) {
         clearTimeout(silenceDebounceRef.current);
@@ -137,24 +155,17 @@ export default function VocabSpeechView() {
     return () => clearTimeout(silenceDebounceRef.current);
   }, [transcript, isListening, stopListening]);
 
-  // 4. GATILHO DE VALIDAÇÃO (Quando a API oficializa que parou)
-  useEffect(() => {
-    if (speechStatus === 'stopped' && turnTranscript.trim() && !feedback) {
-      handleCheck(turnTranscript);
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [speechStatus]);
-
   const handleCheck = async (spokenText) => {
     if (!currentWord) return;
-    const isCorrect = normalize(spokenText) === normalize(currentWord.en);
+    const acceptedNormalized = getAcceptedAnswers(currentWord).map(normalize);
+    const isCorrect = acceptedNormalized.includes(normalize(spokenText));
     let newQueue = [...queue];
 
     if (isCorrect) {
       setFeedback('correct');
       await db.learnedWords.put({
-        en: currentWord.en,
-        translation: promptTranslation,
+        en: Array.isArray(currentWord.en) ? currentWord.en[0] : currentWord.en,
+        translation: promptDisplay,
         level: currentLevelId,
         category: currentWord.category || 'Geral',
         learnedAt: new Date().toISOString(),
@@ -185,6 +196,26 @@ export default function VocabSpeechView() {
         setQueue(newQueue);
       }
     }, isCorrect ? 1800 : 2400);
+  };
+
+  const handleSkip = async () => {
+    if (feedback !== null || !currentWord) return;
+
+    if (isListening) stopListening();
+
+    setFeedback('wrong');
+
+    let newQueue = [...queue];
+    const skippedWord = newQueue.shift();
+    newQueue.push(skippedWord);
+    await saveState(newQueue, progress.correct);
+
+    setTimeout(async () => {
+      resetTranscript();
+      setTurnTranscript('');
+      setFeedback(null);
+      setQueue(newQueue);
+    }, 2400);
   };
 
   const handleRestartLevel = async () => {
@@ -227,9 +258,11 @@ export default function VocabSpeechView() {
                 ? <CheckCircle2 size={60} className="text-green-500 mb-4" />
                 : <XCircle size={60} className="text-red-500 mb-4" />}
               <p className="text-gray-300 text-sm font-bold uppercase tracking-widest mb-1">
-                {feedback === 'correct' ? t('level.excellent', 'Excelente!') : t('level.correctIs', 'A palavra era:')}
+                {feedback === 'correct' ? t('level.excellent', 'Excelente!') : t('level.correctIs', 'Respostas válidas:')}
               </p>
-              <p className="text-white text-2xl font-black">{currentWord?.en}</p>
+              <p className="text-white text-xl sm:text-2xl font-black px-4">
+                {formatAcceptedAnswers(currentWord)}
+              </p>
             </div>
           )}
 
@@ -244,12 +277,11 @@ export default function VocabSpeechView() {
             >
               <Volume2 size={20} />
             </button>
-            <h3 className="text-3xl sm:text-4xl font-black text-white text-center break-words">
-              {promptTranslation}
+            <h3 className="text-2xl sm:text-3xl font-black text-white text-center break-words leading-snug">
+              {promptDisplay}
             </h3>
           </div>
 
-          {/* CAIXA VISUAL DA TRANSCRIÇÃO */}
           <div className="mb-6 p-4 bg-gray-900/80 border border-gray-700 rounded-2xl w-full max-w-xs text-center min-h-[80px] flex flex-col items-center justify-center shadow-inner gap-2">
              {isListening && !turnTranscript && (
                <div className="flex gap-1.5 items-center">
@@ -285,6 +317,32 @@ export default function VocabSpeechView() {
           <p className="text-[11px] text-gray-500 font-bold uppercase tracking-wider mt-4">
             {isListening ? t('general.tapToSpeak', 'Toque para parar') : turnTranscript ? 'Toque para regravar' : 'Toque para falar'}
           </p>
+
+          {/* Botão de verificar resposta manual */}
+          {turnTranscript && !isListening && !feedback && (
+            <button
+              onClick={() => handleCheck(turnTranscript)}
+              className="w-full max-w-xs mt-6 py-4 bg-white hover:bg-gray-200 text-black font-black rounded-2xl shadow-lg transition-all active:scale-95"
+            >
+              {t('general.checkAnswer', 'Verificar Resposta')}
+            </button>
+          )}
+
+          {/* Botão Pular */}
+          <button
+            type="button" 
+            onClick={handleSkip}
+            disabled={feedback !== null}
+            className="w-full max-w-xs mt-4 flex flex-col items-center justify-center bg-yellow-500 hover:bg-yellow-400 text-yellow-950 p-2 sm:p-2.5 rounded-xl transition-colors disabled:opacity-50 shadow-md"
+          >
+            <span className="text-sm sm:text-base font-black uppercase tracking-wider">
+              {t('level.skipBtnMain', 'Pular')}
+            </span>
+            <span className="text-[10px] sm:text-xs font-bold opacity-80">
+              {t('level.skipBtnSub', '(Não sei)')}
+            </span>
+          </button>
+
         </div>
       ) : (
         <div className="bg-gray-800 p-8 rounded-2xl border border-green-500 text-center shadow-lg animate-fade-in">

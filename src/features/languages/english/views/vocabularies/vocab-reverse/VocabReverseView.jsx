@@ -124,6 +124,23 @@ export default function VocabReverseView() {
     }, isCorrect ? 1800 : 2400);
   };
 
+  const handleSkip = async () => {
+    if (feedback !== null || !currentWord) return;
+
+    setFeedback('wrong');
+
+    let newQueue = [...queue];
+    const skippedWord = newQueue.shift();
+    newQueue.push(skippedWord);
+    await saveState(newQueue, progress.correct);
+
+    setTimeout(async () => {
+      setInputVal('');
+      setFeedback(null);
+      setQueue(newQueue);
+    }, 2400);
+  };
+
   const handleRestartLevel = async () => {
     await db.levelProgressReverse.delete(currentLevelId);
     setQueue(levelData.words);
@@ -199,6 +216,20 @@ export default function VocabReverseView() {
               className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold p-3 sm:p-4 rounded-xl transition-colors disabled:opacity-50"
             >
               {t('level.confirm', 'Confirmar')}
+            </button>
+
+            <button
+              type="button" 
+              onClick={handleSkip}
+              disabled={feedback !== null}
+              className="w-full flex flex-col items-center justify-center bg-yellow-500 hover:bg-yellow-400 text-yellow-950 p-2 sm:p-2.5 rounded-xl transition-colors disabled:opacity-50 shadow-md"
+            >
+              <span className="text-sm sm:text-base font-black uppercase tracking-wider">
+                {t('level.skipBtnMain', 'Pular')}
+              </span>
+              <span className="text-[10px] sm:text-xs font-bold opacity-80">
+                {t('level.skipBtnSub', '(Não sei)')}
+              </span>
             </button>
           </form>
         </div>
