@@ -127,7 +127,7 @@ export default function VocabSpeechView() {
   useEffect(() => {
     if (isListening) {
       if (silenceDebounceRef.current) clearTimeout(silenceDebounceRef.current);
-      silenceDebounceRef.current = setTimeout(() => { stopListening(); }, 2500);
+      silenceDebounceRef.current = setTimeout(() => { stopListening(); }, 5000);
     } else {
       if (silenceDebounceRef.current) {
         clearTimeout(silenceDebounceRef.current);
