@@ -1,14 +1,15 @@
 // src/features/languages/english/views/vocabularies/vocab-speech/VocabSpeechView.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { db } from '../../../../../../config/dexieDb';
 import { vocabSpeechLevels } from '../../../../../../data/vocabSpeechLevels';
-import { RotateCcw, CheckCircle2, XCircle, Flame, Mic, StopCircle } from 'lucide-react';
+import { RotateCcw, CheckCircle2, XCircle, Flame, Mic, StopCircle, Volume2 } from 'lucide-react';
 import { useLanguage } from '../../../../../../contexts/LanguageContext';
 import BackButton from '../../../../../../components/BackButton';
 import { addXP } from '../../../../../../utils/xpManager';
 import { useSpeech } from '../../../../../../hooks/useSpeech';
 import StreakModal from '../../../../../../components/StreakModal';
+import SpeechToast from '../../../../../../components/SpeechToast';
 import { useError } from '../../../../../../contexts/ErrorContext';
 
 const normalize = (s) => String(s || '').toLowerCase().replace(/[^a-z0-9\s]/g, '').trim();
@@ -17,7 +18,7 @@ export default function VocabSpeechView() {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const { t, registerLanguageActivity } = useLanguage();
+  const { t, uiLang, registerLanguageActivity } = useLanguage();
   const { showError } = useError();
 
   const currentLevelId = parseInt(id) || 1;
@@ -31,13 +32,23 @@ export default function VocabSpeechView() {
   const [streakUpdate, setStreakUpdate] = useState(null);
   const [showStreakModal, setShowStreakModal] = useState(false);
 
-  const { transcript, isListening, startListening, stopListening, resetTranscript, hasSupport } = useSpeech('en-IE');
+  // Estados Visuais do Microfone
+  const [turnTranscript, setTurnTranscript] = useState('');
+  const [toastStatus, setToastStatus] = useState(null);
+  const silenceDebounceRef = useRef(null);
+
+  const { transcript, isListening, speechStatus, startListening, stopListening, resetTranscript, hasSupport } = useSpeech('en-IE');
 
   const backRoute = location.state?.fromTrail
     ? '/english/trail'
     : `/english/vocabularies/vocab-speech/levels/group/${(levelData?.group && levelData.group[0]) || 'A1'}`;
 
   const currentWord = queue[0];
+  
+  // Extrai a palavra no idioma base do app para a interface e para a voz
+  const promptTranslation = currentWord
+    ? ((uiLang === 'es' && currentWord.es) ? currentWord.es[0] : currentWord.pt?.[0]) || currentWord.en
+    : '';
 
   useEffect(() => {
     if (!levelData) return;
@@ -63,15 +74,27 @@ export default function VocabSpeechView() {
     });
   };
 
-  const speakTarget = () => {
-    if (!window.speechSynthesis || !currentWord) return;
+  // Função atualizada para ditar em Português/Espanhol e com toLowerCase()
+  const speakPrompt = () => {
+    if (!window.speechSynthesis || !promptTranslation) return;
     window.speechSynthesis.cancel();
-    const utt = new SpeechSynthesisUtterance(currentWord.en);
-    utt.lang = 'en-IE';
-    utt.rate = 0.85;
+    const cleanText = String(promptTranslation).toLowerCase(); 
+    const utt = new SpeechSynthesisUtterance(cleanText);
+    utt.lang = uiLang === 'es' ? 'es-ES' : 'pt-BR';
+    utt.rate = 0.9;
     window.speechSynthesis.speak(utt);
   };
 
+  // 1. REPRODUÇÃO AUTOMÁTICA (Auto-TTS em PT/ES)
+  useEffect(() => {
+    if (promptTranslation && !feedback && !isListening) {
+      const timer = setTimeout(() => { speakPrompt(); }, 400);
+      return () => clearTimeout(timer);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [promptTranslation, feedback]);
+
+  // 2. CONTROLE DO MICROFONE E PERMISSÃO iOS
   const handleMic = async () => {
     if (feedback) return;
     if (isListening) { stopListening(); return; }
@@ -88,15 +111,39 @@ export default function VocabSpeechView() {
     }
     setMicLoading(false);
     resetTranscript();
+    setTurnTranscript('');
     startListening();
   };
 
+  // 3. ATUALIZAÇÃO VISUAL E AUTO-STOP POR SILÊNCIO (2.5s)
   useEffect(() => {
-    if (!isListening && transcript && !feedback) {
-      handleCheck(transcript);
+    setToastStatus(speechStatus);
+  }, [speechStatus]);
+
+  useEffect(() => {
+    if (isListening) setTurnTranscript(transcript);
+  }, [transcript, isListening]);
+
+  useEffect(() => {
+    if (isListening) {
+      if (silenceDebounceRef.current) clearTimeout(silenceDebounceRef.current);
+      silenceDebounceRef.current = setTimeout(() => { stopListening(); }, 2500);
+    } else {
+      if (silenceDebounceRef.current) {
+        clearTimeout(silenceDebounceRef.current);
+        silenceDebounceRef.current = null;
+      }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isListening]);
+    return () => clearTimeout(silenceDebounceRef.current);
+  }, [transcript, isListening, stopListening]);
+
+  // 4. GATILHO DE VALIDAÇÃO (Quando a API oficializa que parou)
+  useEffect(() => {
+    if (speechStatus === 'stopped' && turnTranscript.trim() && !feedback) {
+      handleCheck(turnTranscript);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [speechStatus]);
 
   const handleCheck = async (spokenText) => {
     if (!currentWord) return;
@@ -107,7 +154,7 @@ export default function VocabSpeechView() {
       setFeedback('correct');
       await db.learnedWords.put({
         en: currentWord.en,
-        translation: currentWord.pt?.[0] || currentWord.en,
+        translation: promptTranslation,
         level: currentLevelId,
         category: currentWord.category || 'Geral',
         learnedAt: new Date().toISOString(),
@@ -125,6 +172,7 @@ export default function VocabSpeechView() {
 
     setTimeout(async () => {
       resetTranscript();
+      setTurnTranscript('');
       setFeedback(null);
       if (newQueue.length === 0) {
         await addXP(20);
@@ -151,10 +199,11 @@ export default function VocabSpeechView() {
 
   return (
     <div className="w-full pt-8 animate-fade-in relative px-4">
+      <SpeechToast status={toastStatus} transcript={isListening ? transcript : ''} duration={3000} />
       <BackButton to={backRoute} label={t('levelList.title')} />
 
       <div className="flex justify-between items-center mb-6 px-2">
-        <h2 className="text-2xl font-bold text-pink-400">{levelData.title[t('uiLang')] || levelData.title.pt}</h2>
+        <h2 className="text-2xl font-bold text-pink-400">{levelData.title[uiLang] || levelData.title.pt}</h2>
         <button onClick={handleRestartLevel} className="text-gray-400 hover:text-white p-2 bg-gray-800 rounded-lg border border-gray-700 shadow-sm">
           <RotateCcw size={20} />
         </button>
@@ -171,7 +220,7 @@ export default function VocabSpeechView() {
       </div>
 
       {!isFinished ? (
-        <div className="bg-gray-800 p-6 sm:p-8 rounded-2xl shadow-xl border border-gray-700 text-center relative overflow-hidden">
+        <div className="bg-gray-800 p-6 sm:p-8 rounded-2xl shadow-xl border border-gray-700 text-center relative overflow-hidden flex flex-col items-center">
           {feedback && (
             <div className="absolute inset-0 bg-gray-900/95 flex flex-col items-center justify-center z-10 backdrop-blur-md animate-fade-in px-4">
               {feedback === 'correct'
@@ -185,27 +234,56 @@ export default function VocabSpeechView() {
           )}
 
           <p className="text-gray-400 text-sm mb-2">{t('vocab.speechPrompt', 'Pronuncie esta palavra em voz alta:')}</p>
-          <h3 className="text-3xl sm:text-4xl font-black text-white mb-6">
-            {currentWord?.pt?.[0] || currentWord?.en}
-          </h3>
+          
+          <div className="flex items-center justify-center gap-3 mr-12 mb-8 w-full px-2">
+            <button 
+              type="button"
+              onClick={speakPrompt}
+              className="w-10 h-10 mt-2 flex items-center justify-center bg-pink-500/20 text-pink-400 rounded-full hover:bg-pink-500/30 transition-colors shrink-0"
+              title={t('general.listenAgain', 'Ouvir novamente')}
+            >
+              <Volume2 size={20} />
+            </button>
+            <h3 className="text-3xl sm:text-4xl font-black text-white text-center break-words">
+              {promptTranslation}
+            </h3>
+          </div>
 
-          <button onClick={speakTarget} className="text-xs font-bold text-pink-400 underline mb-8">
-            {t('general.listenAgain', 'Ouvir a palavra')}
-          </button>
+          {/* CAIXA VISUAL DA TRANSCRIÇÃO */}
+          <div className="mb-6 p-4 bg-gray-900/80 border border-gray-700 rounded-2xl w-full max-w-xs text-center min-h-[80px] flex flex-col items-center justify-center shadow-inner gap-2">
+             {isListening && !turnTranscript && (
+               <div className="flex gap-1.5 items-center">
+                 {[0, 0.15, 0.3].map((delay) => (
+                   <span key={delay} className="w-2 h-2 bg-pink-400 rounded-full animate-bounce" style={{ animationDelay: `${delay}s` }} />
+                 ))}
+               </div>
+             )}
+             <p className={`font-medium text-lg leading-snug ${turnTranscript ? 'text-white' : 'text-gray-500 italic text-sm'}`}>
+               {turnTranscript ? `"${turnTranscript}"` : t('general.tapToSpeak', 'Toque no microfone e fale...')}
+             </p>
+          </div>
 
           <button
             onClick={handleMic}
             disabled={!!feedback || micLoading}
-            className={`w-24 h-24 mx-auto rounded-full flex items-center justify-center transition-all shadow-xl ${
+            className={`w-20 h-20 sm:w-24 sm:h-24 rounded-full flex items-center justify-center transition-all shadow-xl ${
               isListening
                 ? 'bg-red-500/20 text-red-400 border-2 border-red-500 animate-pulse'
-                : 'bg-gradient-to-tr from-pink-600 to-purple-500 text-white hover:scale-105'
+                : micLoading 
+                  ? 'bg-gray-700 text-gray-400 cursor-wait'
+                  : 'bg-gradient-to-tr from-pink-600 to-purple-500 text-white hover:scale-105'
             }`}
           >
-            {isListening ? <StopCircle size={40} /> : <Mic size={40} />}
+            {micLoading ? (
+               <svg className="w-8 h-8 animate-spin text-gray-400" viewBox="0 0 24 24" fill="none">
+                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
+               </svg>
+            ) : isListening ? <StopCircle size={36} /> : <Mic size={36} />}
           </button>
+          
           <p className="text-[11px] text-gray-500 font-bold uppercase tracking-wider mt-4">
-            {isListening ? t('general.tapToSpeak', 'Toque para parar') : 'Toque para falar'}
+            {isListening ? t('general.tapToSpeak', 'Toque para parar') : turnTranscript ? 'Toque para regravar' : 'Toque para falar'}
           </p>
         </div>
       ) : (

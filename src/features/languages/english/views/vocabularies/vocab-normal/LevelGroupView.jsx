@@ -54,7 +54,7 @@ export default function LevelGroupView() {
       <div className="shrink-0 h-16 w-full bg-gray-900 border-b border-gray-800 z-20 flex items-center justify-between px-4 shadow-lg">
         <div className="flex items-center justify-between">
           <div className="shrink-0 mt-9 mr-3">
-          <BackButton to="/levels" label="" />
+          <BackButton to="/english/vocabularies/vocab-normal/levels" label="" />
         </div>
         
         <div className="w-9 h-9 bg-blue-500/10 text-blue-400 rounded-xl border border-blue-500/20 shadow-inner flex items-center justify-center shrink-0 mr-3">
@@ -85,7 +85,7 @@ export default function LevelGroupView() {
           return (
             <button
               key={level.id}
-              onClick={() => navigate(`/level/${level.id}`)}
+              onClick={() => navigate(`/english/vocabularies/vocab-normal/level/${level.id}`)}
               className={`w-full text-left p-6 rounded-2xl border block transition-all shadow-lg ${
                 done ? 'bg-gray-800/50 border-green-500/30' : 'bg-gray-800 border-gray-700 hover:border-blue-500'
               }`}

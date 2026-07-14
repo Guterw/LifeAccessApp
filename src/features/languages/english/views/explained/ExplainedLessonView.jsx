@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+// src/features/languages/english/views/explained/ExplainedLessonView.jsx
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ChevronRight, ChevronLeft, BookOpen, CheckCircle2, XCircle, PartyPopper, Volume2 } from 'lucide-react';
 import { useLanguage } from '../../../../../contexts/LanguageContext';
@@ -27,25 +28,35 @@ export default function ExplainedLessonView() {
   const isLastSlide = slideIndex === lesson.theory.length - 1;
   const currentQuestion = queue[0];
 
-  // Lê o slide de teoria inteiro: título + corpo no idioma do app,
-  // seguido de cada exemplo (que é sempre em inglês) com voz en-IE.
+  // Lógica blindada contra letras maiúsculas no iOS (toLowerCase)
   const playTheorySlide = () => {
     const segments = [
-      { text: getText(current.title), lang: uiLang },
-      { text: getText(current.body), lang: uiLang },
+      { text: String(getText(current.title)).toLowerCase(), lang: uiLang },
+      { text: String(getText(current.body)).toLowerCase(), lang: uiLang },
     ];
     (current.examples || []).forEach((ex) => {
-      segments.push({ text: ex, lang: 'en' });
+      segments.push({ text: String(ex).toLowerCase(), lang: 'en' });
     });
     speakSequence(segments);
   };
 
   const playExercisePrompt = () => {
-    // A pergunta do exercício é narrada no idioma do app,
-    // já as opções/target (que geralmente contêm inglês) em inglês.
-    speakInUiLang(getText(currentQuestion?.question), uiLang);
+    speakInUiLang(String(getText(currentQuestion?.question)).toLowerCase(), uiLang);
   };
 
+  // REPRODUÇÃO AUTOMÁTICA
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (phase === 'theory' && current) {
+        playTheorySlide();
+      } else if (phase === 'practice' && currentQuestion && !feedback) {
+        playExercisePrompt();
+      }
+    }, 400);
+    return () => clearTimeout(timer);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [slideIndex, currentQuestion, phase, feedback]);
+   
   const nextSlide = () => {
     window.speechSynthesis?.cancel();
     if (isLastSlide) setPhase('practice');
@@ -114,7 +125,7 @@ export default function ExplainedLessonView() {
               {current.examples.map((ex, i) => (
                 <button
                   key={i}
-                  onClick={() => speakInEnglish(ex)}
+                  onClick={() => speakInEnglish(String(ex).toLowerCase())} // BLINDAGEM AQUI
                   className="w-full text-left flex items-center gap-2 group"
                 >
                   <Volume2 size={12} className="text-fuchsia-400 shrink-0 opacity-60 group-hover:opacity-100" />
@@ -166,7 +177,7 @@ export default function ExplainedLessonView() {
               <button
                 key={opt}
                 onClick={() => handleAnswer(opt)}
-                onDoubleClick={() => speakInEnglish(opt)}
+                onDoubleClick={() => speakInEnglish(String(opt).toLowerCase())} // BLINDAGEM AQUI
                 disabled={!!feedback}
                 className="p-4 bg-gray-800 rounded-2xl border-2 border-gray-700 hover:border-fuchsia-400 text-white font-bold text-left disabled:opacity-60"
               >

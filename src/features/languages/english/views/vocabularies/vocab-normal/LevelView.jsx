@@ -107,10 +107,11 @@ export default function LevelView() {
   ) : [];
 
   useEffect(() => {
-    if (currentWord && currentWord.en) {
-      speakWord(currentWord.en, 0.9);
+    if (currentWord && currentWord.en && !feedback) {
+      const timer = setTimeout(() => { speakWord(currentWord.en, 0.9); }, 400);
+      return () => clearTimeout(timer);
     }
-  }, [currentWord]);
+  }, [currentWord, feedback]);
 
   useEffect(() => {
     if (!levelData) return;

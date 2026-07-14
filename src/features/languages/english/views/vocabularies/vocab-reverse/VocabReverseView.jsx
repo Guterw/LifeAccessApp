@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { db } from '../../../../../../config/dexieDb';
 import { vocabReverseLevels } from '../../../../../../data/vocabReverseLevels';
-import { RotateCcw, CheckCircle2, XCircle, Flame } from 'lucide-react';
+import { RotateCcw, CheckCircle2, XCircle, Flame, Volume2 } from 'lucide-react';
 import { useLanguage } from '../../../../../../contexts/LanguageContext';
 import BackButton from '../../../../../../components/BackButton';
 import { addXP } from '../../../../../../utils/xpManager';
@@ -49,6 +49,26 @@ export default function VocabReverseView() {
     };
     load();
   }, [currentLevelId, levelData]);
+
+  // FUNÇÃO ISOLADA DE FALA COM LOWERCASE (Corrige bug iOS para letras singulares)
+  const speakPrompt = () => {
+    if (!window.speechSynthesis || !promptTranslation) return;
+    window.speechSynthesis.cancel();
+    const cleanText = String(promptTranslation).toLowerCase();
+    const utt = new SpeechSynthesisUtterance(cleanText);
+    utt.lang = uiLang === 'es' ? 'es-ES' : 'pt-BR';
+    utt.rate = 0.9;
+    window.speechSynthesis.speak(utt);
+  };
+
+  // REPRODUÇÃO AUTOMÁTICA (Auto-TTS)
+  useEffect(() => {
+    if (promptTranslation && !feedback) {
+      const timer = setTimeout(() => { speakPrompt(); }, 400);
+      return () => clearTimeout(timer);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [promptTranslation, feedback, uiLang]);
 
   const saveState = async (newQueue, newCorrectCount) => {
     await db.levelProgressReverse.put({
@@ -152,7 +172,20 @@ export default function VocabReverseView() {
           <p className="text-gray-400 text-xs sm:text-sm mb-2">
             {t('vocab.reversePrompt', 'Escreva esta palavra em inglês:')}
           </p>
-          <h3 className="text-3xl sm:text-4xl font-black text-white mb-8">{promptTranslation}</h3>
+          
+          <div className="flex items-center justify-center gap-3 mr-12 mb-8 px-2">
+            <button 
+              type="button"
+              onClick={speakPrompt}
+              className="w-10 h-10 mt-2 flex items-center justify-center bg-emerald-500/20 text-emerald-400 rounded-full hover:bg-emerald-500/30 transition-colors shrink-0"
+              title={t('general.listenAgain', 'Ouvir novamente')}
+            >
+              <Volume2 size={20} />
+            </button>
+            <h3 className="text-3xl sm:text-4xl font-black text-white text-center break-words">
+              {promptTranslation}
+            </h3>
+          </div>
 
           <form onSubmit={handleCheck} className="space-y-4">
             <input

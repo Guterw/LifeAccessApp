@@ -33,7 +33,7 @@ export default function LevelListView() {
         {Object.entries(groups).map(([groupName, levels]) => (
           <button
             key={groupName}
-            onClick={() => navigate(`/levels/group/${groupName}`)}
+            onClick={() => navigate(`/english/vocabularies/vocab-normal/levels/group/${groupName}`)}
             className="w-full bg-gray-800 p-6 rounded-2xl border border-gray-700 flex items-center justify-between hover:border-blue-500 transition-all shadow-lg"
           >
             <div className="flex items-center gap-4">
