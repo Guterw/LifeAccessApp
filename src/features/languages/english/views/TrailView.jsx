@@ -72,6 +72,18 @@ export default function TrailView() {
   const completedVocabNormal = useLiveQuery(() => db.completedLevels.toArray(), [], undefined);
   const completedVocabSpeech = useLiveQuery(() => db.completedLevelsSpeech.toArray(), [], undefined);
   const completedVocabReverse = useLiveQuery(() => db.completedLevelsReverse.toArray(), [], undefined);
+  // CORREÇÃO: antes, dictation e explained eram lidos de um cache em
+  // localStorage ('completedDictationsCache' / 'completedExplainedLessonsCache'),
+  // que é uma cópia paralela e não-reativa dos dados reais. Isso causava o bug
+  // relatado: mesmo completando o ditado normalmente, a trilha continuava
+  // mostrando como não concluído (o cache podia ficar dessincronizado do
+  // Dexie, por exemplo após um restore de backup/nuvem, ou simplesmente por
+  // não disparar re-render). Agora lemos diretamente das tabelas reais do
+  // Dexie (completedDictations e completedExplainedLessons), a mesma fonte
+  // de verdade usada pelas próprias telas de ditado/lições explicadas — e de
+  // forma REATIVA via useLiveQuery, assim como os demais tipos de node.
+  const completedDictations = useLiveQuery(() => db.completedDictations.toArray(), [], undefined);
+  const completedExplainedLessons = useLiveQuery(() => db.completedExplainedLessons.toArray(), [], undefined);
 
   const nodeRefs = useRef({});
   const sectionRefs = useRef({});
@@ -80,7 +92,9 @@ export default function TrailView() {
   const dataIsReady = completedAlphaNum !== undefined 
   && completedVocabNormal !== undefined 
   && completedVocabSpeech !== undefined 
-  && completedVocabReverse !== undefined;
+  && completedVocabReverse !== undefined
+  && completedDictations !== undefined
+  && completedExplainedLessons !== undefined;
 
   const getText = (textObj) => {
     if (!textObj) return '';
@@ -113,20 +127,10 @@ export default function TrailView() {
       }
     }
     if (node.type === 'explained') {
-      try {
-        const saved = JSON.parse(localStorage.getItem('completedExplainedLessonsCache') || '[]');
-        return saved.some(id => String(id) === String(node.targetId));
-      } catch {
-        return false;
-      }
+      return completedExplainedLessons.some(c => String(c.lessonId) === String(node.targetId));
     }
     if (node.type === 'dictation') {
-      try {
-        const saved = JSON.parse(localStorage.getItem('completedDictationsCache') || '[]');
-        return saved.some(id => String(id) === String(node.targetId));
-      } catch {
-        return false;
-      }
+      return completedDictations.some(c => String(c.textId) === String(node.targetId));
     }
     return false;
   };

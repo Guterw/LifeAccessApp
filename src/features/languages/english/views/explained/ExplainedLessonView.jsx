@@ -52,7 +52,12 @@ export default function ExplainedLessonView() {
   const [hasInteracted, setHasInteracted] = useState(false);
   const silenceDebounceRef = useRef(null);
 
-  const backRoute = location.state?.fromTrail ? '/english/trail' : `/english/explained/group/${(levelData?.group && levelData.group[0]) || 'A1'}`;
+  // CORREÇÃO: esta linha referenciava "levelData", uma variável que nunca
+  // existiu neste arquivo (era resquício de outro componente copiado/colado).
+  // Isso causava "Uncaught ReferenceError: levelData is not defined" assim
+  // que a tela tentava renderizar, deixando a página em branco. A variável
+  // correta, já carregada acima, é "lesson".
+  const backRoute = location.state?.fromTrail ? '/english/trail' : `/english/explained/group/${(lesson?.group && lesson.group[0]) || 'A1'}`;
 
   useEffect(() => {
     primeVoices();
