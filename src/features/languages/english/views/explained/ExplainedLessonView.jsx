@@ -52,7 +52,7 @@ export default function ExplainedLessonView() {
   const [hasInteracted, setHasInteracted] = useState(false);
   const silenceDebounceRef = useRef(null);
 
-  const backRoute = location.state?.fromTrail ? '/english/trail' : '/english/explained';
+  const backRoute = location.state?.fromTrail ? '/english/trail' : `/english/explained/group/${(levelData?.group && levelData.group[0]) || 'A1'}`;
 
   useEffect(() => {
     primeVoices();

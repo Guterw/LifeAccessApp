@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { db } from '../../../../../../config/dexieDb';
 import { vocabulariesLevels } from '../../../../../../data/vocabulariesLevels';
-import { RotateCcw, CheckCircle2, XCircle, Flame, Volume2, Turtle } from 'lucide-react';
+import { RotateCcw, CheckCircle2, XCircle, Flame, Volume2, VolumeX, Turtle } from 'lucide-react';
 import { useLanguage } from '../../../../../../contexts/LanguageContext';
 import BackButton from '../../../../../../components/BackButton';
 import { addXP } from '../../../../../../utils/xpManager';
@@ -14,13 +14,13 @@ import StreakModal from '../../../../../../components/StreakModal';
 // =========================================
 const speakWord = (text, rate = 0.9) => {
   if (!window.speechSynthesis) return;
-  window.speechSynthesis.cancel(); 
-  
+  window.speechSynthesis.cancel();
+
   let cleanText = String(text).replace(/[^a-zA-Z0-9\s.]/g, '').toLowerCase();
 
   const utterance = new SpeechSynthesisUtterance(cleanText);
   utterance.lang = 'en-US';
-  utterance.rate = rate; 
+  utterance.rate = rate;
   window.speechSynthesis.speak(utterance);
 };
 
@@ -64,7 +64,7 @@ const playCompletionSound = () => {
     const gain = ctx.createGain();
     osc.connect(gain);
     gain.connect(ctx.destination);
-    osc.type = 'sine'; 
+    osc.type = 'sine';
     osc.frequency.value = freq;
     gain.gain.setValueAtTime(0, startTime);
     gain.gain.linearRampToValueAtTime(vol, startTime + 0.05);
@@ -72,18 +72,21 @@ const playCompletionSound = () => {
     osc.start(startTime);
     osc.stop(startTime + duration);
   };
-  playNote(392.00, now, 0.15);       
-  playNote(523.25, now + 0.15, 0.15); 
-  playNote(659.25, now + 0.30, 0.15);  
-  playNote(1046.50, now + 0.45, 0.8, 0.4); 
+  playNote(392.00, now, 0.15);
+  playNote(523.25, now + 0.15, 0.15);
+  playNote(659.25, now + 0.30, 0.15);
+  playNote(1046.50, now + 0.45, 0.8, 0.4);
 };
+
+// Chave de preferência de áudio automático, compartilhada entre sessões
+const AUTO_SPEAK_STORAGE_KEY = 'lifeaccess_vocab_autospeak';
 
 export default function LevelView() {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
   const { t, uiLang, registerLanguageActivity } = useLanguage();
-  
+
   const currentLevelId = parseInt(id) || 1;
   const levelData = vocabulariesLevels[currentLevelId];
 
@@ -97,21 +100,43 @@ export default function LevelView() {
   const [streakUpdate, setStreakUpdate] = useState(null);
   const [showStreakModal, setShowStreakModal] = useState(false);
 
-  const backRoute = location.state?.fromTrail 
-    ? '/english/trail' 
+  // NOVO: controle de reprodução automática (mutar/desmutar), persistido
+  const [autoSpeakEnabled, setAutoSpeakEnabled] = useState(() => {
+    const saved = localStorage.getItem(AUTO_SPEAK_STORAGE_KEY);
+    return saved === null ? true : saved === 'true';
+  });
+
+  const toggleAutoSpeak = () => {
+    setAutoSpeakEnabled((prev) => {
+      const next = !prev;
+      localStorage.setItem(AUTO_SPEAK_STORAGE_KEY, String(next));
+      if (!next && window.speechSynthesis) {
+        window.speechSynthesis.cancel();
+      }
+      return next;
+    });
+  };
+
+  const backRoute = location.state?.fromTrail
+    ? '/english/trail'
     : `/english/vocabularies/vocab-normal/levels/group/${(levelData?.group && levelData.group[0]) || 'A1'}`;
 
   const currentValidAnswers = currentWord ? (
-    (uiLang === 'es' && currentWord.es) ? currentWord.es : 
-    currentWord.pt 
+    (uiLang === 'es' && currentWord.es) ? currentWord.es :
+    currentWord.pt
   ) : [];
 
+  // ==========================================
+  // CORREÇÃO DE PERFORMANCE: o autoplay agora dispara quase instantaneamente
+  // (100ms, só o suficiente para a troca de tela terminar) em vez do delay
+  // de 400ms de antes, e respeita a preferência de mutar do usuário.
+  // ==========================================
   useEffect(() => {
-    if (currentWord && currentWord.en && !feedback) {
-      const timer = setTimeout(() => { speakWord(currentWord.en, 0.9); }, 400);
+    if (currentWord && currentWord.en && !feedback && autoSpeakEnabled) {
+      const timer = setTimeout(() => { speakWord(currentWord.en, 0.9); }, 100);
       return () => clearTimeout(timer);
     }
-  }, [currentWord, feedback]);
+  }, [currentWord, feedback, autoSpeakEnabled]);
 
   useEffect(() => {
     if (!levelData) return;
@@ -151,7 +176,7 @@ export default function LevelView() {
 
     if (isCorrect) {
       setFeedback('correct');
-      playCorrectSound(); 
+      playCorrectSound();
 
       await db.learnedWords.put({
         en: currentWord.en,
@@ -160,10 +185,10 @@ export default function LevelView() {
         category: currentWord.category || 'Geral',
         learnedAt: new Date().toISOString()
       });
-      
+
       await db.mistakesLog.where('word').equals(currentWord.en).delete();
 
-      newQueue.shift(); 
+      newQueue.shift();
       const newCorrectCount = progress.correct + 1;
       setProgress({ ...progress, correct: newCorrectCount });
       await saveStateToDB(newQueue, newCorrectCount);
@@ -178,7 +203,7 @@ export default function LevelView() {
         category: currentWord.category || 'Geral',
         timestamp: new Date().toISOString()
       });
-      
+
       const failedWord = newQueue.shift();
       newQueue.push(failedWord);
       await saveStateToDB(newQueue, progress.correct);
@@ -189,10 +214,10 @@ export default function LevelView() {
     setTimeout(async () => {
       setInputVal('');
       setFeedback(null);
-      
+
       if (newQueue.length === 0) {
         playCompletionSound();
-        
+
         // LÓGICA DE XP ATUALIZADA: Ganha 20 XP sempre que completar
         await addXP(20);
 
@@ -217,8 +242,8 @@ export default function LevelView() {
   const handleSkip = async () => {
     if (feedback !== null || !currentWord) return;
 
-    setFeedback('wrong'); 
-    playWrongSound(); 
+    setFeedback('wrong');
+    playWrongSound();
 
     await db.mistakesLog.add({
       word: currentWord.en,
@@ -229,7 +254,7 @@ export default function LevelView() {
 
     let newQueue = [...queue];
     const skippedWord = newQueue.shift();
-    newQueue.push(skippedWord); 
+    newQueue.push(skippedWord);
     await saveStateToDB(newQueue, progress.correct);
 
     setTimeout(async () => {
@@ -246,7 +271,7 @@ export default function LevelView() {
     setCurrentWord(levelData.words[0]);
     setProgress({ correct: 0, total: levelData.words.length });
     setIsFinished(false);
-    
+
     setShowStreakModal(false);
     setStreakUpdate(null);
   };
@@ -261,9 +286,19 @@ export default function LevelView() {
         <h2 className="text-2xl font-bold text-blue-400">
           {levelData.title[uiLang] || levelData.title.pt}
         </h2>
-        <button onClick={handleRestartLevel} className="text-gray-400 hover:text-white p-2 bg-gray-800 rounded-lg border border-gray-700 transition-colors shadow-sm" title="Recomeçar Level">
-          <RotateCcw size={20} />
-        </button>
+        <div className="flex items-center gap-2">
+          {/* NOVO: Botão de Mutar/Desmutar áudio automático */}
+          <button
+            onClick={toggleAutoSpeak}
+            className="text-gray-400 hover:text-white p-2 bg-gray-800 rounded-lg border border-gray-700 transition-colors shadow-sm"
+            title={autoSpeakEnabled ? 'Mutar áudio automático' : 'Ativar áudio automático'}
+          >
+            {autoSpeakEnabled ? <Volume2 size={20} /> : <VolumeX size={20} className="text-red-400" />}
+          </button>
+          <button onClick={handleRestartLevel} className="text-gray-400 hover:text-white p-2 bg-gray-800 rounded-lg border border-gray-700 transition-colors shadow-sm" title="Recomeçar Level">
+            <RotateCcw size={20} />
+          </button>
+        </div>
       </div>
 
       <div className="mb-8">
@@ -272,8 +307,8 @@ export default function LevelView() {
           <span className="font-bold text-white">{progress.correct} / {progress.total}</span>
         </div>
         <div className="w-full bg-gray-700 rounded-full h-3">
-          <div 
-            className="bg-blue-500 h-3 rounded-full transition-all duration-500" 
+          <div
+            className="bg-blue-500 h-3 rounded-full transition-all duration-500"
             style={{ width: `${(progress.correct / progress.total) * 100}%` }}
           ></div>
         </div>
@@ -281,7 +316,7 @@ export default function LevelView() {
 
       {!isFinished ? (
         <div className="bg-gray-800 p-6 sm:p-8 rounded-2xl shadow-xl border border-gray-700 text-center relative overflow-hidden">
-          
+
           {feedback === 'correct' && (
             <div className="absolute inset-0 bg-gray-900/95 flex flex-col items-center justify-center z-10 backdrop-blur-md animate-fade-in px-4">
               <CheckCircle2 size={60} className="text-green-500 drop-shadow-[0_0_15px_rgba(34,197,94,0.4)] mb-10" />
@@ -298,7 +333,7 @@ export default function LevelView() {
               </div>
             </div>
           )}
-          
+
           {feedback === 'wrong' && (
             <div className="absolute inset-0 bg-gray-900/95 flex flex-col items-center justify-center z-10 backdrop-blur-md animate-fade-in px-4">
               <XCircle size={60} className="text-red-500 drop-shadow-lg mb-4" />
@@ -310,10 +345,10 @@ export default function LevelView() {
           )}
 
           <p className="text-gray-400 text-xs sm:text-sm mb-2">{t('level.translateThis', 'Traduza esta palavra')}</p>
-          
+
           <div className="relative flex items-center justify-center w-full mb-8 min-h-[60px]">
             <div className="absolute left-0 flex items-center gap-1.5 sm:gap-2 z-10">
-              <button 
+              <button
                 type="button"
                 onClick={() => speakWord(currentWord?.en, 0.2)}
                 className="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center bg-yellow-500/20 text-yellow-500 rounded-full hover:bg-yellow-500/30 transition-colors shrink-0"
@@ -322,7 +357,7 @@ export default function LevelView() {
                 <Turtle className="w-4 h-4 sm:w-5 sm:h-5" />
               </button>
 
-              <button 
+              <button
                 type="button"
                 onClick={() => speakWord(currentWord?.en, 0.9)}
                 className="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center bg-yellow-500/20 text-yellow-500 rounded-full hover:bg-yellow-500/30 transition-colors shrink-0"
@@ -344,7 +379,7 @@ export default function LevelView() {
               value={inputVal} onChange={(e) => setInputVal(e.target.value)}
               className="w-full bg-gray-900 text-white p-3 sm:p-4 rounded-xl border-2 border-gray-700 focus:border-blue-500 focus:outline-none text-center text-base sm:text-lg transition-colors"
             />
-            
+
             <button
               type="submit" disabled={feedback !== null}
               className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold p-3 sm:p-4 rounded-xl transition-colors disabled:opacity-50"
@@ -353,7 +388,7 @@ export default function LevelView() {
             </button>
 
             <button
-              type="button" 
+              type="button"
               onClick={handleSkip}
               disabled={feedback !== null}
               className="w-full flex flex-col items-center justify-center bg-yellow-500 hover:bg-yellow-400 text-yellow-950 p-2 sm:p-2.5 rounded-xl transition-colors disabled:opacity-50 shadow-md"
@@ -371,7 +406,7 @@ export default function LevelView() {
         <div className="bg-gray-800 p-8 rounded-2xl border border-green-500 text-center shadow-lg animate-fade-in">
           <CheckCircle2 size={60} className="text-green-500 mx-auto mb-4" />
           <h3 className="text-2xl font-bold text-white mb-2">{t('level.completedTitle', 'Nível Concluído!')}</h3>
-          
+
           <div className="flex items-center justify-center gap-2 mb-4 bg-yellow-500/10 border border-yellow-500/20 py-2 px-4 rounded-xl w-max mx-auto">
             <Flame size={20} className="text-yellow-500" />
             <span className="text-yellow-400 font-black text-lg">+20 {t('level.xpReward', 'XP de Idiomas')}</span>
@@ -379,13 +414,13 @@ export default function LevelView() {
 
           <p className="text-gray-400 mb-8">{t('level.masteredAll', 'Você dominou todas as')} {progress.total} {t('level.words', 'palavras!')}</p>
 
-          <button 
+          <button
             onClick={() => navigate(backRoute)}
             className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold p-4 rounded-xl mb-3 transition-colors shadow-lg"
           >
             {t('level.finishBtn', 'Finalizar')}
           </button>
-          <button 
+          <button
             onClick={handleRestartLevel}
             className="w-full bg-gray-700 hover:bg-gray-600 text-white font-bold p-4 rounded-xl transition-colors"
           >
