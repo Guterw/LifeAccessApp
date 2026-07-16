@@ -11,6 +11,8 @@ import BackButton from '../../../../../components/BackButton';
 import FooterBrand from '../../../../../components/FooterBrand';
 import { getContractionExpansion } from '../../../../../data/dictationTexts';
 
+const DICTATION_XP = 15;
+
 // ─── Sons (mesmo padrão usado em AlphaNumbersExerciseView.jsx) ─────────────
 const playWrongSound = () => {
   try {
@@ -78,6 +80,11 @@ export default function DictationExerciseView() {
   const location = useLocation();
 
   const backRoute = location.state?.fromTrail ? '/english/trail' : '/english/dictation';
+
+  const getTranslated = (textObj) => {
+    if (!textObj) return '';
+    return textObj[uiLang] || textObj.pt || '';
+  };
 
   // ── Timer regressivo ──────────────────────────────────────────────────
   useEffect(() => {
@@ -164,15 +171,23 @@ export default function DictationExerciseView() {
       await db.completedDictations.put({
         textId: textData.id,
         completedAt: new Date().toISOString(),
-        xp: 15,
+        xp: DICTATION_XP,
         timeTakenSeconds: textData.timeLimitSeconds - timeLeft,
       });
+
+      // CORREÇÃO: usava "lesson.id" (variável inexistente nesta tela), o que
+      // lançava um erro silencioso e nunca atualizava o cache lido pela
+      // Trilha (TrailView verifica 'completedDictationsCache' no localStorage,
+      // não a tabela do Dexie diretamente). Por isso o node de ditado na
+      // trilha nunca ficava marcado como concluído mesmo após concluir o
+      // exercício. Agora usamos textData.id, que é o identificador correto.
       const cache = JSON.parse(localStorage.getItem('completedDictationsCache') || '[]');
-      if (!cache.includes(lesson.id)) {
-      cache.push(lesson.id);
-      localStorage.setItem('completedDictationsCache', JSON.stringify(cache));
+      if (!cache.includes(textData.id)) {
+        cache.push(textData.id);
+        localStorage.setItem('completedDictationsCache', JSON.stringify(cache));
       }
-      await addXP(15);
+
+      await addXP(DICTATION_XP);
       await registerLanguageActivity();
     } catch (err) {
       console.error('Erro ao salvar ditado concluído:', err);
@@ -247,9 +262,10 @@ export default function DictationExerciseView() {
         <h2 className="text-3xl font-black text-white mb-3">
           {t('dictation.completedTitle', 'Texto Concluído!')}
         </h2>
-        <div className="flex items-center gap-2 bg-indigo-500/10 border border-indigo-500/20 py-2 px-4 rounded-xl mb-10">
-          <Flame size={18} className="text-indigo-400" />
-          <span className="text-indigo-300 font-black">+15 XP</span>
+        {/* Badge de XP no padrão amarelo/dourado usado no resto do app (não mais azul/índigo) */}
+        <div className="flex items-center gap-2 bg-yellow-500/10 border border-yellow-500/20 py-2 px-4 rounded-xl mb-10">
+          <Flame size={18} className="text-yellow-500" />
+          <span className="text-yellow-400 font-black">+{DICTATION_XP} {t('settings.xp', 'XP')}</span>
         </div>
         <div className="flex flex-col gap-3 w-full max-w-xs">
           <button
@@ -302,13 +318,22 @@ export default function DictationExerciseView() {
 
   const progressPercent = (currentIndex / totalWords) * 100;
   const timeCritical = timeLeft <= 10;
+  const titleText = getTranslated(textData.title);
 
   return (
     <div className="w-full pt-8 animate-fade-in px-4 min-h-screen flex flex-col">
-      <BackButton to={backRoute} label={t('general.back', 'Voltar')} />
+      {/* HEADER: Botão de voltar + Título do exercício, acima da barra de progresso */}
+      <div className="flex items-center gap-3 mb-3">
+        <div className="shrink-0">
+          <BackButton to={backRoute} label={t('general.back', 'Voltar')} />
+        </div>
+        <h1 className="text-lg sm:text-xl font-black text-white truncate -mt-6">
+          {titleText}
+        </h1>
+      </div>
 
       {/* Barra de progresso + Timer */}
-      <div className="mt-4 mb-6 max-w-lg w-full mx-auto flex items-center gap-3">
+      <div className="mb-6 max-w-lg w-full mx-auto flex items-center gap-3">
         <div className="flex-1 bg-gray-800 rounded-full h-2 overflow-hidden">
           <div
             className="bg-pink-500 h-2 rounded-full transition-all duration-300"
@@ -329,37 +354,36 @@ export default function DictationExerciseView() {
 
       <div className="max-w-lg w-full mx-auto flex-1 flex flex-col items-center justify-center">
         {/* Texto */}
-{/* Texto */}
-      <div className="bg-gray-800 border border-gray-700 rounded-[2rem] p-6 sm:p-8 shadow-xl w-full mb-8">
-        <p className="text-xl sm:text-2xl leading-relaxed font-bold text-center flex flex-wrap justify-center gap-x-2 gap-y-1">
-          {textData.words.map((word, idx) => {
-            let colorClass = 'text-white';
-            if (idx < currentIndex) colorClass = 'text-green-500';
-            else if (idx === currentIndex && errorIndex === idx) colorClass = 'text-red-500';
-            else if (idx === currentIndex) colorClass = 'text-yellow-400';
+        <div className="bg-gray-800 border border-gray-700 rounded-[2rem] p-6 sm:p-8 shadow-xl w-full mb-8">
+          <p className="text-xl sm:text-2xl leading-relaxed font-bold text-center flex flex-wrap justify-center gap-x-2 gap-y-1">
+            {textData.words.map((word, idx) => {
+              let colorClass = 'text-white';
+              if (idx < currentIndex) colorClass = 'text-green-500';
+              else if (idx === currentIndex && errorIndex === idx) colorClass = 'text-red-500';
+              else if (idx === currentIndex) colorClass = 'text-yellow-400';
 
-            const expansion = getContractionExpansion(word);
+              const expansion = getContractionExpansion(word);
 
-            return (
-              <span key={idx} className={`transition-colors duration-200 ${colorClass}`}>
-                {word}
-                {expansion && (
-                  <span className={`text-[10px] font-normal align-super ml-0.5 ${idx < currentIndex ? 'text-green-500/70' : 'text-gray-500'}`}>
-                    ({expansion})
-                  </span>
-                )}
-              </span>
-            );
-          })}
-        </p>
+              return (
+                <span key={idx} className={`transition-colors duration-200 ${colorClass}`}>
+                  {word}
+                  {expansion && (
+                    <span className={`text-[10px] font-normal align-super ml-0.5 ${idx < currentIndex ? 'text-green-500/70' : 'text-gray-500'}`}>
+                      ({expansion})
+                    </span>
+                  )}
+                </span>
+              );
+            })}
+          </p>
 
-        {/* Tradução apagadinha, sempre visível, no idioma do app */}
+          {/* Tradução apagadinha, sempre visível, no idioma do app */}
           {textData.translation && (
             <p className="text-[10px] text-gray-600 text-center mt-4 italic leading-snug opacity-70">
               {textData.translation[uiLang] || textData.translation.pt}
             </p>
           )}
-      </div>
+        </div>
 
         {status === 'idle' && (
           <button

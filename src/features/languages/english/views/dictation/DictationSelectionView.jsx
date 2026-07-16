@@ -1,17 +1,21 @@
 // src/features/languages/english/views/dictation/DictationSelectionView.jsx
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
-import { Play, ChevronRight, Mic, CheckCircle2, Trophy, Clock } from 'lucide-react';
+import { Play, ChevronRight, Mic, CheckCircle2, Trophy, Clock, RotateCcw, AlertTriangle, Flame } from 'lucide-react';
 import { useLanguage } from '../../../../../contexts/LanguageContext';
 import { DICTATION_TEXTS } from '../../../../../data/dictationTexts';
 import { db } from '../../../../../config/dexieDb';
 import BackButton from '../../../../../components/BackButton';
 import FooterBrand from '../../../../../components/FooterBrand';
 
+const DICTATION_XP = 15;
+
 export default function DictationSelectionView() {
   const navigate = useNavigate();
   const { t, uiLang } = useLanguage();
+
+  const [resetModal, setResetModal] = useState({ isOpen: false, textId: null });
 
   const getTranslated = (textObj) => {
     if (!textObj) return '';
@@ -19,8 +23,34 @@ export default function DictationSelectionView() {
   };
 
   const completedList = useLiveQuery(() => db.completedDictations.toArray(), [], []) || [];
-  const completedIds = new Set(completedList.map((c) => c.textId));
-  const completedCount = completedIds.size;
+  const completedMap = completedList.reduce((acc, curr) => {
+    acc[curr.textId] = curr;
+    return acc;
+  }, {});
+  const completedCount = Object.keys(completedMap).length;
+
+  const openResetModal = (e, textId) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setResetModal({ isOpen: true, textId });
+  };
+
+  const confirmRestart = async () => {
+    const id = resetModal.textId;
+    if (!id) return;
+    try {
+      await db.completedDictations.where('textId').equals(id).delete();
+
+      // Mantém o cache local (usado pela Trilha) em sincronia com o Dexie
+      const cache = JSON.parse(localStorage.getItem('completedDictationsCache') || '[]');
+      const updatedCache = cache.filter((cachedId) => String(cachedId) !== String(id));
+      localStorage.setItem('completedDictationsCache', JSON.stringify(updatedCache));
+    } catch (err) {
+      console.error('Erro ao reiniciar ditado:', err);
+    } finally {
+      setResetModal({ isOpen: false, textId: null });
+    }
+  };
 
   return (
     <div className="w-full pt-8 animate-fade-in px-4 pb-24 min-h-screen -mt-5 -mb-20">
@@ -53,7 +83,9 @@ export default function DictationSelectionView() {
 
       <div className="grid gap-4">
         {DICTATION_TEXTS.map((item) => {
-          const isCompleted = completedIds.has(item.id);
+          const completedRecord = completedMap[item.id];
+          const isCompleted = !!completedRecord;
+
           return (
             <button
               key={item.id}
@@ -77,15 +109,37 @@ export default function DictationSelectionView() {
                     <span className="font-black text-white text-lg block truncate">
                       {getTranslated(item.title)}
                     </span>
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400 flex items-center gap-2 mt-1">
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400 flex items-center gap-2 mt-1 flex-wrap">
                       {item.difficulty} · {item.words.length} {t('dictation.words', 'palavras')}
                       <span className="flex items-center gap-1 text-blue-400">
                         <Clock size={10} /> {item.timeLimitSeconds}s
                       </span>
+                      {isCompleted ? (
+                        <span className="flex items-center gap-1 bg-green-500/10 text-green-500/70 px-2 py-0.5 rounded-md border border-green-500/20 normal-case tracking-normal">
+                          <CheckCircle2 size={10} />
+                          <span className="text-[10px] font-bold opacity-80">+{completedRecord.xp || DICTATION_XP} {t('settings.xp', 'XP')}</span>
+                        </span>
+                      ) : (
+                        <span className="flex items-center gap-1 bg-yellow-500/10 text-yellow-500 px-2 py-0.5 rounded-md border border-yellow-500/20 normal-case tracking-normal">
+                          <Flame size={10} />
+                          <span className="text-[10px] font-bold">+{DICTATION_XP} {t('settings.xp', 'XP')}</span>
+                        </span>
+                      )}
                     </span>
                   </div>
                 </div>
-                <ChevronRight className="text-gray-600 shrink-0 group-hover:text-pink-400 transition-colors" />
+
+                {isCompleted ? (
+                  <div
+                    onClick={(e) => openResetModal(e, item.id)}
+                    className="p-3 -mr-2 shrink-0 rounded-full bg-black/20 hover:bg-black/50 text-green-300 hover:text-white transition-all z-20"
+                    title={t('general.restartExercise', 'Reiniciar Exercício')}
+                  >
+                    <RotateCcw size={20} />
+                  </div>
+                ) : (
+                  <ChevronRight className="text-gray-600 shrink-0 group-hover:text-pink-400 transition-colors" />
+                )}
               </div>
             </button>
           );
@@ -95,6 +149,34 @@ export default function DictationSelectionView() {
       <div className="shrink-0 mt-10">
         <FooterBrand direction="flex-col" textSize="text-xs" textColor="text-white-400" />
       </div>
+
+      {resetModal.isOpen && (
+        <div className="fixed inset-0 z-[100] bg-gray-900/90 backdrop-blur-md flex items-center justify-center px-6 animate-fade-in">
+          <div className="w-full max-w-sm bg-gray-800 border border-gray-700 rounded-3xl p-6 shadow-2xl">
+            <div className="w-14 h-14 bg-amber-500/15 text-amber-400 rounded-2xl flex items-center justify-center mb-5">
+              <AlertTriangle size={28} />
+            </div>
+            <h3 className="text-xl font-black text-white mb-2">{t('general.restartConfirmation', 'Reiniciar exercício?')}</h3>
+            <p className="text-sm text-gray-400 leading-relaxed mb-6">
+              {t('general.restartWarning', 'Todo o seu progresso neste exercício será apagado e você vai começar do zero. Essa ação não pode ser desfeita.')}
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setResetModal({ isOpen: false, textId: null })}
+                className="flex-1 py-3 rounded-2xl bg-gray-700 hover:bg-gray-600 text-white font-bold transition-colors"
+              >
+                {t('cancel', 'Cancelar')}
+              </button>
+              <button
+                onClick={confirmRestart}
+                className="flex-1 py-3 rounded-2xl bg-red-500 hover:bg-red-400 text-white font-bold transition-colors shadow-lg shadow-red-500/20"
+              >
+                {t('general.restart', 'Reiniciar')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
