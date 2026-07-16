@@ -1,6 +1,6 @@
 // src/features/languages/english/views/dictation/DictationExerciseView.jsx
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Mic, MicOff, PartyPopper, TimerOff, RotateCcw, Clock, Flame } from 'lucide-react';
 import { useSpeech } from '../../../../../hooks/useSpeech';
 import { useLanguage } from '../../../../../contexts/LanguageContext';
@@ -75,6 +75,9 @@ export default function DictationExerciseView() {
   const errorTimeoutRef = useRef(null);
 
   const totalWords = textData.words.length;
+  const location = useLocation();
+
+  const backRoute = location.state?.fromTrail ? '/english/trail' : '/english/dictation';
 
   // ── Timer regressivo ──────────────────────────────────────────────────
   useEffect(() => {
@@ -225,7 +228,7 @@ export default function DictationExerciseView() {
         <h2 className="text-xl text-white font-bold mb-2">{t('ai.micNotSupported', 'Microfone não suportado')}</h2>
         <p className="text-gray-400">{t('ai.micNotSupportedDesc', 'Seu navegador não suporta a API de voz.')}</p>
         <button
-          onClick={() => navigate('/english/dictation')}
+          onClick={() => navigate(backRoute)}
           className="mt-6 bg-blue-600 text-white px-6 py-3 rounded-2xl font-bold"
         >
           {t('general.back', 'Voltar')}
@@ -250,7 +253,7 @@ export default function DictationExerciseView() {
         </div>
         <div className="flex flex-col gap-3 w-full max-w-xs">
           <button
-            onClick={() => navigate('/english/dictation')}
+            onClick={() => navigate(backRoute)}
             className="px-8 py-4 bg-white text-black font-black rounded-full hover:bg-gray-200 transition-all shadow-xl active:scale-95"
           >
             {t('general.backToMenu', 'Voltar para o Menu')}
@@ -287,7 +290,7 @@ export default function DictationExerciseView() {
             <RotateCcw size={18} /> {t('general.restart', 'Tentar Novamente')}
           </button>
           <button
-            onClick={() => navigate('/english/dictation')}
+            onClick={() => navigate(backRoute)}
             className="px-8 py-4 bg-gray-800 border border-gray-700 text-white font-black rounded-full hover:bg-gray-700 transition-all"
           >
             {t('general.backToMenu', 'Voltar para o Menu')}
@@ -302,7 +305,7 @@ export default function DictationExerciseView() {
 
   return (
     <div className="w-full pt-8 animate-fade-in px-4 min-h-screen flex flex-col">
-      <BackButton to="/english/dictation" label={t('general.back', 'Voltar')} />
+      <BackButton to={backRoute} label={t('general.back', 'Voltar')} />
 
       {/* Barra de progresso + Timer */}
       <div className="mt-4 mb-6 max-w-lg w-full mx-auto flex items-center gap-3">
