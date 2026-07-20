@@ -4,7 +4,7 @@ import {
   User, Flame, Dumbbell, Receipt, CalendarCheck, Globe, Bell, Moon, Mic, Zap,
   HardDrive, Download, Upload, Cloud, CloudDownload, LogOut, RefreshCw, Trash2,
   AlertTriangle, X, Wallet, ListChecks, Hourglass, Footprints, HeartPulse,
-  ArrowDownToLine, ArrowUpFromLine as ArrowUpFromLineIcon, ToggleLeft
+  ArrowDownToLine, ArrowUpFromLine as ArrowUpFromLineIcon, ToggleLeft, Pencil
 } from 'lucide-react';
 import { useLanguage } from '../../../contexts/LanguageContext';
 import BackButton from '../../../components/BackButton';
@@ -24,8 +24,7 @@ import { getExchangeRateBRLtoEUR, convertCurrency, formatCurrencyValue } from '.
 import { useFitness } from '../../../contexts/FitnessContext';
 
 export default function SettingsView() {
-  const { t, userName, uiLang, changeLanguage, languageStreak } = useLanguage();
-  const today = new Intl.DateTimeFormat(uiLang, { dateStyle: 'full' }).format(new Date());
+  const { t, userName, uiLang, changeLanguage, languageStreak, updateUserName } = useLanguage();  const today = new Intl.DateTimeFormat(uiLang, { dateStyle: 'full' }).format(new Date());
 
   const [permission, setPermission] = useState(typeof Notification !== 'undefined' ? Notification.permission : 'default');
   const [micPermission, setMicPermission] = useState('prompt');
@@ -50,6 +49,22 @@ export default function SettingsView() {
   const [cloudChoiceModal, setCloudChoiceModal] = useState({ open: false, user: null, remoteDate: null });
   const [importConfirmModal, setImportConfirmModal] = useState({ open: false, data: null, exportedAt: null });
 
+  const [nameInput, setNameInput] = useState(userName || '');
+  const [nameSaved, setNameSaved] = useState(false);
+
+  const [notifWaterReminders, setNotifWaterReminders] = useState(true);
+
+  useEffect(() => {
+    setNameInput(userName || '');
+  }, [userName]);
+
+  const handleSaveName = async () => {
+    if (!nameInput.trim() || nameInput.trim() === userName) return;
+    await updateUserName(nameInput.trim());
+    setNameSaved(true);
+    setTimeout(() => setNameSaved(false), 2000);
+  };
+  
   // ==========================================
   // PERFIL / XP (já existente)
   // ==========================================
@@ -130,6 +145,7 @@ export default function SettingsView() {
       setNotifTasks(settings.notifTasks ?? true);
       setNotifFitness(settings.notifFitness ?? false);
       setNotifFitnessReminders(settings.notifFitnessReminders ?? false);
+      setNotifWaterReminders(settings.notifWaterReminders ?? true);
       setAutoSyncEnabled(settings.autoSyncEnabled ?? true);
       setLastAutoSync(settings.lastAutoSync || null);
       setHealthLastSync(settings.healthLastSync || null);
@@ -519,12 +535,28 @@ export default function SettingsView() {
              <PigeonAvatar accessory={userProfile.equippedSkin || 'none'} className="w-8 h-8 sm:w-10 sm:h-10 mt-1" />
         </div>
         <div className="flex-1 min-w-0">
-          <h3 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2 truncate">
-            <span className="truncate">{userName}</span>
+          <div className="flex items-center gap-2 mb-1">
+            <div className="relative flex-1 min-w-0 flex items-center gap-1.5">
+              <input
+                type="text"
+                value={nameInput}
+                onChange={(e) => setNameInput(e.target.value)}
+                onBlur={handleSaveName}
+                onKeyDown={(e) => { if (e.key === 'Enter') { e.currentTarget.blur(); } }}
+                className="bg-transparent text-xl sm:text-2xl font-bold text-white border-b-2 border-transparent focus:border-blue-500 focus:outline-none min-w-0 flex-1 truncate"
+                placeholder={t('settings.namePlaceholder', 'Seu nome')}
+              />
+              <Pencil size={14} className="text-gray-500 shrink-0" />
+            </div>
             <span className="bg-gradient-to-r from-blue-600 to-cyan-500 text-white text-[10px] sm:text-xs px-2 py-0.5 rounded-lg shadow-sm flex items-center gap-1 font-black shrink-0">
               {t('settings.level', 'Lv.')} {userLevel}
             </span>
-          </h3>
+            {nameSaved && (
+              <span className="text-[10px] font-bold text-green-400 shrink-0">
+                {t('settings.saved', 'Salvo!')}
+              </span>
+            )}
+          </div>
           <p className="text-xs sm:text-sm text-blue-400 font-semibold uppercase tracking-wider mb-2">LifeAccess Member</p>
           <div className="w-full pr-2">
             <div className="flex justify-between items-center mb-1.5">
@@ -709,6 +741,10 @@ export default function SettingsView() {
             <label className="flex justify-between items-center text-sm text-gray-300">
               {t('notifications.fitnessReminders', 'Lembretes de Metas Fitness')}
               <Toggle checked={notifFitnessReminders} onChange={(val) => handleToggleChange('notifFitnessReminders', setNotifFitnessReminders, val)} />
+            </label>
+            <label className="flex justify-between items-center text-sm text-gray-300">
+              {t('notifications.waterReminders', 'Lembretes de Água')}
+              <Toggle checked={notifWaterReminders} onChange={(val) => handleToggleChange('notifWaterReminders', setNotifWaterReminders, val)} />
             </label>
           </div>
         </div>

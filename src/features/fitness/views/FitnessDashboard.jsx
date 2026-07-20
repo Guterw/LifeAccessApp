@@ -148,16 +148,22 @@ export default function FitnessDashboard() {
         <ChevronRight className="text-indigo-400" />
       </button>
 
-      {/* DIETA ORIENTADA POR IA (Em desenvolvimento) */}
-      <div className="metal-border-card w-full bg-gray-800/40 border border-gray-700 border-dashed p-5 rounded-2xl flex items-center justify-between opacity-70 mb-4 relative z-[1]">
+      {/* DIETA ORIENTADA POR IA */}
+      <button
+        onClick={() => navigate('/fitness/diet')}
+        className="metal-border-card w-full bg-gradient-to-r from-orange-900/40 to-gray-800 border border-orange-500/30 p-5 rounded-3xl flex items-center justify-between shadow-lg mb-4 hover:border-orange-400 transition-all relative z-[1]"
+      >
         <div className="flex items-center gap-4">
-          <div className="p-3 bg-gray-700 text-gray-400 rounded-xl"><Salad size={22} /></div>
-          <div>
-            <h4 className="font-bold text-gray-300">{t('fitness.dietModule', 'Dieta Orientada por IA')}</h4>
-            <p className="text-xs text-gray-500">{t('inDev', 'Em desenvolvimento...')}</p>
+          <div className="p-3 bg-orange-500/20 rounded-2xl">
+            <Salad className="text-orange-400" size={24} />
+          </div>
+          <div className="text-left">
+            <h4 className="font-bold text-white">{t('fitness.dietModule', 'Dieta Orientada por IA')}</h4>
+            <p className="text-xs text-gray-400">{t('diet.dashboardDesc', 'Calorias, água e sua dieta personalizada')}</p>
           </div>
         </div>
-      </div>
+        <ChevronRight className="text-orange-400" />
+      </button>
 
       {/* PERSONAL TRAINER IA (Chat) — Em desenvolvimento */}
       <div className="metal-border-card w-full bg-gray-800/40 border border-gray-700 border-dashed p-5 rounded-2xl flex items-center justify-between opacity-70 mb-8 relative z-[1]">

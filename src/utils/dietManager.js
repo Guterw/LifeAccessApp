@@ -117,3 +117,80 @@ export const getFocusStreak = async () => {
 
   return { streak, lastFocusDate };
 };
+
+  // ==========================================
+// PERFIL DE DIETA (id fixo = 1)
+// ==========================================
+export const getDietProfile = async () => {
+  return (await db.dietProfile.get(1)) || null;
+};
+
+export const saveDietProfile = async (data) => {
+  const existing = await db.dietProfile.get(1) || { id: 1 };
+  const merged = { ...existing, ...data, id: 1, updatedAt: new Date().toISOString() };
+  await db.dietProfile.put(merged);
+  return merged;
+};
+
+export const isDietOnboarded = async () => {
+  const profile = await getDietProfile();
+  return !!profile?.isOnboarded;
+};
+
+// ==========================================
+// RASTREADOR DE ÁGUA
+// ==========================================
+export const addWaterEntry = async (amountMl, dateKey) => {
+  return db.waterLog.add({
+    date: dateKey || toDateKey(new Date()),
+    amountMl: Number(amountMl) || 0,
+    createdAt: new Date().toISOString(),
+  });
+};
+
+export const removeLastWaterEntry = async (dateKey) => {
+  const targetDate = dateKey || toDateKey(new Date());
+  const entries = await db.waterLog.where('date').equals(targetDate).toArray();
+  if (entries.length === 0) return;
+  const last = entries.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))[0];
+  await db.waterLog.delete(last.id);
+};
+
+export const getWaterTotalForDate = async (dateKey) => {
+  const targetDate = dateKey || toDateKey(new Date());
+  const entries = await db.waterLog.where('date').equals(targetDate).toArray();
+  return entries.reduce((sum, e) => sum + (e.amountMl || 0), 0);
+};
+
+// ==========================================
+// RELATÓRIO DE CONSUMO (últimos N dias)
+// ==========================================
+export const getDietHistoryReport = async (days = 7) => {
+  const allDiet = await db.dietLog.toArray();
+  const allWater = await db.waterLog.toArray();
+  const profile = await getDietProfile();
+
+  const result = [];
+  const cursor = new Date();
+  for (let i = 0; i < days; i++) {
+    const key = toDateKey(cursor);
+    const dietEntries = allDiet.filter((e) => e.date === key);
+    const waterEntries = allWater.filter((e) => e.date === key);
+    const consumed = dietEntries.reduce((sum, e) => sum + (e.calories || 0), 0);
+    const water = waterEntries.reduce((sum, e) => sum + (e.amountMl || 0), 0);
+    result.push({
+      date: key,
+      consumed,
+      water,
+      target: profile?.dailyCalorieTarget || null,
+      entries: dietEntries,
+    });
+    cursor.setDate(cursor.getDate() - 1);
+  }
+  return result; // mais recente primeiro
+};
+
+export const getTodayDietEntries = async () => {
+  const key = toDateKey(new Date());
+  return db.dietLog.where('date').equals(key).toArray();
+};

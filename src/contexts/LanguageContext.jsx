@@ -7,48 +7,30 @@ import { registerLanguageActivity as registerLanguageActivityDb } from '../utils
 const LanguageContext = createContext();
 
 export const LanguageProvider = ({ children }) => {
-  const [uiLang, setUiLang] = useState('pt'); // Padrão é PT
-  const [isFirstAccess, setIsFirstAccess] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
-  const [userName, setUserName] = useState('');
 
-  // ==========================================
-  // CORREÇÃO CRÍTICA DA OFENSIVA DE IDIOMAS
-  // ==========================================
-  // Antes, a ofensiva vivia em um useState local, atualizado manualmente
-  // apenas dentro da função registerLanguageActivity() do contexto. Isso
-  // criava uma dependência frágil: qualquer inconsistência na tabela do
-  // Dexie (ex: schema não migrado corretamente em alguns navegadores) fazia
-  // a UI mostrar sempre o valor antigo/travado, mesmo que o registro no
-  // banco estivesse correto (ou não).
-  //
-  // Agora a ofensiva é lida diretamente do Dexie com useLiveQuery — o
-  // MESMO padrão já usado e comprovadamente funcional no módulo de Fitness
-  // (db.fitnessStreak via useLiveQuery em FitnessDashboard/SettingsView).
-  // Isso garante que, sempre que registerLanguageActivity() gravar um novo
-  // valor no banco, TODA a UI que usa este contexto reflita o valor real
-  // e atual automaticamente, sem depender de nenhum "setState" manual.
+  // NOVO: leitura reativa do appSettings via useLiveQuery, igual ao
+  // languageStreakRecord. Isso garante que, quando o pullFromCloud (manual
+  // ou automático) sobrescrever o Dexie, a UI (userName, uiLang, etc.)
+  // atualiza sozinha, sem depender de um reload da página.
+  const appSettingsRecord = useLiveQuery(() => db.appSettings.get(1), [], undefined);
+
+  const uiLang = appSettingsRecord?.uiLanguage || 'pt';
+  const isFirstAccess = appSettingsRecord?.isFirstAccess ?? true;
+  const userName = appSettingsRecord?.userName || '';
+
   const languageStreakRecord = useLiveQuery(() => db.languageStreak.get(1), [], undefined);
   const languageStreak = languageStreakRecord?.streak || 0;
 
-  // Quando o app abre, ele lê o DexieDB para ver as configurações
+  // Garante que o registro appSettings exista na primeira abertura do app
   useEffect(() => {
-    const loadSettings = async () => {
+    const ensureSettings = async () => {
       const settings = await db.appSettings.get(1);
-      if (settings) {
-        setUiLang(settings.uiLanguage);
-        setIsFirstAccess(settings.isFirstAccess);
-        setUserName(settings.userName || '');
-      } else {
-        await db.appSettings.put({ 
-          id: 1, uiLanguage: 'pt', isFirstAccess: true, userName: '' 
+      if (!settings) {
+        await db.appSettings.put({
+          id: 1, uiLanguage: 'pt', isFirstAccess: true, userName: ''
         });
       }
-
-      // Garante que o registro de ofensiva de idiomas exista. A leitura em
-      // si já é feita de forma reativa acima via useLiveQuery — aqui só
-      // garantimos que o registro inicial (id: 1) seja criado se for a
-      // primeira vez que o app abre neste dispositivo.
       try {
         const streakRecord = await db.languageStreak.get(1);
         if (!streakRecord) {
@@ -57,10 +39,9 @@ export const LanguageProvider = ({ children }) => {
       } catch (err) {
         console.error('[LanguageContext] Erro ao garantir registro de languageStreak:', err);
       }
-
       setIsLoading(false);
     };
-    loadSettings();
+    ensureSettings();
   }, []);
 
   const isStreakActiveToday = React.useMemo(() => {
@@ -74,48 +55,40 @@ export const LanguageProvider = ({ children }) => {
     );
   }, [languageStreakRecord?.lastLanguageActivity]);
 
-  // Função para mudar o idioma e salvar no banco
   const changeLanguage = async (langCode) => {
-    setUiLang(langCode);
     await db.appSettings.update(1, { uiLanguage: langCode });
   };
 
-  // Função para finalizar o Primeiro Acesso (esconde a tela de boas-vindas)
   const finishOnboarding = async (name) => {
-    setUserName(name);
-    setIsFirstAccess(false);
     await db.appSettings.update(1, { isFirstAccess: false, userName: name });
   };
 
-  // LÓGICA DE OFENSIVA (STREAK) — delega para a tabela dedicada languageStreak.
-  // Não precisa mais chamar setState manualmente: como a leitura acima é
-  // reativa (useLiveQuery), assim que o .put() dentro de
-  // registerLanguageActivityDb() terminar, o valor na tela atualiza sozinho.
-  const registerLanguageActivity = async () => {
-    const result = await registerLanguageActivityDb();
-    return result;
+  const updateUserName = async (name) => {
+    const trimmed = String(name || '').trim();
+    if (!trimmed) return;
+    await db.appSettings.update(1, { userName: trimmed });
   };
 
-  // A função T() é quem vai traduzir os textos nas telas. 
-  // Ex: t('home.greeting') -> "Bem-vindo,"
-  // Aceita um segundo parâmetro opcional de fallback: t('chave', 'Texto padrão')
+  const registerLanguageActivity = async () => {
+    return await registerLanguageActivityDb();
+  };
+
   const t = (path, fallback) => {
     const keys = path.split('.');
     let current = translations[uiLang] || translations['pt'];
-    
     for (const key of keys) {
-      if (current[key] === undefined) return fallback !== undefined ? fallback : path; // Se não achar a tradução, usa o fallback ou devolve a chave
+      if (current[key] === undefined) return fallback !== undefined ? fallback : path;
       current = current[key];
     }
     return current;
   };
 
-  if (isLoading) return <div className="min-h-screen bg-gray-900"></div>; // Tela preta rápida enquanto carrega o DB
+  if (isLoading) return <div className="min-h-screen bg-gray-900"></div>;
 
   return (
     <LanguageContext.Provider value={{ 
       uiLang, changeLanguage, isFirstAccess, finishOnboarding, t, userName, 
-      languageStreak, isStreakActiveToday, registerLanguageActivity // <- Exportamos a variável
+      languageStreak, isStreakActiveToday, registerLanguageActivity, updateUserName
     }}>
       {children}
     </LanguageContext.Provider>

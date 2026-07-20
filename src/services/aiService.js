@@ -215,3 +215,173 @@ export const generateFitnessPlan = async (profileAnswers) => {
     return { summary: raw, days: [] };
   }
 };
+
+// ==========================================
+// MÓDULO DE DIETA: estimativa de calorias por texto e geração de plano
+// ==========================================
+
+// Recebe uma descrição livre (ex: "2 ovos fritos e uma fatia de pão")
+// e devolve os itens identificados com calorias médias.
+export const estimateCaloriesFromText = async (foodDescription) => {
+  const systemPrompt = `You are a nutrition estimation assistant. The user will describe a meal or food item in Portuguese, Spanish or English.
+Identify each distinct food item mentioned and estimate its average calories based on a typical/common portion size.
+Respond ONLY with valid JSON, no markdown fences:
+{
+  "items": [ { "name": "string (in the same language the user wrote)", "estimatedGrams": number, "calories": number } ],
+  "totalCalories": number,
+  "confidenceNote": "short note in the user's language about portion assumptions, e.g. 'Assuming a medium portion'"
+}`;
+
+  const raw = await generateCloudResponse(foodDescription, [], systemPrompt);
+  return parseDietJson(raw);
+};
+
+// Recebe uma imagem em base64 (sem o prefixo data:...) e o mimeType, e pede
+// para o modelo IDENTIFICAR o prato e estimar calorias de cada elemento.
+export const estimateCaloriesFromImage = async (base64Image, mimeType = 'image/jpeg') => {
+  if (API_KEYS.length === 0) {
+    throw new Error("Nenhuma chave de API configurada.");
+  }
+
+  const systemPrompt = `You are a nutrition estimation assistant analyzing a food photo.
+Identify the dish and each visible distinct food element/ingredient, and estimate calories for the portion shown.
+Respond ONLY with valid JSON, no markdown fences:
+{
+  "dishName": "string, short name of the overall dish/plate",
+  "items": [ { "name": "string", "estimatedGrams": number, "calories": number } ],
+  "totalCalories": number,
+  "confidenceNote": "short note about assumptions made"
+}`;
+
+  // Modelos gratuitos do OpenRouter com suporte a visão (multimodal)
+  const VISION_MODELS = [
+    "google/gemma-3-27b-it:free",
+    "qwen/qwen2.5-vl-32b-instruct:free",
+  ];
+
+  let lastError;
+  for (const model of VISION_MODELS) {
+    const apiKey = getNextApiKey();
+    try {
+      const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+          "HTTP-Referer": window.location.origin,
+          "X-Title": "LifeAccess Diet Scanner",
+        },
+        body: JSON.stringify({
+          model,
+          messages: [
+            { role: "system", content: systemPrompt },
+            {
+              role: "user",
+              content: [
+                { type: "text", text: "Analyze this food photo and estimate the calories." },
+                { type: "image_url", image_url: { url: `data:${mimeType};base64,${base64Image}` } }
+              ]
+            }
+          ],
+        }),
+      });
+
+      if (!response.ok) {
+        let errorData = {};
+        try { errorData = await response.json(); } catch (_) {}
+        lastError = new Error(errorData.error?.message || `Erro HTTP ${response.status}`);
+        continue;
+      }
+
+      const data = await response.json();
+      const content = data?.choices?.[0]?.message?.content;
+      if (!content) { lastError = new Error("Resposta vazia da IA."); continue; }
+      return parseDietJson(content);
+    } catch (err) {
+      lastError = err;
+    }
+  }
+
+  throw new Error(lastError?.message || "Não foi possível analisar a foto. Tente novamente.");
+};
+
+function parseDietJson(raw) {
+  if (!raw) return { items: [], totalCalories: 0 };
+  const cleaned = raw.trim().replace(/^```json\s*/i, '').replace(/^```\s*/, '').replace(/```$/, '').trim();
+  try {
+    const parsed = JSON.parse(cleaned);
+    const items = Array.isArray(parsed.items) ? parsed.items : [];
+    const totalCalories = parsed.totalCalories || items.reduce((sum, i) => sum + (Number(i.calories) || 0), 0);
+    return { ...parsed, items, totalCalories };
+  } catch {
+    return { items: [], totalCalories: 0, dishName: '', confidenceNote: raw };
+  }
+}
+
+// Gera um plano de dieta completo a partir das respostas do onboarding
+// (objetivo, restrições, alimentos que gosta/não gosta, dificuldade de abandonar certos alimentos, refeições por dia).
+export const generateDietPlan = async (answers, uiLang = 'pt') => {
+  const langNames = { pt: 'Portuguese', en: 'English', es: 'Spanish' };
+  const nativeLang = langNames[uiLang] || 'Portuguese';
+
+  let calorieInstruction;
+  if (answers.goalCalorieTarget) {
+    calorieInstruction = `The user's daily calorie target has ALREADY been calculated by their Fitness profile (based on BMI, goal, and timeframe) and MUST be exactly ${answers.goalCalorieTarget} kcal/day. Do NOT suggest a different dailyCalorieTarget — always return exactly ${answers.goalCalorieTarget} for that field, and distribute the meals so their estimatedCalories sum up close to this exact number.`;
+  } else if (answers.referenceTdee) {
+    calorieInstruction = `The user's real estimated daily energy expenditure (TDEE) is ${answers.referenceTdee} kcal/day. Use this as the anchor/reference point for the calorie target, adjusting up or down based on their goal.`;
+  } else {
+    calorieInstruction = `No fitness profile TDEE is available — calculate a reasonable calorie target based on the goal alone.`;
+  }
+
+  const fastingInstruction = answers.wantsFasting
+    ? `The user practices intermittent fasting with the "${answers.fastingProtocol}" protocol (fasting ${FASTING_HOURS_HINT[answers.fastingProtocol] || ''} hours). Organize the meals ONLY within the user's likely eating window — do not suggest breakfast/early meals if the protocol implies skipping them (e.g. for 16:8, skip breakfast and start with lunch).`
+    : `The user does not practice intermittent fasting — spread meals evenly across the day.`;
+
+  const systemPrompt = `You are an encouraging AI nutritionist creating a realistic, sustainable daily diet plan.
+
+User profile:
+- Goal: ${answers.goal}
+- ${calorieInstruction}
+- Meals per day: ${answers.mealsPerDay || 4}
+- ${fastingInstruction}
+- Restrictions/allergies: ${answers.restrictions || 'none'}
+- Foods they like: ${answers.likedFoods || 'not specified'}
+- Foods they dislike: ${answers.dislikedFoods || 'not specified'}
+- Foods they find hard to give up: ${answers.difficultyFoods || 'not specified'}
+
+Rules:
+- Never suggest foods listed as disliked or restricted.
+- Be realistic about the "hard to give up" foods: include them in strict moderation instead of banning them completely, to make the plan sustainable.
+- Write all text fields in ${nativeLang}.
+- The number of items in "meals" array should match "Meals per day" above (1 or 2 meals is valid, e.g. for OMAD/strict fasting).
+
+Respond ONLY with valid JSON, no markdown fences:
+{
+  "summary": "2-3 sentence friendly summary explaining the logic of this plan, in ${nativeLang}",
+  "dailyCalorieTarget": number,
+  "waterGoalMl": number,
+  "meals": [
+    { "name": "string, e.g. Breakfast/Café da Manhã", "suggestion": "string describing what to eat", "estimatedCalories": number }
+  ],
+  "tips": ["short actionable tip in ${nativeLang}", "..."]
+}`;
+
+  const raw = await generateCloudResponse("Generate my diet plan.", [], systemPrompt);
+  const parsed = parseDietJson(raw);
+
+  // Trava final de segurança: mesmo que a IA ignore a instrução acima,
+  // nunca deixamos a meta divergir do que já foi calculado no Fitness.
+  if (answers.goalCalorieTarget) {
+    parsed.dailyCalorieTarget = answers.goalCalorieTarget;
+  }
+
+  return parsed;
+};
+
+// Mapa auxiliar só para dar contexto textual de horas de jejum ao prompt acima
+const FASTING_HOURS_HINT = {
+  '16:8': 16,
+  '18:6': 18,
+  '20:4': 20,
+  'OMAD': 23,
+};

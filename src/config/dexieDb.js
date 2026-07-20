@@ -55,3 +55,14 @@ db.version(17).stores({
 db.version(18).stores({
   dietLog: '++id, date, foodName, calories, source, createdAt',
 });
+
+// ==========================================
+// VERSÃO 19: Módulo de Dieta (Perfil + Água)
+// ==========================================
+// dietProfile: um único registro (id:1) com as preferências, metas e o
+// plano de dieta atual (gerado por IA ou editado manualmente).
+// waterLog: cada copo/garrafa de água registrado, para o rastreador diário.
+db.version(19).stores({
+  dietProfile: 'id',
+  waterLog: '++id, date, createdAt',
+});

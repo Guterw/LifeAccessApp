@@ -83,6 +83,16 @@ import FitnessStatsView from './features/fitness/views/FitnessStatsView';
 import FastingView from './features/fitness/views/FastingView';
 import FitnessWorkoutsView from './features/fitness/views/FitnessWorkoutsView';
 
+import { checkWaterReminder } from './utils/notificationService';
+
+
+// Módulo Dieta do Módulo Fitness
+import DietOnboardingView from './features/fitness/views/diet/DietOnboardingView';
+import DietDashboardView from './features/fitness/views/diet/DietDashboardView';
+import FoodScannerView from './features/fitness/views/diet/FoodScannerView';
+import DietReportView from './features/fitness/views/diet/DietReportView';
+import DietProfileEditView from './features/fitness/views/diet/DietProfileEditView';
+
 function App() {
   const { isFirstAccess } = useLanguage();
   const [onboardingStep, setOnboardingStep] = useState(1);
@@ -106,8 +116,22 @@ function App() {
       const settings = await db.appSettings.get(1);
       if (settings) {
         checkAllNotifications(settings, [], {});
+
+        if (settings.notifWaterReminders !== false) {
+          try {
+            const dietProfile = await db.dietProfile.get(1);
+            if (dietProfile?.isOnboarded) {
+              const { getWaterTotalForDate } = await import('./utils/dietManager');
+              const { toDateKey } = await import('./utils/calendarUtils');
+              const waterToday = await getWaterTotalForDate(toDateKey(new Date()));
+              checkWaterReminder(dietProfile, waterToday);
+            }
+          } catch (err) {
+            console.error('[App] Erro ao checar lembrete de água:', err);
+          }
+        }
       }
-    }, 1000 * 60 * 30);
+    }, 1000 * 60 * 30); 
 
     // NOVO: checagem de tarefas/lembretes a cada 1 minuto (mais preciso)
     checkTaskNotifications();
@@ -206,12 +230,12 @@ function App() {
                 <Route path="/english/ai-voice/free" element={<AiVoiceFreeView />} />
                 <Route path="/english/ai-voice/tasks/:taskId" element={<AiVoiceTaskView />} />
                 <Route path="/english/ai-voice/tasks" element={<AiVoiceTaskSelectionView />} />
-                
+              
                 {/* Explained Module de Inglês */}
                 <Route path="/english/explained" element={<ExplainedLessonListView />} />
                 <Route path="/english/explained/group/:groupName" element={<ExplainedLessonGroupView />} />
                 <Route path="/english/explained/:lessonId" element={<ExplainedLessonView />} />
-
+              
                 {/* Ditado de Texto Corrido de Inglês */}
                 <Route path="/english/dictation" element={<DictationSelectionView />} />
                 <Route path="/english/dictation/:textId" element={<DictationExerciseView />} />
@@ -224,7 +248,13 @@ function App() {
                 <Route path="/fitness/workouts" element={<FitnessWorkoutsView />} />
                 <Route path="/fitness/group/:groupId" element={<FitnessGroupView />} />
                 <Route path="/fitness/group/:groupId/exercise/:exerciseId" element={<FitnessExerciseView />} />
-
+                {/* Módulo Dieta do Fitness */}
+                <Route path="/fitness/diet" element={<DietDashboardView />} />
+                <Route path="/fitness/diet/onboarding" element={<DietOnboardingView />} />
+                <Route path="/fitness/diet/scanner" element={<FoodScannerView />} />
+                <Route path="/fitness/diet/report" element={<DietReportView />} />
+                <Route path="/fitness/diet/edit" element={<DietProfileEditView />} />
+                
                 {/* Financias */}
                 <Route path="/finance" element={<FinanceView />} />
                 <Route path="/finance/transactions" element={<FinanceTransactionsView />} />
