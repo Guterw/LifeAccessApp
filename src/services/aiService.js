@@ -4,6 +4,9 @@ const API_KEYS = [
   import.meta.env.VITE_OPENROUTER_API_KEY_ONE,
   import.meta.env.VITE_OPENROUTER_API_KEY_TWO,
   import.meta.env.VITE_OPENROUTER_API_KEY_THREE,
+  import.meta.env.VITE_OPENROUTER_API_KEY_FOUR,
+  import.meta.env.VITE_OPENROUTER_API_KEY_FIVE,
+  import.meta.env.VITE_OPENROUTER_API_KEY_SIX,
 ].filter(Boolean);
 
 const MODELS = [

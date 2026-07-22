@@ -79,7 +79,7 @@ export default function FitnessDashboard() {
             </p>
 
             {/* NOVO: Meta máxima de calorias recomendada */}
-            <div className="flex items-center gap-1.5 mt-2 bg-orange-500/10 border border-orange-500/20 rounded-lg px-2.5 py-1 w-max">
+            <div className="flex items-center mr-3 gap-1.5 mt-2 bg-orange-500/10 border border-orange-500/20 rounded-lg px-2.5 py-1 w-max">
               <Flame size={12} className="text-orange-400" />
               <span className="text-[11px] font-bold text-orange-300">
                 {t('fitness.maxCalories', 'Máx. recomendado')}: {goalCalories.dailyTarget} kcal/dia
