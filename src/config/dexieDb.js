@@ -4,9 +4,9 @@ import Dexie from 'dexie';
 export const db = new Dexie('LifeAccessDB');
 
 // ==========================================
-// VERSÃO 16 (mantida — já existia)
+// VERSÃO 16
 // ==========================================
-db.version(16).stores({
+db.version(21).stores({
   appSettings: 'id, uiLanguage, isFirstAccess, userName',
   learnedWords: 'en, translation, level, category, learnedAt',
   mistakesLog: '++id, word, level, category, timestamp',
@@ -32,6 +32,12 @@ db.version(16).stores({
   completedLevelsSpeech: 'level, completedAt',
   levelProgressReverse: 'level, correctCount, total, pendingQueue',
   completedLevelsReverse: 'level, completedAt',
+  fitnessCalorieLog: '++id, date, amount, source, createdAt',
+  dietLog: '++id, date, foodName, calories, source, createdAt',
+  dietProfile: 'id',
+  waterLog: '++id, date, createdAt',
+  customWorkoutProfile: 'id, isOnboarded, updatedAt',
+  customWorkoutPlan: 'id, updatedAt',
 });
 
 // ==========================================
@@ -41,9 +47,7 @@ db.version(16).stores({
 // permitir quebrar as calorias queimadas por Hoje / Semana / Mês / Total,
 // sem depender apenas do acumulador único fitnessProfile.caloriesBurnedTotal.
 // Compatibilidade: nenhuma tabela existente é alterada, apenas adicionada.
-db.version(17).stores({
-  fitnessCalorieLog: '++id, date, amount, source, createdAt',
-});
+
 
 // ==========================================
 // VERSÃO 18: Diário Alimentar (preparação para dieta + scanner de IA futuro)
@@ -52,9 +56,7 @@ db.version(17).stores({
 // `source` diferencia entradas manuais ('manual') de futuras leituras
 // automáticas por IA ('ai_scanner'), sem precisar de nova migração quando
 // esse recurso for implementado.
-db.version(18).stores({
-  dietLog: '++id, date, foodName, calories, source, createdAt',
-});
+
 
 // ==========================================
 // VERSÃO 19: Módulo de Dieta (Perfil + Água)
@@ -62,7 +64,3 @@ db.version(18).stores({
 // dietProfile: um único registro (id:1) com as preferências, metas e o
 // plano de dieta atual (gerado por IA ou editado manualmente).
 // waterLog: cada copo/garrafa de água registrado, para o rastreador diário.
-db.version(19).stores({
-  dietProfile: 'id',
-  waterLog: '++id, date, createdAt',
-});

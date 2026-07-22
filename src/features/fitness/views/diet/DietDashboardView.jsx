@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
 import {
   Salad, Camera, BarChart3, Pencil, Droplets, Plus, Minus, Flame,
-  Timer, ChevronRight, Trash2,
+  Timer, ChevronRight, Trash2, ChefHat
 } from 'lucide-react';
 import { useLanguage } from '../../../../contexts/LanguageContext';
 import { db } from '../../../../config/dexieDb';
@@ -195,12 +195,18 @@ export default function DietDashboardView() {
           <span className="text-xs font-black text-white text-center">{t('diet.reportTitle', 'Relatório')}</span>
         </button>
       </div>
-
       <button
         onClick={() => navigate('/fitness/diet/edit')}
-        className="w-full bg-gray-800 border border-gray-700 hover:border-orange-500/50 text-white font-bold py-3.5 rounded-2xl flex items-center justify-center gap-2 mb-6 transition-colors"
+        className="w-full bg-gray-800 border border-gray-700 hover:border-orange-500/50 text-white font-bold py-3.5 rounded-2xl flex items-center justify-center gap-2 mb-4 transition-colors"
       >
         <Pencil size={16} /> {t('diet.editMyDiet', 'Editar minha dieta')}
+      </button>
+      <button
+          onClick={() => navigate('/fitness/diet/suggestions')}
+          className="w-full bg-gray-800 border border-emerald-500/30 hover:border-emerald-400 rounded-2xl py-3.5 p-4 flex flex-col items-center gap-2 mb-6 transition-all shadow-md active:scale-95"
+      >
+        <ChefHat size={22} className="text-emerald-400" />
+        <span className="text-[10px] sm:text-xs font-black text-white text-center">{t('diet.whatToEat', 'Sugestão do que comer? (Dentro da Dieta)')}</span>
       </button>
 
       {/* REFEIÇÕES DO PLANO */}

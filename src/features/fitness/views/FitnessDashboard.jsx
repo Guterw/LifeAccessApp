@@ -114,6 +114,23 @@ export default function FitnessDashboard() {
         </button>
       </div>
 
+      {/* PLANO DE TREINO PERSONALIZADO */}
+      <button
+        onClick={() => navigate('/fitness/custom-plan')}
+        className="metal-border-card w-full bg-gradient-to-r from-teal-900/40 to-gray-800 border border-teal-500/30 p-5 rounded-3xl flex items-center justify-between shadow-lg mb-4 hover:border-teal-400 transition-all relative z-[1]"
+      >
+        <div className="flex items-center gap-4">
+          <div className="p-3 bg-teal-500/20 rounded-2xl">
+            <Dumbbell className="text-teal-400" size={24} />
+          </div>
+          <div className="text-left">
+            <h4 className="font-bold text-white">{t('fitness.customPlanBtn', 'Plano de Treino IA')}</h4>
+            <p className="text-xs text-gray-400">{t('fitness.customPlanDesc', 'Treino sob medida (Casa, Academia, etc.)')}</p>
+          </div>
+        </div>
+        <ChevronRight className="text-teal-400" />
+      </button>
+
       {/* BOTÃO ÚNICO: Treinos (leva para a lista de grupos musculares) */}
       <button
         onClick={() => navigate('/fitness/workouts')}

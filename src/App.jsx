@@ -85,6 +85,8 @@ import FitnessWorkoutsView from './features/fitness/views/FitnessWorkoutsView';
 
 import { checkWaterReminder } from './utils/notificationService';
 
+// Módulo Treino Personalizado do Módulo Fitness
+import CustomWorkoutPlanView from './features/fitness/views/customPlan/CustomWorkoutPlanView';
 
 // Módulo Dieta do Módulo Fitness
 import DietOnboardingView from './features/fitness/views/diet/DietOnboardingView';
@@ -92,6 +94,7 @@ import DietDashboardView from './features/fitness/views/diet/DietDashboardView';
 import FoodScannerView from './features/fitness/views/diet/FoodScannerView';
 import DietReportView from './features/fitness/views/diet/DietReportView';
 import DietProfileEditView from './features/fitness/views/diet/DietProfileEditView';
+import DietSuggestionView from './features/fitness/views/diet/DietSuggestionView';
 
 function App() {
   const { isFirstAccess } = useLanguage();
@@ -254,6 +257,9 @@ function App() {
                 <Route path="/fitness/diet/scanner" element={<FoodScannerView />} />
                 <Route path="/fitness/diet/report" element={<DietReportView />} />
                 <Route path="/fitness/diet/edit" element={<DietProfileEditView />} />
+                <Route path="/fitness/diet/suggestions" element={<DietSuggestionView />} />
+                {/* Módulo Treino Personalizado do Fitness */}
+                <Route path="/fitness/custom-plan" element={<CustomWorkoutPlanView />} />
                 
                 {/* Financias */}
                 <Route path="/finance" element={<FinanceView />} />

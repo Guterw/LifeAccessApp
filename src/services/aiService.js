@@ -255,8 +255,8 @@ Respond ONLY with valid JSON, no markdown fences:
 
   // Modelos gratuitos do OpenRouter com suporte a visão (multimodal)
   const VISION_MODELS = [
-    "google/gemma-3-27b-it:free",
-    "qwen/qwen2.5-vl-32b-instruct:free",
+    "google/gemma-4-31b-it:free",
+    "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
   ];
 
   let lastError;
@@ -384,4 +384,97 @@ const FASTING_HOURS_HINT = {
   '18:6': 18,
   '20:4': 20,
   'OMAD': 23,
+};
+
+export const generateMealSuggestions = async (filters, dietProfile, uiLang = 'pt') => {
+  const langNames = { pt: 'Portuguese', en: 'English', es: 'Spanish' };
+  const nativeLang = langNames[uiLang] || 'Portuguese';
+
+  const systemPrompt = `You are a creative and expert AI nutritionist. The user needs 1 to 4 meal suggestions based on their diet profile and specific optional cravings.
+
+User Diet Profile:
+- Goal/Target: ${dietProfile?.dailyCalorieTarget ? `${dietProfile.dailyCalorieTarget} kcal/day` : 'Maintain weight'}
+- Restrictions: ${dietProfile?.restrictions || 'None'}
+
+User Request (Filters):
+- Meal Type: ${filters.mealType || 'Any'}
+- Craving/Category (e.g., pizza, burger, sweet): ${filters.craving || 'Any'}
+- Preparation Preference: ${filters.makeOrBuy || 'Any (make or buy)'}
+- Ingredients they have/want to use: ${filters.ingredients || 'Any'}
+- Budget (Real or Euro): ${filters.budget || 'Any'}
+
+Rules:
+1. Generate 1 to 4 delicious suggestions.
+2. If the user craves "junk food" (like pizza, pastel), suggest healthier versions, low-calorie flavors, or portion-controlled options that fit a healthy diet.
+3. Consider the budget if provided (suggest accessible ingredients or cheap places/options).
+4. Respond ONLY with valid JSON, no markdown fences. Write the content in ${nativeLang}.
+
+Format:
+{
+  "suggestions": [
+    {
+      "name": "Dish name",
+      "description": "Short appetizing description and why it fits their diet/budget",
+      "estimatedCalories": number,
+      "priceNote": "Short note about the cost (e.g., 'Econômico', 'Aprox. R$20', '€5')",
+      "type": "Fazer em casa" or "Comprar pronto"
+    }
+  ]
+}`;
+
+  const raw = await generateCloudResponse("Suggest meals based on my filters.", [], systemPrompt);
+  
+  const cleaned = raw.trim().replace(/^```json\s*/i, '').replace(/^```\s*/, '').replace(/```$/, '').trim();
+  try {
+    return JSON.parse(cleaned);
+  } catch {
+    return { suggestions: [] };
+  }
+};
+
+export const generateCustomWorkoutPlan = async (answers, fitnessProfile, uiLang = 'pt') => {
+  const langNames = { pt: 'Portuguese', en: 'English', es: 'Spanish' };
+  const nativeLang = langNames[uiLang] || 'Portuguese';
+
+  const systemPrompt = `You are an expert AI Personal Trainer creating a highly customized weekly workout plan.
+
+User Profile:
+- Goal: ${fitnessProfile?.goal || 'General Fitness'}
+- Fitness Level: ${answers.difficulty || 'Beginner'}
+- Training Locations: ${answers.locations?.join(', ') || 'Home'}
+- Available Equipment: ${answers.equipment?.join(', ') || 'Bodyweight only'}
+- Target/Focus Areas: ${answers.focusAreas?.join(', ') || 'Full Body'}
+- Disliked Exercises (DO NOT include these): ${answers.dislikedExercises || 'None'}
+- Additional Comments: ${answers.extraComments || 'None'}
+
+Rules:
+1. Create a realistic weekly routine (3 to 6 days of training) based strictly on their locations and equipment.
+2. If they only have resistance bands and a jump rope, do NOT suggest barbells.
+3. Keep the exercises safe and effective.
+4. Write all text fields in ${nativeLang}.
+5. Respond ONLY with valid JSON, no markdown fences.
+
+Format:
+{
+  "summary": "2-3 sentences explaining the strategy of this routine in ${nativeLang}",
+  "days": [
+    {
+      "dayName": "e.g., Segunda-feira (Peito e Tríceps)",
+      "isRestDay": false,
+      "exercises": [
+        { "name": "Flexão com elástico", "sets": "3", "reps": "10-15", "notes": "Mantenha o core contraído" }
+      ]
+    }
+  ],
+  "tips": ["Tip 1", "Tip 2"]
+}`;
+
+  const raw = await generateCloudResponse("Generate my custom workout plan.", [], systemPrompt);
+  
+  const cleaned = raw.trim().replace(/^```json\s*/i, '').replace(/^```\s*/, '').replace(/```$/, '').trim();
+  try {
+    return JSON.parse(cleaned);
+  } catch {
+    throw new Error("Erro ao analisar a resposta da IA para o plano de treino.");
+  }
 };

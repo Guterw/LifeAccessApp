@@ -1,7 +1,7 @@
 // src/features/fitness/views/diet/DietOnboardingView.jsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Salad, Loader2, Sparkles, ArrowRight, ChevronLeft, X, Droplets, Utensils, Timer } from 'lucide-react';
+import { Salad, Loader2, Sparkles, ArrowRight, ChevronLeft, X, Droplets, Utensils, Timer, Info } from 'lucide-react';
 import { useLanguage } from '../../../../contexts/LanguageContext';
 import { db } from '../../../../config/dexieDb';
 import { saveDietProfile } from '../../../../utils/dietManager';
@@ -9,15 +9,38 @@ import { generateDietPlan } from '../../../../services/aiService';
 import { calculateDailyCalorieNeed, calculateGoalCalorieTarget, FASTING_PROTOCOLS, startFast } from '../../../../utils/fitnessManager';
 import FooterBrand from '../../../../components/FooterBrand';
 
-const GOALS = [
-  { id: 'lose_weight', label: { pt: 'Perder peso', en: 'Lose weight', es: 'Perder peso' }, icon: '🔥' },
-  { id: 'gain_muscle', label: { pt: 'Ganhar massa', en: 'Gain muscle', es: 'Ganar músculo' }, icon: '💪' },
-  { id: 'maintain', label: { pt: 'Manter o peso', en: 'Maintain weight', es: 'Mantener el peso' }, icon: '⚖️' },
-  { id: 'eat_healthier', label: { pt: 'Comer melhor', en: 'Eat healthier', es: 'Comer mejor' }, icon: '🥗' },
-];
-
 const MEAL_OPTIONS = [1, 2, 3, 4, 5, 6];
 const FASTING_PROTOCOL_IDS = Object.keys(FASTING_PROTOCOLS); // '16:8', '18:6', '20:4', 'OMAD'
+
+// Rótulos amigáveis para o objetivo já definido no perfil de Fitness —
+// usados apenas para EXIBIÇÃO (não perguntamos de novo ao usuário).
+const GOAL_LABELS = {
+  lose_weight: { pt: 'Perder peso', en: 'Lose weight', es: 'Perder peso' },
+  gain_muscle: { pt: 'Ganhar músculo', en: 'Gain muscle', es: 'Ganar músculo' },
+  maintain: { pt: 'Manter a forma', en: 'Maintain fitness', es: 'Mantener la forma' },
+  endurance: { pt: 'Melhorar resistência', en: 'Improve endurance', es: 'Mejorar resistencia' },
+};
+
+// ==========================================
+// Cálculo de meta de água recomendada por nutricionistas: ~35ml por kg de
+// peso corporal para adultos saudáveis (referência comum: 30-40ml/kg).
+// Ajustamos um pouco para cima quando o nível de atividade é maior, já que
+// a perda de líquidos por suor aumenta a necessidade hídrica diária.
+// ==========================================
+const ACTIVITY_WATER_BONUS_ML = {
+  sedentary: 0,
+  light: 150,
+  moderate: 350,
+  active: 600,
+};
+
+const calculateWaterGoalMl = (weightKg, activityLevel) => {
+  const w = Number(weightKg) || 70; // fallback razoável se não houver peso
+  const base = w * 35;
+  const bonus = ACTIVITY_WATER_BONUS_ML[activityLevel] || 0;
+  // Arredonda para o múltiplo de 50ml mais próximo, fica mais "redondo" na UI
+  return Math.round((base + bonus) / 50) * 50;
+};
 
 export default function DietOnboardingView() {
   const navigate = useNavigate();
@@ -25,8 +48,13 @@ export default function DietOnboardingView() {
   const [step, setStep] = useState(0);
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedPlan, setGeneratedPlan] = useState(null);
+
+  // Dados vindos do perfil de Fitness (objetivo, peso, atividade) — nunca
+  // perguntados de novo aqui, só extraídos e usados nos cálculos/prompts.
+  const [fitnessProfile, setFitnessProfile] = useState(null);
+  const [isLoadingFitness, setIsLoadingFitness] = useState(true);
+
   const [answers, setAnswers] = useState({
-    goal: '',
     mealsPerDay: 4,
     wantsFasting: null, // null = ainda não respondeu, true/false
     fastingProtocol: '16:8',
@@ -38,6 +66,25 @@ export default function DietOnboardingView() {
   });
 
   const getLabel = (obj) => obj[uiLang] || obj.pt;
+
+  useEffect(() => {
+    const loadFitness = async () => {
+      try {
+        const profile = await db.fitnessProfile.get(1);
+        setFitnessProfile(profile || null);
+      } catch (err) {
+        console.warn('[DietOnboardingView] Não foi possível ler o fitnessProfile:', err);
+      } finally {
+        setIsLoadingFitness(false);
+      }
+    };
+    loadFitness();
+  }, []);
+
+  const hasFitnessGoal = !!fitnessProfile?.goal;
+  const goalLabel = hasFitnessGoal
+    ? getLabel(GOAL_LABELS[fitnessProfile.goal] || { pt: fitnessProfile.goal, en: fitnessProfile.goal, es: fitnessProfile.goal })
+    : null;
 
   // A etapa de escolha de protocolo só existe se o usuário disser "sim" ao jejum
   const needsFastingProtocolStep = answers.wantsFasting === true;
@@ -54,28 +101,25 @@ export default function DietOnboardingView() {
           <p className="text-gray-400 text-sm leading-relaxed">
             {t('diet.introDesc', 'Responda algumas perguntas rápidas. No final, nossa IA vai montar uma sugestão de dieta personalizada — e você pode editar tudo depois.')}
           </p>
-        </div>
-      ),
-    },
-    {
-      key: 'goal',
-      render: () => (
-        <div className="flex flex-col gap-4 w-full">
-          <h3 className="text-xl font-bold text-white text-center">{t('diet.goalQuestion', 'Qual seu objetivo principal?')}</h3>
-          <div className="grid grid-cols-2 gap-3">
-            {GOALS.map((g) => (
-              <button
-                key={g.id}
-                onClick={() => setAnswers((a) => ({ ...a, goal: g.id }))}
-                className={`p-4 rounded-2xl border-2 flex flex-col items-center gap-2 transition-all ${
-                  answers.goal === g.id ? 'bg-orange-500/20 border-orange-500' : 'bg-gray-800 border-gray-700'
-                }`}
-              >
-                <span className="text-2xl">{g.icon}</span>
-                <span className="text-xs font-bold text-white text-center">{getLabel(g.label)}</span>
-              </button>
-            ))}
-          </div>
+
+          {/* Mostra o objetivo já vindo do perfil de Fitness, sem perguntar de novo */}
+          {hasFitnessGoal && (
+            <div className="w-full bg-blue-500/10 border border-blue-500/20 rounded-2xl p-4 flex items-start gap-3 text-left">
+              <Info size={16} className="text-blue-400 shrink-0 mt-0.5" />
+              <p className="text-xs text-blue-200 leading-relaxed">
+                {t('diet.usingFitnessGoal', 'Vamos usar o objetivo já definido no seu perfil de Fitness')}:{' '}
+                <span className="font-black text-blue-100">{goalLabel}</span>
+              </p>
+            </div>
+          )}
+          {!hasFitnessGoal && !isLoadingFitness && (
+            <div className="w-full bg-amber-500/10 border border-amber-500/20 rounded-2xl p-4 flex items-start gap-3 text-left">
+              <Info size={16} className="text-amber-400 shrink-0 mt-0.5" />
+              <p className="text-xs text-amber-200 leading-relaxed">
+                {t('diet.noFitnessGoalWarning', 'Você ainda não configurou seu perfil de Fitness. Recomendamos configurá-lo primeiro para termos um objetivo e metas calóricas mais precisas — mas você pode continuar mesmo assim.')}
+              </p>
+            </div>
+          )}
         </div>
       ),
     },
@@ -235,7 +279,6 @@ export default function DietOnboardingView() {
 
   const isStepValid = () => {
     const key = activeSteps[step].key;
-    if (key === 'goal') return !!answers.goal;
     if (key === 'fasting') return answers.wantsFasting !== null;
     if (key === 'fastingProtocol') return !!answers.fastingProtocol;
     return true;
@@ -244,46 +287,62 @@ export default function DietOnboardingView() {
   const handleGenerate = async () => {
     setIsGenerating(true);
     try {
-      // Se o usuário já tem um perfil de Fitness (peso/altura/idade/atividade/meta),
-      // calculamos o TDEE real E a meta calórica de OBJETIVO (considerando o
-      // déficit/superávit planejado no onboarding do Fitness), para usar como
-      // âncora obrigatória — não deixamos a IA "chutar" um número desalinhado
-      // do que já foi calculado no perfil de Fitness.
+      // O objetivo NUNCA é perguntado aqui — é extraído direto do perfil de
+      // Fitness já existente. Se o usuário não tiver perfil de Fitness ainda,
+      // usamos "maintain" como padrão neutro para não travar o fluxo.
+      const goal = fitnessProfile?.goal || 'maintain';
+
+      // TDEE real e meta calórica de OBJETIVO (considerando déficit/superávit
+      // planejado no Fitness) — usados como âncora obrigatória para a IA,
+      // exatamente como calculado no módulo de Fitness (BMI + objetivo + prazo).
       let referenceTdee = null;
       let goalCalorieTarget = null;
-      try {
-        const fitnessProfile = await db.fitnessProfile.get(1);
-        if (fitnessProfile?.isOnboarded) {
-          referenceTdee = calculateDailyCalorieNeed(fitnessProfile);
-          const goalInfo = calculateGoalCalorieTarget(fitnessProfile);
-          goalCalorieTarget = goalInfo.dailyTarget;
-        }
-      } catch (err) {
-        console.warn('[DietOnboardingView] Não foi possível ler o fitnessProfile:', err);
+      if (fitnessProfile?.isOnboarded) {
+        referenceTdee = calculateDailyCalorieNeed(fitnessProfile);
+        const goalInfo = calculateGoalCalorieTarget(fitnessProfile);
+        goalCalorieTarget = goalInfo.dailyTarget;
       }
 
+      // Meta de água calculada com a fórmula padrão de nutrição
+      // (35ml x peso corporal em kg, com bônus por nível de atividade),
+      // em vez de deixar a IA "chutar" um valor genérico.
+      const waterGoalMl = calculateWaterGoalMl(fitnessProfile?.weightKg, fitnessProfile?.activityLevel);
+
       const plan = await generateDietPlan(
-        { ...answers, referenceTdee, goalCalorieTarget },
+        {
+          ...answers,
+          goal,
+          referenceTdee,
+          goalCalorieTarget,
+          waterGoalMl,
+          weightKg: fitnessProfile?.weightKg || null,
+          heightCm: fitnessProfile?.heightCm || null,
+          age: fitnessProfile?.age || null,
+          gender: fitnessProfile?.gender || null,
+          activityLevel: fitnessProfile?.activityLevel || null,
+        },
         uiLang
       );
 
-      // GARANTIA DE CONSISTÊNCIA: a meta calórica da dieta NUNCA deve
-      // divergir da meta já calculada no perfil de Fitness (IMC + objetivo +
-      // prazo). Se existir um goalCalorieTarget, ele sempre prevalece sobre
-      // o que a IA sugeriu, evitando o cenário de "2000 kcal na dieta" vs
-      // "1457 kcal no Fitness".
+      // GARANTIAS DE CONSISTÊNCIA: tanto a meta calórica quanto a meta de
+      // água NUNCA devem divergir dos cálculos nutricionais reais — mesmo
+      // que a IA tenha sugerido outro número, o valor calculado localmente
+      // sempre prevalece.
       if (goalCalorieTarget) {
         plan.dailyCalorieTarget = goalCalorieTarget;
       } else if (!plan.dailyCalorieTarget && referenceTdee) {
         plan.dailyCalorieTarget = referenceTdee;
       }
+      plan.waterGoalMl = waterGoalMl;
 
-      setGeneratedPlan({ ...plan, referenceTdee, goalCalorieTarget });
+      setGeneratedPlan({ ...plan, referenceTdee, goalCalorieTarget, goal });
     } catch (err) {
       console.error(err);
+      const fallbackWater = calculateWaterGoalMl(fitnessProfile?.weightKg, fitnessProfile?.activityLevel);
       setGeneratedPlan({
         summary: t('diet.generateError', 'Não foi possível gerar automaticamente. Você pode editar manualmente depois.'),
-        dailyCalorieTarget: 2000, waterGoalMl: 2000, meals: [], tips: [],
+        dailyCalorieTarget: 2000, waterGoalMl: fallbackWater, meals: [], tips: [],
+        goal: fitnessProfile?.goal || 'maintain',
       });
     } finally {
       setIsGenerating(false);
@@ -305,7 +364,7 @@ export default function DietOnboardingView() {
 
   const confirmPlan = async () => {
     await saveDietProfile({
-      goal: answers.goal,
+      goal: generatedPlan.goal || fitnessProfile?.goal || 'maintain',
       mealsPerDay: answers.mealsPerDay,
       restrictions: answers.restrictions,
       likedFoods: answers.likedFoods,
@@ -371,6 +430,12 @@ export default function DietOnboardingView() {
             </div>
           )}
 
+          <div className="bg-sky-500/10 border border-sky-500/20 rounded-xl p-3 mb-4 w-full text-center">
+            <p className="text-[11px] text-sky-200 leading-relaxed">
+              {t('diet.waterFormulaNote', 'Meta de água calculada com base no seu peso (35ml por kg)')}
+            </p>
+          </div>
+
           {answers.wantsFasting === true && (
             <div className="bg-indigo-500/10 border border-indigo-500/20 rounded-xl p-3 mb-4 w-full text-center flex items-center justify-center gap-2">
               <Timer size={14} className="text-indigo-400" />
@@ -387,7 +452,7 @@ export default function DietOnboardingView() {
             </div>
             <div className="bg-gray-800 p-4 rounded-2xl border border-gray-700 text-center">
               <p className="text-[10px] text-gray-500 font-bold uppercase flex items-center justify-center gap-1"><Droplets size={12} /> {t('diet.waterGoal', 'Meta de Água')}</p>
-              <p className="text-xl font-black text-sky-400">{(generatedPlan.waterGoalMl / 1000).toFixed(1)}L</p>
+              <p className="text-xl font-black text-sky-400">{(generatedPlan.waterGoalMl / 1000).toFixed(2)}L</p>
             </div>
           </div>
 
