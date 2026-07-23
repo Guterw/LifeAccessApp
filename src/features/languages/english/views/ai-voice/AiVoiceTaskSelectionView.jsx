@@ -1,37 +1,35 @@
 // src/features/languages/english/views/ai-voice/AiVoiceTaskSelectionView.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useLiveQuery } from 'dexie-react-hooks';
 import BackButton from '../../../../../components/BackButton';
 import FooterBrand from '../../../../../components/FooterBrand';
 import { Headphones, ChevronRight, CheckCircle2, RotateCcw, AlertTriangle } from 'lucide-react';
 import { useLanguage } from '../../../../../contexts/LanguageContext';
 import { VOICE_SCENARIOS } from '../../../../../data/voiceScenarios';
+import { db } from '../../../../../config/dexieDb';
 
 export default function AiVoiceTaskSelectionView() {
   const { t, uiLang } = useLanguage();
   const navigate = useNavigate();
-  const [completedTasks, setCompletedTasks] = useState([]);
-  const [resetModal, setResetModal] = useState({ isOpen: false, taskId: null });
 
-  useEffect(() => {
-    // Memória exclusiva para as missões de voz
-    const saved = JSON.parse(localStorage.getItem('completedVoiceTasks') || '[]');
-    setCompletedTasks(saved);
-  }, []);
+  // Lido diretamente do Dexie (reativo) — entra no backup/sincronização com a nuvem.
+  const completedRecords = useLiveQuery(() => db.completedVoiceTasks.toArray(), [], []) || [];
+  const completedTasks = completedRecords.map((r) => r.taskId);
+
+  const [resetModal, setResetModal] = useState({ isOpen: false, taskId: null });
 
   const openResetModal = (e, taskId) => {
     e.stopPropagation();
     setResetModal({ isOpen: true, taskId });
   };
 
-  const confirmRestart = () => {
+  const confirmRestart = async () => {
     const taskId = resetModal.taskId;
-    const updatedCompleted = completedTasks.filter(id => id !== taskId);
-    
-    setCompletedTasks(updatedCompleted);
-    localStorage.setItem('completedVoiceTasks', JSON.stringify(updatedCompleted));
+
+    await db.completedVoiceTasks.delete(String(taskId));
     localStorage.removeItem(`aiVoiceTaskHistory_${taskId}`);
-    
+
     setResetModal({ isOpen: false, taskId: null });
     navigate(`/english/ai-voice/tasks/${taskId}`);
   };
@@ -57,7 +55,7 @@ export default function AiVoiceTaskSelectionView() {
         </p>
         
         {VOICE_SCENARIOS.map((scenario) => {
-          const isCompleted = completedTasks.includes(scenario.id);
+          const isCompleted = completedTasks.includes(String(scenario.id));
           const title = scenario.title[uiLang] || scenario.title.pt;
           const description = scenario.description[uiLang] || scenario.description.pt;
 

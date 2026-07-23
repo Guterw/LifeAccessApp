@@ -133,10 +133,23 @@ export default function AiChatTaskView() {
   const [isResetModalOpen, setIsResetModalOpen] = useState(false);
   const chatEndRef = useRef(null);
 
-  const [taskSuccess, setTaskSuccess] = useState(() => {
-    const savedCompleted = JSON.parse(localStorage.getItem('completedAiTasks') || '[]');
-    return savedCompleted.includes(taskId);
-  });
+  // CORREÇÃO: a conclusão da tarefa agora vive no Dexie (db.completedAiTasks),
+  // não mais no localStorage — assim entra no backup/sincronização com a
+  // nuvem. Como a leitura do Dexie é assíncrona, começamos com `false` e
+  // carregamos o valor real logo no primeiro useEffect abaixo.
+  const [taskSuccess, setTaskSuccess] = useState(false);
+
+  useEffect(() => {
+    const checkCompleted = async () => {
+      try {
+        const record = await db.completedAiTasks.get(String(taskId));
+        setTaskSuccess(!!record);
+      } catch (err) {
+        console.error('Erro ao checar conclusão da tarefa:', err);
+      }
+    };
+    checkCompleted();
+  }, [taskId]);
 
   useEffect(() => {
     const loadLevel = async () => {
@@ -177,10 +190,8 @@ export default function AiChatTaskView() {
     setManualToggles(prev => ({ ...prev, [idx]: !currentlyOpen }));
   };
 
-  const confirmRestartChat = () => {
-    const savedCompleted = JSON.parse(localStorage.getItem('completedAiTasks') || '[]');
-    const updatedCompleted = savedCompleted.filter(id => String(id) !== String(taskId));
-    localStorage.setItem('completedAiTasks', JSON.stringify(updatedCompleted));
+  const confirmRestartChat = async () => {
+    await db.completedAiTasks.delete(String(taskId));
     localStorage.removeItem(`aiTaskHistory_${taskId}`);
     
     setTaskSuccess(false);
@@ -217,10 +228,9 @@ export default function AiChatTaskView() {
       
       if (isCompleted) {
         setTaskSuccess(true);
-        const savedCompleted = JSON.parse(localStorage.getItem('completedAiTasks') || '[]');
-        if (!savedCompleted.includes(String(taskId)) && !savedCompleted.includes(Number(taskId))) {
-          savedCompleted.push(taskId);
-          localStorage.setItem('completedAiTasks', JSON.stringify(savedCompleted));
+        const existing = await db.completedAiTasks.get(String(taskId));
+        if (!existing) {
+          await db.completedAiTasks.put({ taskId: String(taskId), completedAt: new Date().toISOString() });
           await addXP(20);
         }
         const result = await registerLanguageActivity();

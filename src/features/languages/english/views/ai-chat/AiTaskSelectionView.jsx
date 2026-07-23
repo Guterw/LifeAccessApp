@@ -1,37 +1,36 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useLiveQuery } from 'dexie-react-hooks';
 import BackButton from '../../../../../components/BackButton';
 import FooterBrand from '../../../../../components/FooterBrand';
 import { ListTodo, ChevronRight, CheckCircle2, RotateCcw, AlertTriangle } from 'lucide-react';
 import { useLanguage } from '../../../../../contexts/LanguageContext';
 import { TASK_SCENARIOS } from '../../../../../data/taskScenarios';
+import { db } from '../../../../../config/dexieDb';
 
 export default function AiTaskSelectionView() {
   const { t, uiLang } = useLanguage();
   const navigate = useNavigate();
-  const [completedTasks, setCompletedTasks] = useState([]);
-  
+
+  // Lido diretamente do Dexie (reativo), não mais do localStorage — assim
+  // fica incluído automaticamente no backup/sincronização com a nuvem.
+  const completedRecords = useLiveQuery(() => db.completedAiTasks.toArray(), [], []) || [];
+  const completedTasks = completedRecords.map((r) => r.taskId);
+
   // Estado para controlar o modal customizado
   const [resetModal, setResetModal] = useState({ isOpen: false, taskId: null });
-
-  useEffect(() => {
-    const saved = JSON.parse(localStorage.getItem('completedAiTasks') || '[]');
-    setCompletedTasks(saved);
-  }, []);
 
   const openResetModal = (e, taskId) => {
     e.stopPropagation();
     setResetModal({ isOpen: true, taskId });
   };
 
-  const confirmRestart = () => {
+  const confirmRestart = async () => {
     const taskId = resetModal.taskId;
-    const updatedCompleted = completedTasks.filter(id => id !== taskId);
-    
-    setCompletedTasks(updatedCompleted);
-    localStorage.setItem('completedAiTasks', JSON.stringify(updatedCompleted));
+
+    await db.completedAiTasks.delete(String(taskId));
     localStorage.removeItem(`aiTaskHistory_${taskId}`);
-    
+
     setResetModal({ isOpen: false, taskId: null });
     navigate(`/english/ai-chat/tasks/${taskId}`);
   };
@@ -59,7 +58,7 @@ export default function AiTaskSelectionView() {
         </p>
         
         {TASK_SCENARIOS.map((scenario) => {
-          const isCompleted = completedTasks.includes(scenario.id);
+          const isCompleted = completedTasks.includes(String(scenario.id));
           const title = scenario.title[uiLang] || scenario.title.pt;
           const description = scenario.description[uiLang] || scenario.description.pt;
 

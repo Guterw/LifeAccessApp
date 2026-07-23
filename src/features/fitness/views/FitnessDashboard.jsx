@@ -78,10 +78,14 @@ export default function FitnessDashboard() {
               {profile.weightKg}kg • {profile.heightCm}cm • IMC {profile.bmi} ({t(`fitness.bmi.${bmiCategory}`, bmiCategory)})
             </p>
 
-            {/* NOVO: Meta máxima de calorias recomendada */}
-            <div className="flex items-center mr-3 gap-1.5 mt-2 bg-orange-500/10 border border-orange-500/20 rounded-lg px-2.5 py-1 w-max">
-              <Flame size={12} className="text-orange-400" />
-              <span className="text-[11px] font-bold text-orange-300">
+            {/* CORREÇÃO: removido "w-max" (impedia o card de encolher/quebrar
+                linha em telas estreitas, fazendo o texto vazar para fora do
+                container em celulares reais). Agora usa "w-fit max-w-full"
+                + "break-words", então o badge nunca ultrapassa a largura do
+                card pai, quebrando o texto em múltiplas linhas se precisar. */}
+            <div className="flex items-start gap-1.5 mt-2 bg-orange-500/10 border border-orange-500/20 rounded-lg px-2.5 py-1 w-fit max-w-full">
+              <Flame size={12} className="text-orange-400 shrink-0 mt-0.5" />
+              <span className="text-[11px] font-bold text-orange-300 break-words">
                 {t('fitness.maxCalories', 'Máx. recomendado')}: {goalCalories.dailyTarget} kcal/dia
               </span>
             </div>

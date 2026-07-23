@@ -36,7 +36,9 @@ const DIRTY_TABLES = [
   'dietProfile',
   'waterLog',
   'customWorkoutProfile',
-  'customWorkoutPlan'
+  'customWorkoutPlan',
+  'completedAiTasks',
+  'completedVoiceTasks'
 ];
 
 const SYNC_INTERVAL_MS = 5 * 60 * 1000; // ciclo periódico de segurança (5 min)

@@ -13,6 +13,8 @@ import { startAutoHealthSync } from './utils/autoHealthSync';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from './config/firebaseConfig';
 
+import { migrateAiTasksToDexie } from './utils/aiTasksMigration';
+
 // Principais Telas
 import WelcomeView from './features/onboarding/views/WelcomeView';
 import SyncChoiceView from './features/onboarding/views/SyncChoiceView';
@@ -101,6 +103,7 @@ function App() {
   const [onboardingStep, setOnboardingStep] = useState(1);
 
   useEffect(() => {
+    migrateAiTasksToDexie();
     repairUserProfile();
 
     // Sincronização automática de saúde (Health/Fit) — roda independente de login,

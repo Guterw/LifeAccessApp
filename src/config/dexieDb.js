@@ -4,9 +4,15 @@ import Dexie from 'dexie';
 export const db = new Dexie('LifeAccessDB');
 
 // ==========================================
-// VERSÃO 16
+// VERSÃO 22: Tasks de IA (Chat e Voz) — migradas do localStorage para o Dexie
 // ==========================================
-db.version(21).stores({
+// Antes, a conclusão das tarefas de IA (Chat e Voz) ficava só em
+// localStorage ('completedAiTasks' / 'completedVoiceTasks'), que NÃO é
+// incluído no backup/sync com a nuvem (só as tabelas do Dexie são).
+// Isso fazia o usuário perder esse progresso ao reinstalar o app ou trocar
+// de dispositivo, mesmo restaurando o backup — e a Trilha voltava a pedir
+// os "bosses" de novo. Agora cada tarefa concluída vira um registro aqui.
+db.version(22).stores({
   appSettings: 'id, uiLanguage, isFirstAccess, userName',
   learnedWords: 'en, translation, level, category, learnedAt',
   mistakesLog: '++id, word, level, category, timestamp',
@@ -38,29 +44,6 @@ db.version(21).stores({
   waterLog: '++id, date, createdAt',
   customWorkoutProfile: 'id, isOnboarded, updatedAt',
   customWorkoutPlan: 'id, updatedAt',
+  completedAiTasks: 'taskId, completedAt',
+  completedVoiceTasks: 'taskId, completedAt',
 });
-
-// ==========================================
-// VERSÃO 17: Log de calorias do Fitness (exercícios + jejum)
-// ==========================================
-// Usado por fitnessManager.js (logCalorieEvent / getCalorieBreakdown) para
-// permitir quebrar as calorias queimadas por Hoje / Semana / Mês / Total,
-// sem depender apenas do acumulador único fitnessProfile.caloriesBurnedTotal.
-// Compatibilidade: nenhuma tabela existente é alterada, apenas adicionada.
-
-
-// ==========================================
-// VERSÃO 18: Diário Alimentar (preparação para dieta + scanner de IA futuro)
-// ==========================================
-// dietLog guarda cada entrada de alimento consumido em um dia. O campo
-// `source` diferencia entradas manuais ('manual') de futuras leituras
-// automáticas por IA ('ai_scanner'), sem precisar de nova migração quando
-// esse recurso for implementado.
-
-
-// ==========================================
-// VERSÃO 19: Módulo de Dieta (Perfil + Água)
-// ==========================================
-// dietProfile: um único registro (id:1) com as preferências, metas e o
-// plano de dieta atual (gerado por IA ou editado manualmente).
-// waterLog: cada copo/garrafa de água registrado, para o rastreador diário.

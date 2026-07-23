@@ -84,6 +84,11 @@ export default function TrailView() {
   // forma REATIVA via useLiveQuery, assim como os demais tipos de node.
   const completedDictations = useLiveQuery(() => db.completedDictations.toArray(), [], undefined);
   const completedExplainedLessons = useLiveQuery(() => db.completedExplainedLessons.toArray(), [], undefined);
+  // CORREÇÃO: tasks de IA (chat/voz) agora são lidas do Dexie (reativo),
+  // não mais do localStorage — assim refletem o estado correto após
+  // restaurar um backup da nuvem em um dispositivo novo/reinstalado.
+  const completedAiChatTasks = useLiveQuery(() => db.completedAiTasks.toArray(), [], undefined);
+  const completedAiVoiceTasks = useLiveQuery(() => db.completedVoiceTasks.toArray(), [], undefined);
 
   const nodeRefs = useRef({});
   const sectionRefs = useRef({});
@@ -94,7 +99,9 @@ export default function TrailView() {
   && completedVocabSpeech !== undefined 
   && completedVocabReverse !== undefined
   && completedDictations !== undefined
-  && completedExplainedLessons !== undefined;
+  && completedExplainedLessons !== undefined
+  && completedAiChatTasks !== undefined
+  && completedAiVoiceTasks !== undefined;
 
   const getText = (textObj) => {
     if (!textObj) return '';
@@ -118,13 +125,8 @@ export default function TrailView() {
     }
     if (node.type === 'task') {
       const isVoiceTask = node.path.includes('/ai-voice/');
-      const storageKey = isVoiceTask ? 'completedVoiceTasks' : 'completedAiTasks';
-      try {
-        const saved = JSON.parse(localStorage.getItem(storageKey) || '[]');
-        return saved.some(id => String(id) === String(node.targetId));
-      } catch {
-        return false;
-      }
+      const list = isVoiceTask ? completedAiVoiceTasks : completedAiChatTasks;
+      return list.some(record => String(record.taskId) === String(node.targetId));
     }
     if (node.type === 'explained') {
       return completedExplainedLessons.some(c => String(c.lessonId) === String(node.targetId));

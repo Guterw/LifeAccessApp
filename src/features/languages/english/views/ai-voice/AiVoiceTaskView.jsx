@@ -116,10 +116,19 @@ export default function AiVoiceTaskView() {
     setToastStatus(speechStatus);
   }, [speechStatus]);
 
-  const [taskSuccess, setTaskSuccess] = useState(() => {
-    const savedCompleted = JSON.parse(localStorage.getItem('completedVoiceTasks') || '[]');
-    return savedCompleted.includes(taskId);
-  });
+  const [taskSuccess, setTaskSuccess] = useState(false);
+
+  useEffect(() => {
+    const checkCompleted = async () => {
+      try {
+        const record = await db.completedVoiceTasks.get(String(taskId));
+        setTaskSuccess(!!record);
+      } catch (err) {
+        console.error('Erro ao checar conclusão da tarefa de voz:', err);
+      }
+    };
+    checkCompleted();
+  }, [taskId]);
 
   const [history, setHistory] = useState(() => {
     const saved = localStorage.getItem(`aiVoiceTaskHistory_${taskId}`);
@@ -211,14 +220,13 @@ export default function AiVoiceTaskView() {
       setCallState('speaking');
     };
 
-    utterance.onend = async () => {
+  utterance.onend = async () => {
       if (isCompletedFlag) {
         setCallState('idle');
         setTaskSuccess(true); 
-        const savedCompleted = JSON.parse(localStorage.getItem('completedVoiceTasks') || '[]');
-        if (!savedCompleted.includes(taskId)) {
-          savedCompleted.push(taskId);
-          localStorage.setItem('completedVoiceTasks', JSON.stringify(savedCompleted));
+        const existing = await db.completedVoiceTasks.get(String(taskId));
+        if (!existing) {
+          await db.completedVoiceTasks.put({ taskId: String(taskId), completedAt: new Date().toISOString() });
           
           await addXP(20);
           const result = await registerLanguageActivity();
@@ -331,10 +339,8 @@ export default function AiVoiceTaskView() {
     }
   };
 
-  const confirmRestartTask = () => {
-    const savedCompleted = JSON.parse(localStorage.getItem('completedVoiceTasks') || '[]');
-    const updatedCompleted = savedCompleted.filter(id => id !== taskId);
-    localStorage.setItem('completedVoiceTasks', JSON.stringify(updatedCompleted));
+  const confirmRestartTask = async () => {
+    await db.completedVoiceTasks.delete(String(taskId));
     localStorage.removeItem(`aiVoiceTaskHistory_${taskId}`);
     
     synth.cancel();
