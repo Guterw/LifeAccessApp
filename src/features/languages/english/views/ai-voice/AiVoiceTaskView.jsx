@@ -33,6 +33,10 @@ function buildVoiceTaskPrompt(uiLang, level, scenario) {
 Role: ${scenario.aiRole}
 Condition for success: ${scenario.completionCondition}
 
+CRITICAL IDENTITY RULE: You already sent the user this exact first message, which permanently establishes your name, gender, and identity for this roleplay:
+"${scenario.firstMessage.text}"
+You MUST remain 100% consistent with that identity for the entire conversation. NEVER introduce yourself again, NEVER use a different name than the one in that first message, and NEVER change your gender or role mid-conversation. If the user refers to you by the name from your first message, that is correct — do not "correct" them or claim to be someone else.
+
 English Complexity Level: ${level}
 
 IMPORTANT RULES:
